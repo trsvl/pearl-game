@@ -1,57 +1,66 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace Generator
 {
-    public class SphereGenerator : MonoBehaviour
+    [Serializable]
+    public class MaterialController
     {
-        [Header("Sphere Properties")] public float smallSphereRadiusScale = 1.5f;
+        [Range(0.1f, 1f)] public float colorPercentage;
+        public Material material;
+    }
+
+    [Serializable]
+    public class Sphere
+    {
+        [Header("Sphere Properties")]
         public int smallSphereCount = 500;
         public float largeSphereRadius = 2f;
+        public float smallSphereRadiusScale = 2f;
 
-        [Header("Material Settings")] public Material[] materials;
-        public float[] colorPercentages;
-
-        [Header("Runtime Control")] [Range(1, 1000)]
-        public int smallSphereCountRuntime = 500;
-
+        [Header("Runtime Control")]
+        [Range(1, 1000)] public int smallSphereCountRuntime = 500;
         [Range(0.1f, 10f)] public float smallSphereRadiusScaleRuntime = 1.5f;
         [Range(0.1f, 10f)] public float largeSphereRadiusRuntime = 2f;
+        [Range(10, 500)] public int maxSpheresPerChunk = 20;
 
-        [Header("Chunk Control")] public int maxSpheresPerChunk = 20;
+        [Header("Material Settings")]
+        public MaterialController[] materialControllers;
 
-        private readonly List<GameObject> smallSpheres = new();
-        private readonly List<Vector3> spherePositions = new();
+        [NonSerialized] private readonly List<GameObject> smallSpheres = new();
+        [NonSerialized] private readonly List<Vector3> spherePositions = new();
 
-
-        private void Start() => GenerateFibonacciSphere();
-
-        private void Update()
+        public void ClearSpheres()
         {
-            if (smallSphereCount != smallSphereCountRuntime ||
-                !Mathf.Approximately(smallSphereRadiusScale, smallSphereRadiusScaleRuntime) ||
-                !Mathf.Approximately(largeSphereRadius, largeSphereRadiusRuntime))
-            {
-                smallSphereCount = smallSphereCountRuntime;
-                smallSphereRadiusScale = smallSphereRadiusScaleRuntime;
-                largeSphereRadius = largeSphereRadiusRuntime;
-                ClearSpheres();
-                GenerateFibonacciSphere();
-            }
+            foreach (GameObject sphere in smallSpheres)
+                UnityEngine.Object.DestroyImmediate(sphere);
+            smallSpheres.Clear();
+            spherePositions.Clear();
         }
 
-        private void GenerateFibonacciSphere()
+        public void Generate(GameObject prefab, Transform parent)
         {
-            if (materials.Length != colorPercentages.Length)
+            // Validate materials
+            if (materialControllers == null || materialControllers.Length == 0)
             {
-                Debug.LogError("Color percentages must match the number of materials.");
+                Debug.LogError("No material controllers defined!");
                 return;
             }
 
-            spherePositions.Clear();
-            float smallSphereRadius = CalculateSmallSphereRadius(largeSphereRadius, smallSphereCount);
+            // Update runtime values
+            smallSphereCount = smallSphereCountRuntime;
+            smallSphereRadiusScale = smallSphereRadiusScaleRuntime;
+            largeSphereRadius = largeSphereRadiusRuntime;
 
+            ClearSpheres();
+            GeneratePositions();
+            AssignMaterials(prefab, parent);
+        }
+
+        private void GeneratePositions()
+        {
             for (int i = 0; i < smallSphereCount; i++)
             {
                 float y = 1f - (i / (float)(smallSphereCount - 1)) * 2f;
@@ -66,15 +75,21 @@ namespace Generator
 
                 spherePositions.Add(position);
             }
+        }
 
-            // Assign materials to create chunks
+        private void AssignMaterials(GameObject prefab, Transform parent)
+        {
+            Material[] materials = materialControllers.Select(mc => mc.material).ToArray();
+            float[] percentages = materialControllers.Select(mc => mc.colorPercentage).ToArray();
+            
             Material[] sphereMaterials = new Material[smallSphereCount];
             bool[] isAssigned = new bool[smallSphereCount];
+            float smallSphereRadius = CalculateSmallSphereRadius();
 
             for (int matIndex = 0; matIndex < materials.Length; matIndex++)
             {
                 Material currentMat = materials[matIndex];
-                float percentage = colorPercentages[matIndex];
+                float percentage = percentages[matIndex];
                 int totalSpheres = Mathf.RoundToInt(smallSphereCount * percentage);
 
                 int numChunks = Mathf.CeilToInt((float)totalSpheres / maxSpheresPerChunk);
@@ -85,17 +100,7 @@ namespace Generator
                     int chunkSize = Mathf.Min(maxSpheresPerChunk, remaining);
                     if (chunkSize <= 0) break;
 
-                    // Find seed position
-                    int seedIndex = -1;
-                    for (int i = 0; i < smallSphereCount; i++)
-                    {
-                        if (!isAssigned[i])
-                        {
-                            seedIndex = i;
-                            break;
-                        }
-                    }
-
+                    int seedIndex = FindFirstUnassigned(isAssigned);
                     if (seedIndex == -1) break;
 
                     sphereMaterials[seedIndex] = currentMat;
@@ -118,30 +123,71 @@ namespace Generator
                 }
             }
 
+            // Create spheres
             for (int i = 0; i < smallSphereCount; i++)
             {
-                GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                sphere.transform.position = spherePositions[i];
+                GameObject sphere = UnityEngine.Object.Instantiate(prefab, parent);
+                sphere.transform.localPosition = spherePositions[i];
                 sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2f);
-                sphere.transform.parent = transform;
                 sphere.GetComponent<Renderer>().material = sphereMaterials[i] ?? materials[0];
                 smallSpheres.Add(sphere);
             }
         }
 
-        private float CalculateSmallSphereRadius(float largeRadius, int numSpheres)
+        private float CalculateSmallSphereRadius()
         {
-            float surfaceArea = 4f * Mathf.PI * largeRadius * largeRadius;
-            float smallArea = surfaceArea / numSpheres;
+            float surfaceArea = 4f * Mathf.PI * largeSphereRadius * largeSphereRadius;
+            float smallArea = surfaceArea / smallSphereCount;
             return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * smallSphereRadiusScale;
         }
 
-        private void ClearSpheres()
+        private int FindFirstUnassigned(bool[] assigned)
         {
-            foreach (GameObject sphere in smallSpheres)
-                DestroyImmediate(sphere);
-            smallSpheres.Clear();
-            spherePositions.Clear();
+            for (int i = 0; i < assigned.Length; i++)
+                if (!assigned[i]) return i;
+            return -1;
+        }
+    }
+
+    public class SphereGenerator : MonoBehaviour
+    {
+        public GameObject prefabSphere;
+        public Sphere[] spheres;
+        
+        private Transform parent;
+
+        private void Start()
+        {
+            GameObject spheresParent = new GameObject("Spheres");
+            parent = spheresParent.transform;
+            GenerateAllSpheres(parent);
+        }
+
+        private void Update()
+        {
+            foreach (var sphere in spheres)
+            {
+                if (sphere.smallSphereCount != sphere.smallSphereCountRuntime ||
+                    !Mathf.Approximately(sphere.smallSphereRadiusScale, sphere.smallSphereRadiusScaleRuntime) ||
+                    !Mathf.Approximately(sphere.largeSphereRadius, sphere.largeSphereRadiusRuntime))
+                {
+                    GenerateAllSpheres(parent);
+                    break;
+                }
+            }
+        }
+
+        private void GenerateAllSpheres(Transform parentObj)
+        {
+            foreach (Transform child in parentObj)
+            {
+                Destroy(child.gameObject);
+            }
+
+            foreach (var sphere in spheres)
+            {
+                sphere.Generate(prefabSphere, parentObj);
+            }
         }
     }
 }

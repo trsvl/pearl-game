@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class ChainedSphereDestroyer : MonoBehaviour
 {
+    private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+    
     [Header("Raycast Settings")] public float maxRayDistance = 100f;
     public LayerMask sphereLayer;
     public LayerMask ignoreRaycastLayer;
@@ -41,7 +43,7 @@ public class ChainedSphereDestroyer : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, maxRayDistance, sphereLayer))
         {
             GameObject hitSphere = hit.collider.gameObject;
-            Color hitColor = hitSphere.GetComponent<Renderer>().material.color;
+            Color hitColor = hitSphere.GetComponent<Renderer>().material.GetColor(BaseColor);
 
             processedSpheres.Clear();
             StartCoroutine(DestroyConnectedSpheres(hitSphere, hitColor));
@@ -62,7 +64,7 @@ public class ChainedSphereDestroyer : MonoBehaviour
         {
             GameObject neighbor = nearbySpheres[i].gameObject;
 
-            if (neighbor && neighbor.GetComponent<Renderer>().material.color == color)
+            if (neighbor && neighbor.GetComponent<Renderer>().material.GetColor(BaseColor) == color)
             {
                 StartCoroutine(DestroyConnectedSpheres(neighbor, color));
             }

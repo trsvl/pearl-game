@@ -2307,9 +2307,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 318ea9f7ae474f7e83820544ef734120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  detectionRadius: 1.5
-  maxSphereChecks: 10
-  wavePropagationDelay: 0.01
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 1
+  detectionRadius: 0.5
+  maxSphereChecks: 20
+  wavePropagationDelay: 0.1
   fallDuration: 0.5
   pulseIntensity: 2
   pulseDuration: 0.3

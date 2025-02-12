@@ -7,6 +7,7 @@ namespace Gameplay.BallThrowing
 {
     public class SphereDestroyer : MonoBehaviour
     {
+        public LayerMask layerMask;
         public float detectionRadius = 1f;
         public int maxSphereChecks = 10;
         public float wavePropagationDelay = 0.01f;
@@ -43,36 +44,57 @@ namespace Gameplay.BallThrowing
 
             while (waveQueue.Count > 0)
             {
-                GameObject currentSphere = waveQueue.Dequeue();
+                int currentWaveSize = waveQueue.Count;
 
-                StartCoroutine(VisualPulse(currentSphere));
-                StartCoroutine(ProcessSphereDestruction(currentSphere));
-
-                int neighborsFound = Physics.OverlapSphereNonAlloc(
-                    currentSphere.transform.position,
-                    detectionRadius,
-                    nearbySpheres,
-                    LayerMask.GetMask("Default")
-                );
-
-                for (int i = 0; i < neighborsFound; i++)
+                // Process all spheres in current wave layer simultaneously
+                for (int i = 0; i < currentWaveSize; i++)
                 {
-                    if (!nearbySpheres[i]) continue;
+                    GameObject currentSphere = waveQueue.Dequeue();
 
-                    GameObject neighbor = nearbySpheres[i].gameObject;
-                    if (processed.Contains(neighbor)) continue;
+                    // Skip destroyed/null objects
+                    if (currentSphere == null) continue;
 
-                    Renderer neighborRenderer = neighbor.GetComponent<Renderer>();
-                    if (!neighborRenderer) continue;
+                    StartCoroutine(VisualPulse(currentSphere));
+                    StartCoroutine(ProcessSphereDestruction(currentSphere));
 
-                    if (ColorMatch(neighborRenderer.material.GetColor(BaseColor), targetColor))
+                    int neighborsFound = Physics.OverlapSphereNonAlloc(
+                        currentSphere.transform.position,
+                        detectionRadius,
+                        nearbySpheres,
+                        layerMask
+                    );
+
+                    for (int j = 0; j < neighborsFound; j++)
                     {
-                        processed.Add(neighbor);
-                        waveQueue.Enqueue(neighbor);
-                        yield return new WaitForSeconds(wavePropagationDelay);
+                        Collider neighborCollider = nearbySpheres[j];
+                        if (!neighborCollider) continue;
+
+                        GameObject neighbor = neighborCollider.gameObject;
+                        if (processed.Contains(neighbor)) continue;
+
+                        Renderer neighborRenderer = neighbor.GetComponent<Renderer>();
+                        if (!neighborRenderer) continue;
+
+                        // Add more robust color comparison
+                        if (IsColorCompatible(neighborRenderer.material.GetColor(BaseColor), targetColor))
+                        {
+                            processed.Add(neighbor);
+                            waveQueue.Enqueue(neighbor);
+                        }
                     }
                 }
+
+                // Add delay between wave layers instead of per-neighbor
+                yield return new WaitForSeconds(wavePropagationDelay);
             }
+        }
+
+// Improved color comparison
+        private bool IsColorCompatible(Color a, Color b, float threshold = 0.1f)
+        {
+            return Mathf.Abs(a.r - b.r) < threshold &&
+                   Mathf.Abs(a.g - b.g) < threshold &&
+                   Mathf.Abs(a.b - b.b) < threshold;
         }
 
         private IEnumerator VisualPulse(GameObject sphere)
@@ -108,11 +130,6 @@ namespace Gameplay.BallThrowing
             _pearlsData.Count += 1;
 
             Destroy(sphere);
-        }
-
-        private bool ColorMatch(Color a, Color b, float threshold = 0.01f)
-        {
-            return Vector4.Distance(a, b) < threshold;
         }
     }
 }

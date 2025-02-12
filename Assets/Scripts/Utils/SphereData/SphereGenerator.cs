@@ -1,3 +1,4 @@
+using Gameplay;
 using UnityEngine;
 
 namespace Utils.SphereData
@@ -10,15 +11,21 @@ namespace Utils.SphereData
         public float _smallSphereRadiusScale { get; private set; }
         public Material[] _materials { get; private set; }
 
+        private GameplayStateObserver _gameplayStateObserver;
+        private const float cooldown = 3f;
+        private float timer;
 
-        public void Init(GameObject prefabSphere)
+
+        public void Init(GameObject prefabSphere, GameplayStateObserver gameplayStateObserver = null)
         {
             _prefabSphere = prefabSphere;
+            _gameplayStateObserver = gameplayStateObserver;
         }
 
         private void Update()
         {
             transform.rotation *= Quaternion.Euler(12f * Time.deltaTime, 12f * Time.deltaTime, 0);
+            CheckChildCount();
         }
 
         public void LoadSpheresFromJSON(SpheresJSON json)
@@ -43,6 +50,23 @@ namespace Utils.SphereData
             {
                 Sphere newSphere = new Sphere();
                 newSphere.GenerateFromJSON(this, sphereJson, _materials);
+            }
+        }
+
+        private void CheckChildCount()
+        {
+            if (timer <= cooldown)
+            {
+                timer += Time.deltaTime;
+            }
+            else
+            {
+                timer = 0f;
+
+                if (transform.childCount == 0)
+                {
+                    _gameplayStateObserver?.FinishGame();
+                }
             }
         }
     }

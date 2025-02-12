@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Utils.SphereData;
 
-namespace Generator
+namespace LevelGenerator
 {
-    public class SphereGenerator : MonoBehaviour
+    public class SphereGeneratorBuilder : MonoBehaviour
     {
+        public GameObject _prefabSphere { get; private set; }
         public bool _isActiveEdit;
-
-        [Space] public GameObject _prefabSphere;
         public float _smallSphereRadiusScaleRuntime;
         public Sphere[] _spheres;
 
@@ -19,6 +19,11 @@ namespace Generator
 
         private float _smallSphereRadiusScale;
 
+
+        private void Awake()
+        {
+            _prefabSphere = Resources.Load<GameObject>("Prefabs/Sphere");
+        }
 
         private void Update()
         {
@@ -63,6 +68,8 @@ namespace Generator
         public void LoadSpheresFromJSON(SpheresJSON json)
         {
             _smallSphereRadiusScale = json.smallSphereRadiusScale;
+            _smallSphereRadiusScaleRuntime = json.smallSphereRadiusScale;
+
             _materials = new Material[json.materialNames.Length];
             _isStaticSize = json.isStaticRadius;
             _sphereLocalScaleRadius = json.smallSphereRadius;
@@ -87,7 +94,7 @@ namespace Generator
 
         public
             (
-            SphereGenerator sphereGenerator,
+            SphereGeneratorBuilder sphereGenerator,
             string[] materialNames,
             List<int[]>
             )

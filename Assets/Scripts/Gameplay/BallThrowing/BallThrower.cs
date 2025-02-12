@@ -1,12 +1,11 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Gameplay.BallThrowing
 {
     public class BallThrower : MonoBehaviour
     {
-        public Material[] materials; //!!!
-
         [SerializeField] private SphereDestroyer sphereDestroyer;
 
         [Header("Settings")] public GameObject ballPrefab;
@@ -22,13 +21,16 @@ namespace Gameplay.BallThrowing
         public LayerMask collisionMaskBall;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private Material[] _materials;
+        private Material previousMaterial;
         private LineRenderer lineRenderer;
         private Ball currentBall;
         private bool isDragging;
         private Vector3 initialMousePosition;
 
-        private void Start()
+        public void Init(Material[] materials)
         {
+            _materials = materials;
             lineRenderer = GetComponent<LineRenderer>();
             SpawnBall();
         }
@@ -149,10 +151,19 @@ namespace Gameplay.BallThrowing
         private void SpawnBall()
         {
             currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
-            int randomIndex = Random.Range(0, materials.Length);
-            currentBall.GetComponent<Renderer>().material = materials[randomIndex];
+            currentBall.GetComponent<Renderer>().material = GetBallMaterial();
 
             currentBall.Init(sphereDestroyer, collisionMaskBall);
+        }
+
+        private Material GetBallMaterial()
+        {
+            if (_materials.Length <= 1) return _materials[0];
+
+            Material[] filteredMaterials = _materials.Where(material => material != previousMaterial).ToArray();
+            int randomIndex = Random.Range(0, filteredMaterials.Length);
+
+            return filteredMaterials[randomIndex];
         }
 
         private IEnumerator SpawnBallAfterDelay(float delay)

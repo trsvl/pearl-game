@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Generator
+namespace Utils.SphereData
 {
     [Serializable]
     public class SpheresJSON

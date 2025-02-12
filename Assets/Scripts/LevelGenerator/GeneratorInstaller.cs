@@ -3,11 +3,11 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Generator
+namespace LevelGenerator
 {
     public class GeneratorInstaller : MonoBehaviour
     {
-        [SerializeField] private SphereGenerator generator;
+        [SerializeField] private SphereGeneratorBuilder generatorBuilder;
         [SerializeField] private TextMeshProUGUI levelText;
 
         [SerializeField] private Button generateNewSphereButton;
@@ -64,20 +64,20 @@ namespace Generator
 
         private void GenerateNewSpheres()
         {
-            generator.GenerateNewSpheres();
+            generatorBuilder.GenerateNewSpheres();
         }
 
         private void LoadSpheresJSON()
         {
-            generator.LoadSpheresFromJSON(dataContext.LoadSpheresJSON());
+            generatorBuilder.LoadSpheresFromJSON(dataContext.LoadSpheresJSON());
         }
 
         private void SaveSpheresJSON()
         {
             (
-                SphereGenerator sphereGenerator,
+                SphereGeneratorBuilder sphereGenerator,
                 string[] newMaterialNames,
-                List<int[]> materialIndexesList) = generator.GetDataForJSON();
+                List<int[]> materialIndexesList) = generatorBuilder.GetDataForJSON();
             dataContext.SaveSpheresJSON(sphereGenerator, newMaterialNames, materialIndexesList);
 
             UpdateLevel(0);

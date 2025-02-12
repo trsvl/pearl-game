@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using Utils.SphereData;
 
-namespace Generator
+namespace LevelGenerator
 {
     public class DataContext
     {
@@ -17,27 +18,27 @@ namespace Generator
         }
 
         public void SaveSpheresJSON(
-            SphereGenerator generator,
+            SphereGeneratorBuilder generatorBuilder,
             string[] newMaterialNames,
             List<int[]> materialIndexesList)
         {
             var spheresJson = new SpheresJSON
             {
-                isStaticRadius = generator._isStaticSize,
-                smallSphereRadius = generator._isStaticSize
-                    ? generator._sphereLocalScaleRadius
+                isStaticRadius = generatorBuilder._isStaticSize,
+                smallSphereRadius = generatorBuilder._isStaticSize
+                    ? generatorBuilder._sphereLocalScaleRadius
                     : 0,
-                smallSphereRadiusScale = generator._smallSphereRadiusScaleRuntime,
+                smallSphereRadiusScale = generatorBuilder._smallSphereRadiusScaleRuntime,
                 materialNames = newMaterialNames,
-                spheres = new SphereJSON[generator._spheres.Length]
+                spheres = new SphereJSON[generatorBuilder._spheres.Length]
             };
 
-            for (var i = 0; i < generator._spheres.Length; i++)
+            for (var i = 0; i < generatorBuilder._spheres.Length; i++)
             {
                 spheresJson.spheres[i] = new SphereJSON
                 {
-                    smallSphereCount = generator._spheres[i].smallSphereCount,
-                    largeSphereRadius = generator._spheres[i].largeSphereRadius,
+                    smallSphereCount = generatorBuilder._spheres[i].smallSphereCount,
+                    largeSphereRadius = generatorBuilder._spheres[i].largeSphereRadius,
                     materialIndexes = materialIndexesList[i]
                 };
             }

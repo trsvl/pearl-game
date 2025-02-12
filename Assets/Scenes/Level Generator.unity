@@ -488,7 +488,7 @@ Transform:
   m_GameObject: {fileID: 193378901}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.3540372, y: 0.93189704, z: -0.6737043}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -915,24 +915,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _isActiveEdit: 0
-  _prefabSphere: {fileID: 3001519617694562174, guid: ca9a7601fe33b5b478ddcaf20ac02989,
-    type: 3}
   _smallSphereRadiusScaleRuntime: 2
   _spheres:
-  - smallSphereCountRuntime: 150
-    largeSphereRadiusRuntime: 3.1
-    maxSpheresPerChunk: 20
+  - smallSphereCountRuntime: 0
+    largeSphereRadiusRuntime: 0
+    maxSpheresPerChunk: 0
     materialControllers:
-    - colorPercentage: 0.384
-      material: {fileID: 2100000, guid: 6b861d8590ab94b4f821ea61a33bdb22, type: 2}
-    - colorPercentage: 0.534
-      material: {fileID: 2100000, guid: 959faa4e76af07f4c9d0fe815ae26924, type: 2}
-    - colorPercentage: 0.506
-      material: {fileID: 2100000, guid: b622cbc1fdf3518418fbea28a42ffd9d, type: 2}
-    - colorPercentage: 0.5
-      material: {fileID: 2100000, guid: 959faa4e76af07f4c9d0fe815ae26924, type: 2}
+    - colorPercentage: 0
+      material: {fileID: 2100000, guid: 4859cd2efb8bfc54d832b9afc1a7b43e, type: 2}
   _isStaticSize: 1
-  _sphereLocalScaleRadius: 1
+  _sphereLocalScaleRadius: 0
 --- !u!4 &673427681
 Transform:
   m_ObjectHideFlags: 0
@@ -1229,7 +1221,7 @@ RectTransform:
   - {fileID: 1192757181}
   - {fileID: 2097670010}
   - {fileID: 795071154}
-  m_Father: {fileID: 1371968144}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1601,7 +1593,6 @@ Transform:
   m_Children:
   - {fileID: 1670016803}
   - {fileID: 673427681}
-  - {fileID: 850421604}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1450114437
@@ -2007,7 +1998,7 @@ Transform:
   m_GameObject: {fileID: 1623228690}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.594037, y: 0, z: -4.88}
+  m_LocalPosition: {x: 1.65, y: 0, z: -4.88}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -2057,7 +2048,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6da0ec53e284c61ae271d0cc4bcce1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generator: {fileID: 673427680}
+  generatorBuilder: {fileID: 673427680}
   levelText: {fileID: 795071155}
   generateNewSphereButton: {fileID: 403654885}
   loadSphereButton: {fileID: 1872820822}
@@ -2643,18 +2634,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: deb20d30b8fa449f987d2600b3cf0d79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  materials:
+  - {fileID: 2100000, guid: 959faa4e76af07f4c9d0fe815ae26924, type: 2}
+  - {fileID: 2100000, guid: 6b861d8590ab94b4f821ea61a33bdb22, type: 2}
   sphereDestroyer: {fileID: 1450114438}
-  ballPrefab: {fileID: 3001519617694562174, guid: ca9a7601fe33b5b478ddcaf20ac02989,
+  ballPrefab: {fileID: 3001519617694562174, guid: 17f60c6c069d5914a8d9adc0daf2da03,
     type: 3}
   launchPoint: {fileID: 1623228694}
   forceMultiplier: 0.1
   maxForce: 20
   verticalMultiplier: 1.5
   maxDragDistance: 200
-  lineRenderer: {fileID: 1997298884}
-  trajectoryPoints: 30
-  timeStep: 0.1
-  respawnDelay: 0.5
+  trajectoryPoints: 40
+  timeStep: 0.07
+  respawnDelay: 0.3
+  collisionMaskLine:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionMaskBall:
+    serializedVersion: 2
+    m_Bits: 1
 --- !u!120 &1997298884
 LineRenderer:
   serializedVersion: 2
@@ -2676,7 +2675,7 @@ LineRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 0}
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2990,9 +2989,9 @@ Transform:
   m_GameObject: {fileID: 2074499760}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -5.12, z: 0}
-  m_LocalScale: {x: 4.92, y: 4.92, z: 4.92}
-  m_ConstrainProportionsScale: 1
+  m_LocalPosition: {x: 0, y: -2, z: 0}
+  m_LocalScale: {x: 5, y: 0.3, z: 5}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3069,5 +3068,6 @@ SceneRoots:
   - {fileID: 410087041}
   - {fileID: 832575519}
   - {fileID: 2074499764}
+  - {fileID: 850421604}
   - {fileID: 1371968144}
   - {fileID: 193378902}

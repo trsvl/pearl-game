@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using Gameplay.Header;
 using UnityEngine;
 
 namespace Gameplay.BallThrowing
@@ -21,16 +22,19 @@ namespace Gameplay.BallThrowing
         public LayerMask collisionMaskBall;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
-        private Material[] _materials;
         private Material previousMaterial;
         private LineRenderer lineRenderer;
         private Ball currentBall;
         private bool isDragging;
         private Vector3 initialMousePosition;
 
-        public void Init(Material[] materials)
+        private Material[] _materials;
+        private ShotsData _shotData;
+
+        public void Init(Material[] materials, ShotsData shotData)
         {
             _materials = materials;
+            _shotData = shotData;
             lineRenderer = GetComponent<LineRenderer>();
             SpawnBall();
         }
@@ -115,6 +119,7 @@ namespace Gameplay.BallThrowing
         {
             isDragging = false;
             lineRenderer.positionCount = 0;
+            _shotData.Count -= 1;
 
             if (!currentBall) return;
 
@@ -150,6 +155,8 @@ namespace Gameplay.BallThrowing
 
         private void SpawnBall()
         {
+            if (_shotData.Count <= 0) return;
+
             currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
             currentBall.GetComponent<Renderer>().material = GetBallMaterial();
 

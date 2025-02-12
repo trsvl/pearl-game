@@ -1,30 +1,29 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Gameplay.Header;
 using UnityEngine;
 
 namespace Gameplay.BallThrowing
 {
     public class SphereDestroyer : MonoBehaviour
     {
-        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
-
-        [Header("Raycast Settings")] public float maxRayDistance = 100f;
         public LayerMask sphereLayer;
         public LayerMask ignoreRaycastLayer;
-
-        [Header("Wave Settings")] public float detectionRadius = 1f;
+        public float detectionRadius = 1f;
         public int maxSphereChecks = 10;
         public float wavePropagationDelay = 0.01f;
         public float fallDuration = 0.5f;
-
-        [Header("Visual Feedback")] public float pulseIntensity = 2f;
+        public float pulseIntensity = 2f;
         public float pulseDuration = 0.3f;
 
+        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private Collider[] nearbySpheres;
+        private PearlsData _pearlsData;
 
 
-        private void Start()
+        public void Init(PearlsData pearlsData)
         {
+            _pearlsData = pearlsData;
             nearbySpheres = new Collider[maxSphereChecks];
         }
 
@@ -71,6 +70,7 @@ namespace Gameplay.BallThrowing
                     {
                         processed.Add(neighbor);
                         waveQueue.Enqueue(neighbor);
+                        _pearlsData.Count += 1;
                         yield return new WaitForSeconds(wavePropagationDelay);
                     }
                 }
@@ -86,7 +86,8 @@ namespace Gameplay.BallThrowing
             float elapsed = 0f;
             while (elapsed < pulseDuration)
             {
-                mat.SetColor(BaseColor, Color.Lerp(originalColor * pulseIntensity, originalColor, elapsed / pulseDuration));
+                mat.SetColor(BaseColor,
+                    Color.Lerp(originalColor * pulseIntensity, originalColor, elapsed / pulseDuration));
                 elapsed += Time.deltaTime;
                 yield return null;
             }

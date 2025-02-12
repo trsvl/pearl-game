@@ -220,9 +220,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 2026288071}
   - {fileID: 1462244183}
   - {fileID: 562423104}
-  - {fileID: 2026288071}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &261183246
@@ -1305,7 +1305,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 318ea9f7ae474f7e83820544ef734120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxRayDistance: 100
   sphereLayer:
     serializedVersion: 2
     m_Bits: 1
@@ -1747,7 +1746,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 45d82701ce244954b806e45e602d1752, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pearlsText: {fileID: 1927021751}
   ballThrower: {fileID: 562423106}
+  sphereDestroyer: {fileID: 1462244182}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

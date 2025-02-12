@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Linq;
-using Gameplay.Header;
+using Gameplay.BallThrowing;
 using UnityEngine;
 
-namespace Gameplay.BallThrowing
+namespace LevelGenerator
 {
     public class BallThrower : MonoBehaviour
     {
@@ -20,6 +20,8 @@ namespace Gameplay.BallThrowing
         public float respawnDelay = 0.3f;
         public LayerMask collisionMaskLine;
         public LayerMask collisionMaskBall;
+        public RectTransform allowedDragAreaUI;
+        private Rect allowedDragArea;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private Material previousMaterial;
@@ -28,14 +30,13 @@ namespace Gameplay.BallThrowing
         private bool isDragging;
         private Vector3 initialMousePosition;
 
-        private Material[] _materials;
-        private ShotsData _shotData;
+        public Material[] _materials;
 
-        public void Init(Material[] materials, ShotsData shotData)
+        private void Start()
         {
-            _materials = materials;
-            _shotData = shotData;
             lineRenderer = GetComponent<LineRenderer>();
+            Vector2 size = allowedDragAreaUI.sizeDelta * allowedDragAreaUI.lossyScale;
+            allowedDragArea = new Rect((Vector2)allowedDragAreaUI.position - size / 2, size);
             SpawnBall();
         }
 
@@ -49,13 +50,18 @@ namespace Gameplay.BallThrowing
 
         private void HandleInput()
         {
+            Vector3 mousePos = Input.mousePosition;
+
             if (Input.GetMouseButtonDown(0))
             {
-                isDragging = true;
-                initialMousePosition = Input.mousePosition;
-                lineRenderer.positionCount = trajectoryPoints;
-                lineRenderer.startColor = currentBall._renderer.material.GetColor(BaseColor);
-                lineRenderer.endColor = currentBall._renderer.material.GetColor(BaseColor);
+                if (allowedDragArea.Contains(mousePos)) // Ensure dragging starts in allowed area
+                {
+                    isDragging = true;
+                    initialMousePosition = mousePos;
+                    lineRenderer.positionCount = trajectoryPoints;
+                    lineRenderer.startColor = currentBall._renderer.material.GetColor(BaseColor);
+                    lineRenderer.endColor = currentBall._renderer.material.GetColor(BaseColor);
+                }
             }
 
             if (Input.GetMouseButtonUp(0) && isDragging)
@@ -68,6 +74,8 @@ namespace Gameplay.BallThrowing
         private void UpdateTrajectory()
         {
             Vector3 currentMousePos = Input.mousePosition;
+            if (!allowedDragArea.Contains(currentMousePos)) return; // Restrict dragging outside area
+
             Vector3 dragVector = currentMousePos - initialMousePosition;
             float dragMagnitude = Mathf.Clamp(dragVector.magnitude, 0, maxDragDistance);
             float forceMagnitude = Mathf.Min(dragMagnitude * forceMultiplier, maxForce);
@@ -93,8 +101,7 @@ namespace Gameplay.BallThrowing
             int actualPoints = trajectoryPoints;
 
             Vector3 currentPosition = startPos;
-            // Apply the same vertical multiplier as in ApplyThrowForce
-            Vector3 currentVelocity = new Vector3(initialVelocity.x, initialVelocity.y * 1.2f, initialVelocity.z);
+            Vector3 currentVelocity = initialVelocity;
 
             for (int i = 1; i < trajectoryPoints; i++)
             {
@@ -120,7 +127,6 @@ namespace Gameplay.BallThrowing
         {
             isDragging = false;
             lineRenderer.positionCount = 0;
-            _shotData.Count -= 1;
 
             if (!currentBall) return;
 
@@ -156,8 +162,6 @@ namespace Gameplay.BallThrowing
 
         private void SpawnBall()
         {
-            if (_shotData.Count <= 0) return;
-
             currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
             currentBall.GetComponent<Renderer>().material = GetBallMaterial();
 
@@ -170,6 +174,7 @@ namespace Gameplay.BallThrowing
 
             Material[] filteredMaterials = _materials.Where(material => material != previousMaterial).ToArray();
             int randomIndex = Random.Range(0, filteredMaterials.Length);
+            previousMaterial = filteredMaterials[randomIndex];
 
             return filteredMaterials[randomIndex];
         }

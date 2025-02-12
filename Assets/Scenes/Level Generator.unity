@@ -940,6 +940,41 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1371968144}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &720026467
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 720026468}
+  m_Layer: 5
+  m_Name: Throw Area
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &720026468
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 720026467}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 850421604}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 700}
+  m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &795071153
 GameObject:
   m_ObjectHideFlags: 0
@@ -1221,6 +1256,7 @@ RectTransform:
   - {fileID: 1192757181}
   - {fileID: 2097670010}
   - {fileID: 795071154}
+  - {fileID: 720026468}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1624,7 +1660,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 318ea9f7ae474f7e83820544ef734120, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxRayDistance: 100
   sphereLayer:
     serializedVersion: 2
     m_Bits: 1
@@ -2598,7 +2633,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1997298882}
-  - component: {fileID: 1997298883}
+  - component: {fileID: 1997298885}
   - component: {fileID: 1997298884}
   m_Layer: 0
   m_Name: Ball Thrower
@@ -2622,38 +2657,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 193378902}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1997298883
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1997298881}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: deb20d30b8fa449f987d2600b3cf0d79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  materials:
-  - {fileID: 2100000, guid: 959faa4e76af07f4c9d0fe815ae26924, type: 2}
-  - {fileID: 2100000, guid: 6b861d8590ab94b4f821ea61a33bdb22, type: 2}
-  sphereDestroyer: {fileID: 1450114438}
-  ballPrefab: {fileID: 3001519617694562174, guid: 17f60c6c069d5914a8d9adc0daf2da03,
-    type: 3}
-  launchPoint: {fileID: 1623228694}
-  forceMultiplier: 0.1
-  maxForce: 20
-  verticalMultiplier: 1.5
-  maxDragDistance: 200
-  trajectoryPoints: 40
-  timeStep: 0.07
-  respawnDelay: 0.3
-  collisionMaskLine:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  collisionMaskBall:
-    serializedVersion: 2
-    m_Bits: 1
 --- !u!120 &1997298884
 LineRenderer:
   serializedVersion: 2
@@ -2756,6 +2759,39 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
+--- !u!114 &1997298885
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1997298881}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 156569fe01fd434a980240167043b2ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sphereDestroyer: {fileID: 1450114438}
+  ballPrefab: {fileID: 3001519617694562174, guid: 17f60c6c069d5914a8d9adc0daf2da03,
+    type: 3}
+  launchPoint: {fileID: 1623228694}
+  forceMultiplier: 0.3
+  maxForce: 50
+  verticalMultiplier: 1.5
+  maxDragDistance: 300
+  trajectoryPoints: 40
+  timeStep: 0.07
+  respawnDelay: 0.3
+  collisionMaskLine:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  collisionMaskBall:
+    serializedVersion: 2
+    m_Bits: 1
+  allowedDragAreaUI: {fileID: 720026468}
+  _materials:
+  - {fileID: 2100000, guid: 6b861d8590ab94b4f821ea61a33bdb22, type: 2}
+  - {fileID: 2100000, guid: 959faa4e76af07f4c9d0fe815ae26924, type: 2}
 --- !u!1 &2045697732
 GameObject:
   m_ObjectHideFlags: 0

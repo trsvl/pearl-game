@@ -7,8 +7,6 @@ namespace Gameplay.BallThrowing
 {
     public class SphereDestroyer : MonoBehaviour
     {
-        public LayerMask sphereLayer;
-        public LayerMask ignoreRaycastLayer;
         public float detectionRadius = 1f;
         public int maxSphereChecks = 10;
         public float wavePropagationDelay = 0.01f;
@@ -19,6 +17,7 @@ namespace Gameplay.BallThrowing
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private Collider[] nearbySpheres;
         private PearlsData _pearlsData;
+        private BallThrower _ballThrower;
 
 
         public void Init(PearlsData pearlsData)
@@ -53,7 +52,7 @@ namespace Gameplay.BallThrowing
                     currentSphere.transform.position,
                     detectionRadius,
                     nearbySpheres,
-                    sphereLayer
+                    LayerMask.GetMask("Default")
                 );
 
                 for (int i = 0; i < neighborsFound; i++)
@@ -70,7 +69,6 @@ namespace Gameplay.BallThrowing
                     {
                         processed.Add(neighbor);
                         waveQueue.Enqueue(neighbor);
-                        _pearlsData.Count += 1;
                         yield return new WaitForSeconds(wavePropagationDelay);
                     }
                 }
@@ -97,7 +95,8 @@ namespace Gameplay.BallThrowing
 
         private IEnumerator ProcessSphereDestruction(GameObject sphere)
         {
-            sphere.layer = ignoreRaycastLayer;
+            sphere.layer = LayerMask.NameToLayer("Ignore Raycast");
+
             if (sphere.TryGetComponent(out Rigidbody rb))
             {
                 rb.isKinematic = false;
@@ -105,6 +104,9 @@ namespace Gameplay.BallThrowing
             }
 
             yield return new WaitForSeconds(fallDuration);
+
+            _pearlsData.Count += 1;
+
             Destroy(sphere);
         }
 

@@ -16,6 +16,7 @@ namespace Gameplay
         [SerializeField] private BallThrower ballThrower;
         [SerializeField] private SphereDestroyer sphereDestroyer;
         [SerializeField] private Button pauseButton;
+        [SerializeField] private Button changeBallButton;
 
         [Header("Popup")] [Space] [SerializeField]
         private TextButton firstButton;
@@ -66,11 +67,13 @@ namespace Gameplay
         private void OnEnable()
         {
             pauseButton.onClick.AddListener(() => gameplayStateObserver.PauseGame());
+            changeBallButton.onClick.AddListener(() => ballThrower.RespawnBall());
         }
 
         private void OnDisable()
         {
             pauseButton.onClick.RemoveAllListeners();
+            changeBallButton.onClick.RemoveAllListeners();
         }
     }
 }

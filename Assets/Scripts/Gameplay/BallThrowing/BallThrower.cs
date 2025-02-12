@@ -1,7 +1,9 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Gameplay.Header;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Gameplay.BallThrowing
 {
@@ -19,7 +21,8 @@ namespace Gameplay.BallThrowing
         public float timeStep = 0.07f;
         public float respawnDelay = 0.3f;
         public LayerMask collisionMaskLine;
-        public LayerMask collisionMaskBall;
+        public GameObject throwAreaObject;
+        private Bounds dragAreaBounds;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private Material previousMaterial;
@@ -36,6 +39,8 @@ namespace Gameplay.BallThrowing
             _materials = materials;
             _shotData = shotData;
             lineRenderer = GetComponent<LineRenderer>();
+            dragAreaBounds = throwAreaObject.GetComponent<Collider>().bounds;
+
             SpawnBall();
         }
 
@@ -44,13 +49,27 @@ namespace Gameplay.BallThrowing
             if (!currentBall) return;
 
             HandleInput();
-            if (isDragging) UpdateTrajectory();
+
+            if (isDragging)
+            {
+                if (!IsMouseInDragArea())
+                {
+                    isDragging = false;
+                    lineRenderer.positionCount = 0;
+                }
+                else
+                {
+                    UpdateTrajectory();
+                }
+            }
         }
 
         private void HandleInput()
         {
             if (Input.GetMouseButtonDown(0))
             {
+                if (!IsMouseInDragArea()) return;
+
                 isDragging = true;
                 initialMousePosition = Input.mousePosition;
                 lineRenderer.positionCount = trajectoryPoints;
@@ -60,8 +79,16 @@ namespace Gameplay.BallThrowing
 
             if (Input.GetMouseButtonUp(0) && isDragging)
             {
-                ReleaseBall();
-                StartCoroutine(SpawnBallAfterDelay(respawnDelay));
+                if (IsPointerOverUIElement())
+                {
+                    isDragging = false;
+                    lineRenderer.positionCount = 0;
+                }
+                else
+                {
+                    ReleaseBall();
+                    StartCoroutine(SpawnBallAfterDelay(respawnDelay));
+                }
             }
         }
 
@@ -93,7 +120,7 @@ namespace Gameplay.BallThrowing
             int actualPoints = trajectoryPoints;
 
             Vector3 currentPosition = startPos;
-            // Apply the same vertical multiplier as in ApplyThrowForce
+
             Vector3 currentVelocity = new Vector3(initialVelocity.x, initialVelocity.y * 1.2f, initialVelocity.z);
 
             for (int i = 1; i < trajectoryPoints; i++)
@@ -161,7 +188,14 @@ namespace Gameplay.BallThrowing
             currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
             currentBall.GetComponent<Renderer>().material = GetBallMaterial();
 
-            currentBall.Init(sphereDestroyer, collisionMaskBall);
+            currentBall.Init(sphereDestroyer, LayerMask.NameToLayer("Ignore Raycast"));
+        }
+
+        public void RespawnBall()
+        {
+            if (currentBall != null) Destroy(currentBall.gameObject);
+
+            SpawnBall();
         }
 
         private Material GetBallMaterial()
@@ -178,6 +212,28 @@ namespace Gameplay.BallThrowing
         {
             yield return new WaitForSeconds(delay);
             SpawnBall();
+        }
+
+        private bool IsMouseInDragArea()
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("DragArea")))
+            {
+                return dragAreaBounds.Contains(hit.point);
+            }
+
+            return false;
+        }
+
+        private bool IsPointerOverUIElement()
+        {
+            if (!EventSystem.current) return false;
+
+            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            eventData.position = Input.mousePosition;
+            List<RaycastResult> results = new List<RaycastResult>();
+            EventSystem.current.RaycastAll(eventData, results);
+            return results.Count > 0;
         }
     }
 }

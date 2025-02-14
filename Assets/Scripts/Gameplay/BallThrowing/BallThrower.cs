@@ -22,22 +22,24 @@ namespace Gameplay.BallThrowing
         public float respawnDelay = 0.3f;
         public LayerMask collisionMaskLine;
         public GameObject throwAreaObject;
-        private Bounds dragAreaBounds;
 
         private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private Bounds dragAreaBounds;
         private Material previousMaterial;
         private LineRenderer lineRenderer;
         private Ball currentBall;
         private bool isDragging;
         private Vector3 initialMousePosition;
-
         private Material[] _materials;
         private ShotsData _shotData;
+        private GameplayStateObserver _gameplayStateObserver;
 
-        public void Init(Material[] materials, ShotsData shotData)
+
+        public void Init(Material[] materials, ShotsData shotData, GameplayStateObserver gameplayStateObserver)
         {
             _materials = materials;
             _shotData = shotData;
+            _gameplayStateObserver = gameplayStateObserver;
             lineRenderer = GetComponent<LineRenderer>();
             dragAreaBounds = throwAreaObject.GetComponent<Collider>().bounds;
 
@@ -47,6 +49,7 @@ namespace Gameplay.BallThrowing
         private void Update()
         {
             if (!currentBall) return;
+            if (_gameplayStateObserver.GameplayState != GameplayState.PLAY) return;
 
             HandleInput();
 

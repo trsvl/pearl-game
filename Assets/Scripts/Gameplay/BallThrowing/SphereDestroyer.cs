@@ -46,13 +46,11 @@ namespace Gameplay.BallThrowing
             {
                 int currentWaveSize = waveQueue.Count;
 
-                // Process all spheres in current wave layer simultaneously
                 for (int i = 0; i < currentWaveSize; i++)
                 {
                     GameObject currentSphere = waveQueue.Dequeue();
 
-                    // Skip destroyed/null objects
-                    if (currentSphere == null) continue;
+                    if (!currentSphere) continue;
 
                     StartCoroutine(VisualPulse(currentSphere));
                     StartCoroutine(ProcessSphereDestruction(currentSphere));
@@ -75,7 +73,6 @@ namespace Gameplay.BallThrowing
                         Renderer neighborRenderer = neighbor.GetComponent<Renderer>();
                         if (!neighborRenderer) continue;
 
-                        // Add more robust color comparison
                         if (IsColorCompatible(neighborRenderer.material.GetColor(BaseColor), targetColor))
                         {
                             processed.Add(neighbor);
@@ -84,12 +81,10 @@ namespace Gameplay.BallThrowing
                     }
                 }
 
-                // Add delay between wave layers instead of per-neighbor
                 yield return new WaitForSeconds(wavePropagationDelay);
             }
         }
 
-// Improved color comparison
         private bool IsColorCompatible(Color a, Color b, float threshold = 0.1f)
         {
             return Mathf.Abs(a.r - b.r) < threshold &&

@@ -27,10 +27,7 @@ namespace MainMenu
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
             sphereGenerator.Init(spherePrefab);
             sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
-        }
-
-        private void Start()
-        {
+            
             levelNumber = PlayerData.Instance.CurrentLevel;
             UpdateLevel(levelNumber);
         }
@@ -41,7 +38,6 @@ namespace MainMenu
             PlayerData.Instance.CurrentLevel = levelNumber;
 
             CheckButtons();
-            dataContext.UpdateFilePath(levelNumber);
             levelText.SetText($"Level {levelNumber}");
 
             LoadSpheres();
@@ -49,8 +45,10 @@ namespace MainMenu
 
         private void CheckButtons()
         {
-            previousLevelButton.interactable = dataContext.CheckFileExists(levelNumber - 1);
-            nextLevelButton.interactable = dataContext.CheckFileExists(levelNumber + 1);
+            var playerData = PlayerData.Instance;
+            
+            previousLevelButton.interactable = 1 <= levelNumber - 1;
+            nextLevelButton.interactable = playerData.MaxLevel >= levelNumber + 1;
         }
 
         private void OnEnable()
@@ -69,7 +67,7 @@ namespace MainMenu
 
         private void LoadSpheres()
         {
-            sphereGenerator.LoadSpheresFromJSON(dataContext.LoadSpheresJSON());
+            StartCoroutine(dataContext.LoadSpheres(levelNumber, sphereGenerator));
         }
     }
 }

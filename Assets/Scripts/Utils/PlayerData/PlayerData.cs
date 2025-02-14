@@ -15,6 +15,8 @@ namespace Utils.PlayerData
             }
         }
 
+        public int MaxLevel { get; private set; }
+
         private int currentLevel;
         private const string CURRENT_LEVEL = "CurrentLevel";
 
@@ -22,6 +24,8 @@ namespace Utils.PlayerData
         public void Init()
         {
             currentLevel = PlayerPrefs.GetInt(CURRENT_LEVEL, 1);
+
+            MaxLevel = 5; //!!!
         }
     }
 }

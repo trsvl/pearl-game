@@ -6,7 +6,7 @@ namespace Gameplay
 {
     public class GameplayStateObserver
     {
-        private GameplayState GameplayState = GameplayState.OFF;
+        public GameplayState GameplayState { get; set; } = GameplayState.OFF;
 
         private readonly List<object> listeners = new();
 

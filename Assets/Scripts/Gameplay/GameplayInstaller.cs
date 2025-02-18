@@ -5,6 +5,7 @@ using Gameplay.Header;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.Colors;
 using Utils.PlayerData;
 using Utils.SphereData;
 
@@ -40,18 +41,20 @@ namespace Gameplay
             gameplayStateObserver = new GameplayStateObserver();
             pearlsData = new PearlsData(pearlsText);
             gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
+            var allColors = new AllColors();
+            var allSpheres = new AllSpheres();
 
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
-            sphereGenerator.Init(spherePrefab, gameplayStateObserver);
+            sphereGenerator.Init(spherePrefab, allColors, allSpheres);
             sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
 
             int level = PlayerData.Instance.CurrentLevel;
             yield return StartCoroutine(dataContext.LoadSpheres(level, sphereGenerator));
 
-            int shotsCount = sphereGenerator._materials.Length * 2;
+            int shotsCount = sphereGenerator._levelColors.Length * 2;
             shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
 
-            ballThrower.Init(sphereGenerator._materials, shotsData, gameplayStateObserver);
+            ballThrower.Init(sphereGenerator._levelColors, shotsData, gameplayStateObserver);
             sphereDestroyer.Init(pearlsData);
 
             gameplayStateObserver.AddListener(gamePopup);

@@ -8,7 +8,7 @@ namespace Utils.SphereData
         public bool isStaticRadius;
         public float smallSphereRadius;
         public float smallSphereRadiusScale;
-        public string[] materialNames;
+        public string[] colorNames;
         public SphereJSON[] spheres;
     }
 
@@ -17,6 +17,6 @@ namespace Utils.SphereData
     {
         public int smallSphereCount;
         public float largeSphereRadius;
-        public int[] materialIndexes;
+        public int[] colorIndexes;
     }
 }

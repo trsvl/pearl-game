@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using Utils.Colors;
 
 namespace Gameplay.BallThrowing
 {
@@ -24,7 +25,7 @@ namespace Gameplay.BallThrowing
             if (collision.gameObject.CompareTag("Ball"))
             {
                 var touchedBallMaterial = collision.gameObject.GetComponent<Renderer>().material;
-                if (_renderer.material.name == touchedBallMaterial.name)
+                if (_renderer.material.GetColor(AllColors.BaseColor) == touchedBallMaterial.GetColor(AllColors.BaseColor))
                 {
                     _sphereDestroyer.TryInitiateWave(collision);
                     Destroy(gameObject);

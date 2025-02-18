@@ -133,7 +133,7 @@ namespace LevelGenerator
                 GameObject sphere = UnityEngine.Object.Instantiate(prefab, parent);
                 sphere.transform.localPosition = spherePositions[i];
                 sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2f);
-                var material = sphere.GetComponent<Renderer>().material = sphereMaterials[i] ?? materials[0];
+                Material material = sphere.GetComponent<Renderer>().material = sphereMaterials[i] ?? materials[0];
                 materialNames[i] = material.name;
                 smallSpheres.Add(sphere);
             }
@@ -178,7 +178,7 @@ namespace LevelGenerator
                     UnityEngine.Object.Instantiate(generator._prefabSphere, generator.transform);
                 sphere.transform.localPosition = spherePositions[i];
                 sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2f);
-                sphere.GetComponent<Renderer>().material = materials[json.materialIndexes[i]];
+                sphere.GetComponent<Renderer>().material = materials[json.colorIndexes[i]];
                 smallSpheres.Add(sphere);
             }
         }

@@ -4,6 +4,7 @@ using System.Linq;
 using Gameplay.Header;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Utils.Colors;
 
 namespace Gameplay.BallThrowing
 {
@@ -23,21 +24,20 @@ namespace Gameplay.BallThrowing
         public LayerMask collisionMaskLine;
         public GameObject throwAreaObject;
 
-        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        private Color previousColor = new(0, 0, 0, 0);
         private Bounds dragAreaBounds;
-        private Material previousMaterial;
         private LineRenderer lineRenderer;
         private Ball currentBall;
         private bool isDragging;
         private Vector3 initialMousePosition;
-        private Material[] _materials;
+        private Color[] _levelColors;
         private ShotsData _shotData;
         private GameplayStateObserver _gameplayStateObserver;
 
 
-        public void Init(Material[] materials, ShotsData shotData, GameplayStateObserver gameplayStateObserver)
+        public void Init(Color[] levelColors, ShotsData shotData, GameplayStateObserver gameplayStateObserver)
         {
-            _materials = materials;
+            _levelColors = levelColors;
             _shotData = shotData;
             _gameplayStateObserver = gameplayStateObserver;
             lineRenderer = GetComponent<LineRenderer>();
@@ -76,8 +76,8 @@ namespace Gameplay.BallThrowing
                 isDragging = true;
                 initialMousePosition = Input.mousePosition;
                 lineRenderer.positionCount = trajectoryPoints;
-                lineRenderer.startColor = currentBall._renderer.material.GetColor(BaseColor);
-                lineRenderer.endColor = currentBall._renderer.material.GetColor(BaseColor);
+                lineRenderer.startColor = currentBall._renderer.material.GetColor(AllColors.BaseColor);
+                lineRenderer.endColor = currentBall._renderer.material.GetColor(AllColors.BaseColor);
             }
 
             if (Input.GetMouseButtonUp(0) && isDragging)
@@ -189,7 +189,7 @@ namespace Gameplay.BallThrowing
             if (_shotData.Count <= 0) return;
 
             currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
-            currentBall.GetComponent<Renderer>().material = GetBallMaterial();
+            currentBall.GetComponent<Renderer>().material.SetColor(AllColors.BaseColor, GetBallColor());
 
             currentBall.Init(sphereDestroyer, LayerMask.NameToLayer("Ignore Raycast"));
         }
@@ -201,14 +201,15 @@ namespace Gameplay.BallThrowing
             SpawnBall();
         }
 
-        private Material GetBallMaterial()
+        private Color GetBallColor()
         {
-            if (_materials.Length <= 1) return _materials[0];
+            if (_levelColors.Length <= 1) return _levelColors[0];
 
-            Material[] filteredMaterials = _materials.Where(material => material != previousMaterial).ToArray();
-            int randomIndex = Random.Range(0, filteredMaterials.Length);
+            Color[] filteredColors = _levelColors.Where(color => !IsEqualTo(color, previousColor)).ToArray();
+            int randomIndex = Random.Range(0, filteredColors.Length);
+            previousColor = filteredColors[randomIndex];
 
-            return filteredMaterials[randomIndex];
+            return filteredColors[randomIndex];
         }
 
         private IEnumerator SpawnBallAfterDelay(float delay)
@@ -237,6 +238,11 @@ namespace Gameplay.BallThrowing
             List<RaycastResult> results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0;
+        }
+
+        private bool IsEqualTo(Color a, Color b)
+        {
+            return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
         }
     }
 }

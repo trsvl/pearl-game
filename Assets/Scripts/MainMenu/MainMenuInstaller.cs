@@ -1,6 +1,7 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.Colors;
 using Utils.Loader;
 using Utils.PlayerData;
 using Utils.SphereData;
@@ -23,11 +24,13 @@ namespace MainMenu
         {
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             dataContext = new DataContext();
+            var allColors = new AllColors();
+            var allSpheres = new AllSpheres();
 
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
-            sphereGenerator.Init(spherePrefab);
+            sphereGenerator.Init(spherePrefab, allColors, allSpheres);
             sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
-            
+
             levelNumber = PlayerData.Instance.CurrentLevel;
             UpdateLevel(levelNumber);
         }
@@ -46,7 +49,7 @@ namespace MainMenu
         private void CheckButtons()
         {
             var playerData = PlayerData.Instance;
-            
+
             previousLevelButton.interactable = 1 <= levelNumber - 1;
             nextLevelButton.interactable = playerData.MaxLevel >= levelNumber + 1;
         }

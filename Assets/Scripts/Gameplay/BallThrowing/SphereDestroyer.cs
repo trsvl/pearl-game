@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Gameplay.Header;
 using UnityEngine;
+using Utils.Colors;
 
 namespace Gameplay.BallThrowing
 {
@@ -15,7 +16,6 @@ namespace Gameplay.BallThrowing
         public float pulseIntensity = 2f;
         public float pulseDuration = 0.3f;
 
-        private static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
         private Collider[] nearbySpheres;
         private PearlsData _pearlsData;
         private BallThrower _ballThrower;
@@ -30,11 +30,11 @@ namespace Gameplay.BallThrowing
         public void TryInitiateWave(Collision targetCollision)
         {
             GameObject originSphere = targetCollision.gameObject;
-            Color targetColor = originSphere.GetComponent<Renderer>().material.GetColor(BaseColor);
+            Color targetColor = originSphere.GetComponent<Renderer>().material.GetColor(AllColors.BaseColor);
             StartCoroutine(PropagateWave(originSphere, targetColor));
         }
 
-        private IEnumerator PropagateWave(GameObject startSphere, Color targetColor)
+        private IEnumerator PropagateWave(GameObject startSphere, Color targetColor = default)
         {
             Queue<GameObject> waveQueue = new Queue<GameObject>();
             HashSet<GameObject> processed = new HashSet<GameObject>();
@@ -52,7 +52,6 @@ namespace Gameplay.BallThrowing
 
                     if (!currentSphere) continue;
 
-                    StartCoroutine(VisualPulse(currentSphere));
                     StartCoroutine(ProcessSphereDestruction(currentSphere));
 
                     int neighborsFound = Physics.OverlapSphereNonAlloc(
@@ -73,7 +72,7 @@ namespace Gameplay.BallThrowing
                         Renderer neighborRenderer = neighbor.GetComponent<Renderer>();
                         if (!neighborRenderer) continue;
 
-                        if (IsColorCompatible(neighborRenderer.material.GetColor(BaseColor), targetColor))
+                        if (IsColorCompatible(neighborRenderer.material.GetColor(AllColors.BaseColor), targetColor))
                         {
                             processed.Add(neighbor);
                             waveQueue.Enqueue(neighbor);
@@ -90,24 +89,6 @@ namespace Gameplay.BallThrowing
             return Mathf.Abs(a.r - b.r) < threshold &&
                    Mathf.Abs(a.g - b.g) < threshold &&
                    Mathf.Abs(a.b - b.b) < threshold;
-        }
-
-        private IEnumerator VisualPulse(GameObject sphere)
-        {
-            Renderer sphereRenderer = sphere.GetComponent<Renderer>();
-            Material mat = sphereRenderer.material;
-            Color originalColor = mat.GetColor(BaseColor);
-
-            float elapsed = 0f;
-            while (elapsed < pulseDuration)
-            {
-                mat.SetColor(BaseColor,
-                    Color.Lerp(originalColor * pulseIntensity, originalColor, elapsed / pulseDuration));
-                elapsed += Time.deltaTime;
-                yield return null;
-            }
-
-            mat.SetColor(BaseColor, originalColor);
         }
 
         private IEnumerator ProcessSphereDestruction(GameObject sphere)

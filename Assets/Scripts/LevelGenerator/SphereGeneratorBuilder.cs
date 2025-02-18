@@ -70,13 +70,13 @@ namespace LevelGenerator
             _smallSphereRadiusScale = json.smallSphereRadiusScale;
             _smallSphereRadiusScaleRuntime = json.smallSphereRadiusScale;
 
-            _materials = new Material[json.materialNames.Length];
+            _materials = new Material[json.colorNames.Length];
             _isStaticSize = json.isStaticRadius;
             _sphereLocalScaleRadius = json.smallSphereRadius;
 
-            for (int i = 0; i < json.materialNames.Length; i++)
+            for (int i = 0; i < json.colorNames.Length; i++)
             {
-                var material = Resources.Load<Material>($"Materials/{json.materialNames[i]}");
+                var material = Resources.Load<Material>($"Materials/{json.colorNames[i]}");
                 _materials[i] = material;
             }
 

@@ -29,7 +29,7 @@ namespace LevelGenerator
                     ? generatorBuilder._sphereLocalScaleRadius
                     : 0,
                 smallSphereRadiusScale = generatorBuilder._smallSphereRadiusScaleRuntime,
-                materialNames = newMaterialNames,
+                colorNames = newMaterialNames,
                 spheres = new SphereJSON[generatorBuilder._spheres.Length]
             };
 
@@ -39,7 +39,7 @@ namespace LevelGenerator
                 {
                     smallSphereCount = generatorBuilder._spheres[i].smallSphereCount,
                     largeSphereRadius = generatorBuilder._spheres[i].largeSphereRadius,
-                    materialIndexes = materialIndexesList[i]
+                    colorIndexes = materialIndexesList[i]
                 };
             }
 

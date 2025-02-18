@@ -2,7 +2,7 @@
     "isStaticRadius": false,
     "smallSphereRadius": 0.0,
     "smallSphereRadiusScale": 2.0,
-    "materialNames": [
+    "colorNames": [
         "Green",
         "White",
         "Black",
@@ -12,7 +12,7 @@
         {
             "smallSphereCount": 179,
             "largeSphereRadius": 2.0,
-            "materialIndexes": [
+            "colorIndexes": [
                 0,
                 0,
                 0,

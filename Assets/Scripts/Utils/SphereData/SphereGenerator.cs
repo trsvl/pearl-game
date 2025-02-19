@@ -1,13 +1,11 @@
-using System.Collections.Generic;
-using Gameplay;
 using UnityEngine;
 using Utils.Colors;
-using Vector2 = System.Numerics.Vector2;
 
 namespace Utils.SphereData
 {
     public class SphereGenerator : MonoBehaviour
     {
+        public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
         public bool _isStaticSize { get; private set; }
         public float _sphereLocalScaleRadius { get; private set; }
         public float _smallSphereRadiusScale { get; private set; }
@@ -28,6 +26,11 @@ namespace Utils.SphereData
         private void Update()
         {
             transform.rotation *= Quaternion.Euler(12f * Time.deltaTime, 12f * Time.deltaTime, 0);
+
+            foreach (Transform child in transform)
+            {
+                child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+            }
         }
 
         public void LoadSpheresFromJSON(SpheresJSON json)
@@ -52,10 +55,11 @@ namespace Utils.SphereData
                 newBigSphere.GenerateSmallSpherePositions(this, json.spheres[i], _levelColors, _allSpheres, i);
                 bigSpheres[i] = newBigSphere;
             }
+            
+            var materialPropertyBlock = new MaterialPropertyBlock();
 
             foreach (var pair in _allSpheres.Get())
             {
-                var materialPropertyBlock = new MaterialPropertyBlock();
                 materialPropertyBlock.SetColor(AllColors.BaseColor, pair.Key);
 
                 for (int i = 0; i < pair.Value.Length; i++)

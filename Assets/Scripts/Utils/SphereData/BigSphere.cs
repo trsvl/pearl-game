@@ -34,7 +34,7 @@ namespace Utils.SphereData
             float smallSphereRadius = CalculateSmallSphereRadius();
 
             sphere.transform.localPosition = localPosition;
-            sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2f);
+            sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2.3f);
             sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
         }
 

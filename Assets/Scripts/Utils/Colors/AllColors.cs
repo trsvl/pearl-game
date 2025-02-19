@@ -7,15 +7,15 @@ namespace Utils.Colors
     {
         private readonly Dictionary<string, Color> allColors = new()
         {
-            { "Red", new Color(255, 0, 0, 255) },
-            { "Green", new Color(0, 255, 0, 255) },
-            { "Blue", new Color(0, 0, 255, 255) },
-            { "White", new Color(255, 255, 255, 255) },
-            { "Black", new Color(0, 0, 0, 255) },
-            { "Orange", new Color(250, 156, 28, 255) },
-            { "Yellow", new Color(234, 239, 44, 255) },
+            { "Red", new Color(1f, 0, 0) },
+            { "Green", new Color(0, 1f, 0) },
+            { "Blue", new Color(0, 0, 1f) },
+            { "White", new Color(0.7f, 0.7f, 0.7f) },
+            { "Black", new Color(0.1f, 0.1f, 0.1f) },
+            { "Orange", new Color(1f, 0.7f, 0.1f) },
+            { "Yellow", new Color(0.9f, 0.9f, 0.2f) },
         };
-        public static readonly int BaseColor = Shader.PropertyToID("_BaseColor");
+        public static readonly int BaseColor = Shader.PropertyToID("_Color");
 
 
         public Color[] GetAllColors()

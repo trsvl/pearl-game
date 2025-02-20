@@ -5,7 +5,6 @@ using Gameplay.Header;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.Colors;
 using Utils.PlayerData;
 using Utils.SphereData;
 
@@ -42,7 +41,7 @@ namespace Gameplay
             pearlsData = new PearlsData(pearlsText);
             gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
             var allColors = new AllColors();
-            var allSpheres = new AllSpheres();
+            var allSpheres = new AllSpheresData();
 
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
             sphereGenerator.Init(spherePrefab, allColors, allSpheres);

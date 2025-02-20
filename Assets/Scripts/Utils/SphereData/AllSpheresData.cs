@@ -3,12 +3,14 @@ using UnityEngine;
 
 namespace Utils.SphereData
 {
-    public class AllSpheres
+    public class AllSpheresData
     {
         private readonly Dictionary<Color, List<Vector3>[]> allSpheres = new();
 
-        public void AddBigSphereToDictionary(Color color, int bigSpheresCount)
+        public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
+            if (allSpheres.ContainsKey(color)) return;
+            
             var sphereListArray = new List<Vector3>[bigSpheresCount];
 
             for (int i = 0; i < bigSpheresCount; i++)

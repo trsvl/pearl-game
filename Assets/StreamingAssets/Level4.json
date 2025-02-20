@@ -1,7 +1,6 @@
 {
-    "isStaticRadius": false,
     "smallSphereRadius": 0.0,
-    "smallSphereRadiusScale": 2.0,
+    "smallSphereScale": 2.0,
     "colorNames": [
         "Black",
         "Yellow",

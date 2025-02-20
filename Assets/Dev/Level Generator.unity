@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.114580475, g: 0.3301212, b: 0.71203196, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -880,17 +880,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 714e88100a4238c4da4905a9dde7f0f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _isActiveEdit: 0
-  _smallSphereRadiusScaleRuntime: 2
-  _spheres:
-  - smallSphereCountRuntime: 0
-    largeSphereRadiusRuntime: 0
-    maxSpheresPerChunk: 0
-    materialControllers:
-    - colorPercentage: 0
-      material: {fileID: 2100000, guid: 4859cd2efb8bfc54d832b9afc1a7b43e, type: 2}
-  _isStaticSize: 1
-  _sphereLocalScaleRadius: 0
+  _childQuaternion: {x: 0.19, y: -0.9, z: 0.17}
+  _smallSphereRadiusRuntime: 0
+  _smallSphereScaleRuntime: 1
+  _bigSpheres:
+  - smallSphereCountRuntime: 247
+    largeSphereRadiusRuntime: 2.37
+    maxSpheresPerChunkRuntime: 122
+    colorData:
+    - colorPercentage: 0.1
+      colorName: 0
+    - colorPercentage: 0.119
+      colorName: 0
 --- !u!4 &673427681
 Transform:
   m_ObjectHideFlags: 0
@@ -900,7 +901,7 @@ Transform:
   m_GameObject: {fileID: 673427679}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1910,7 +1911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6da0ec53e284c61ae271d0cc4bcce1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generatorBuilder: {fileID: 673427680}
+  sphereGenerator: {fileID: 673427680}
   levelText: {fileID: 795071155}
   generateNewSphereButton: {fileID: 403654885}
   loadSphereButton: {fileID: 1872820822}

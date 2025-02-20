@@ -13,7 +13,7 @@ namespace Utils.SphereData
         {
             string filePath = FilePath(levelNumber);
 
-            string json = string.Empty;
+            string json;
 
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -53,7 +53,7 @@ namespace Utils.SphereData
             sphereGenerator.LoadSpheresFromJSON(spheres);
         }
 
-        private string FilePath(int level)
+        protected string FilePath(int level)
         {
             return Path.Combine(Application.streamingAssetsPath, $"Level{level}.json");
         }

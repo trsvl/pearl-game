@@ -2,12 +2,13 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.SphereData;
 
-namespace LevelGenerator
+namespace Dev.LevelBuilder
 {
     public class GeneratorInstaller : MonoBehaviour
     {
-        [SerializeField] private SphereGeneratorBuilder generatorBuilder;
+        [SerializeField] private SphereGeneratorBuilder sphereGenerator;
         [SerializeField] private TextMeshProUGUI levelText;
 
         [SerializeField] private Button generateNewSphereButton;
@@ -19,25 +20,30 @@ namespace LevelGenerator
         [SerializeField] private Button prevLevelButton;
         [SerializeField] private Button nextLevelButton;
 
-        private DataContext dataContext;
+        private DataContextBuilder dataContext;
         private int levelNumber = 1;
-        private bool isNewLevel = false;
+        private bool isNewLevel;
 
 
         private void Awake()
         {
-            dataContext = new DataContext();
-            UpdateLevel(0);
+            var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
+            var allColors = new AllColors();
+            var allSpheres = new AllSpheresData();
+
+            dataContext = new DataContextBuilder();
+            sphereGenerator.Init(spherePrefab, allColors, allSpheres);
+            UpdateLevel(levelNumber);
         }
 
-        private void UpdateLevel(int number)
+        private void UpdateLevel(int newLevel)
         {
-            levelNumber += number;
+            levelNumber = newLevel;
 
             CheckButtons();
+            levelText.SetText($"{(isNewLevel ? "New Level " : "Level")} {levelNumber}");
 
-            dataContext.UpdateFilePath(levelNumber);
-            levelText.SetText(isNewLevel ? $"New Level {levelNumber}" : $"Level {levelNumber}");
+            LoadSpheresFromJSON();
         }
 
         private void CheckButtons()
@@ -64,41 +70,39 @@ namespace LevelGenerator
 
         private void GenerateNewSpheres()
         {
-            generatorBuilder.GenerateNewSpheres();
+            sphereGenerator.GenerateNewSpheres();
         }
 
-        private void LoadSpheresJSON()
+        private void LoadSpheresFromJSON()
         {
-            generatorBuilder.LoadSpheresFromJSON(dataContext.LoadSpheresJSON());
+            StartCoroutine(dataContext.LoadSpheres(levelNumber, sphereGenerator));
         }
 
         private void SaveSpheresJSON()
         {
-            (
-                SphereGeneratorBuilder sphereGenerator,
-                string[] newMaterialNames,
-                List<int[]> materialIndexesList) = generatorBuilder.GetDataForJSON();
-            dataContext.SaveSpheresJSON(sphereGenerator, newMaterialNames, materialIndexesList);
+            (SphereGeneratorBuilder generator, string[] newColorNames, List<int[]> newColorsIds) =
+                sphereGenerator.GetDataForJSON();
+            dataContext.SaveSpheresJSON(generator, newColorNames, newColorsIds, levelNumber);
 
             UpdateLevel(0);
         }
 
         private void DeleteSpheresJSON()
         {
-            dataContext.DeleteFile();
+            dataContext.DeleteFile(levelNumber);
         }
 
         private void OnEnable()
         {
             generateNewSphereButton.onClick.AddListener(GenerateNewSpheres);
 
-            loadSphereButton.onClick.AddListener(LoadSpheresJSON);
+            loadSphereButton.onClick.AddListener(LoadSpheresFromJSON);
             saveSphereButton.onClick.AddListener(SaveSpheresJSON);
 
             deleteSphereButton.onClick.AddListener(DeleteSpheresJSON);
 
-            prevLevelButton.onClick.AddListener(() => UpdateLevel(-1));
-            nextLevelButton.onClick.AddListener(() => UpdateLevel(1));
+            prevLevelButton.onClick.AddListener(() => UpdateLevel(levelNumber - 1));
+            nextLevelButton.onClick.AddListener(() => UpdateLevel(levelNumber + 1));
         }
 
         private void OnDisable()

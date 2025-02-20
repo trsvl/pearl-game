@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using Utils.Colors;
+using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
 {

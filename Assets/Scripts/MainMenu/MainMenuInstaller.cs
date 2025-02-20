@@ -1,7 +1,6 @@
 ﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.Colors;
 using Utils.Loader;
 using Utils.PlayerData;
 using Utils.SphereData;
@@ -25,9 +24,9 @@ namespace MainMenu
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             dataContext = new DataContext();
             var allColors = new AllColors();
-            var allSpheres = new AllSpheres();
+            var allSpheres = new AllSpheresData();
 
-            sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
+            sphereGenerator = new GameObject().AddComponent<SphereGeneratorMainMenu>();
             sphereGenerator.Init(spherePrefab, allColors, allSpheres);
             sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
 

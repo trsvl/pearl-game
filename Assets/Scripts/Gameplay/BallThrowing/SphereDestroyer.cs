@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Gameplay.Header;
 using UnityEngine;
-using Utils.Colors;
+using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
 {

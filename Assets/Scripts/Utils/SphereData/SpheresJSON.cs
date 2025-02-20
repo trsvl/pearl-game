@@ -5,9 +5,8 @@ namespace Utils.SphereData
     [Serializable]
     public class SpheresJSON
     {
-        public bool isStaticRadius;
         public float smallSphereRadius;
-        public float smallSphereRadiusScale;
+        public float smallSphereScale;
         public string[] colorNames;
         public SphereJSON[] spheres;
     }

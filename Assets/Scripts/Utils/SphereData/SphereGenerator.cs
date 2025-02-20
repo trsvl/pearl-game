@@ -1,64 +1,82 @@
 using UnityEngine;
-using Utils.Colors;
 
 namespace Utils.SphereData
 {
     public class SphereGenerator : MonoBehaviour
     {
-        public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
-        public bool _isStaticSize { get; private set; }
-        public float _sphereLocalScaleRadius { get; private set; }
-        public float _smallSphereRadiusScale { get; private set; }
+        public float _smallSphereRadius { get; protected set; }
+        public float _smallSphereScale { get; protected set; }
+
         public Color[] _levelColors { get; private set; }
+        public AllColors _allColors {get; private set;}
+        public AllSpheresData _allSpheresData {get; private set;}
+        public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
 
         private GameObject _prefabSphere;
-        private AllColors _allColors;
-        private AllSpheres _allSpheres;
+        private Quaternion _sphereRotation;
 
 
-        public void Init(GameObject prefabSphere, AllColors allColors, AllSpheres allSpheres)
+        public void Init(GameObject prefabSphere, AllColors allColors, AllSpheresData allSpheresData)
         {
             _prefabSphere = prefabSphere;
             _allColors = allColors;
-            _allSpheres = allSpheres;
+            _allSpheresData = allSpheresData;
+            _sphereRotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             transform.rotation *= Quaternion.Euler(12f * Time.deltaTime, 12f * Time.deltaTime, 0);
 
-            foreach (Transform child in transform)
+            for (int i = 0; i < transform.childCount; i++)
             {
-                child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+                transform.GetChild(i).rotation = _sphereRotation;
             }
+
+            //EDIT LIFETIME ROTATION
+
+            // foreach (Transform child in transform)
+            // {
+            //     child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+            // }
         }
 
-        public void LoadSpheresFromJSON(SpheresJSON json)
+        public virtual void LoadSpheresFromJSON(SpheresJSON json)
         {
-            _smallSphereRadiusScale = json.smallSphereRadiusScale;
+            _smallSphereScale = json.smallSphereScale;
             _levelColors = new Color[json.colorNames.Length];
-            _isStaticSize = json.isStaticRadius;
-            _sphereLocalScaleRadius = json.smallSphereRadius;
+            _smallSphereRadius = json.smallSphereRadius;
 
             BigSphere[] bigSpheres = new BigSphere[json.spheres.Length];
 
             for (int i = 0; i < json.colorNames.Length; i++)
             {
                 Color color = _allColors.GetColor(json.colorNames[i]);
-                _allSpheres.AddBigSphereToDictionary(color, json.spheres.Length);
+                _allSpheresData.AddColorToDictionary(color, json.spheres.Length);
                 _levelColors[i] = color;
             }
 
+            FillSpheresData(json, bigSpheres);
+
+            GenerateSpheres(bigSpheres);
+        }
+
+        private void FillSpheresData(SpheresJSON json, BigSphere[] bigSpheres)
+        {
             for (int i = 0; i < json.spheres.Length; i++)
             {
                 BigSphere newBigSphere = new BigSphere();
-                newBigSphere.GenerateSmallSpherePositions(this, json.spheres[i], _levelColors, _allSpheres, i);
+                newBigSphere.GenerateSmallSpherePositions(json.spheres[i], _levelColors, _allSpheresData,
+                    _smallSphereScale, _smallSphereRadius, i);
                 bigSpheres[i] = newBigSphere;
             }
-            
+        }
+
+        protected void GenerateSpheres(BigSphere[] bigSpheres)
+        {
             var materialPropertyBlock = new MaterialPropertyBlock();
 
-            foreach (var pair in _allSpheres.Get())
+            foreach (var pair in _allSpheresData.Get())
             {
                 materialPropertyBlock.SetColor(AllColors.BaseColor, pair.Key);
 

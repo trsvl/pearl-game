@@ -1,30 +1,27 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Utils.SphereData
 {
-    [Serializable]
     public class BigSphere
     {
-        private int _smallSphereCount;
-        private float _largeSphereRadius;
-        private float smallSphereRadiusScale;
-        private SphereGenerator _generator;
+        public int _smallSphereCount {get; set;}
+        public float _largeSphereRadius {get; set;}
+        protected float _smallSphereScale;
+        protected float _smallSphereRadius;
 
 
-        public void GenerateSmallSpherePositions(SphereGenerator generator, SphereJSON json, Color[] levelColors,
-            AllSpheres allSpheres, int bigSphereIndex)
+        public void GenerateSmallSpherePositions(SphereJSON json, Color[] levelColors,
+            AllSpheresData allSpheresData, float smallSphereRadiusScale, float smallSphereRadius, int bigSphereIndex)
         {
-            _generator = generator;
-
             _smallSphereCount = json.smallSphereCount;
             _largeSphereRadius = json.largeSphereRadius;
-            smallSphereRadiusScale = _generator._smallSphereRadiusScale;
+            _smallSphereScale = smallSphereRadiusScale;
+            _smallSphereRadius = smallSphereRadius;
 
             for (int i = 0; i < _smallSphereCount; i++)
             {
                 Color color = levelColors[json.colorIndexes[i]];
-                allSpheres.AddSphere(color, GeneratePosition(i), bigSphereIndex);
+                allSpheresData.AddSphere(color, GeneratePosition(i), bigSphereIndex);
             }
         }
 
@@ -38,19 +35,19 @@ namespace Utils.SphereData
             sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
         }
 
-        private float CalculateSmallSphereRadius()
+        protected float CalculateSmallSphereRadius()
         {
-            if (_generator._isStaticSize)
+            if (!Mathf.Approximately(_smallSphereRadius, default))
             {
-                return _generator._sphereLocalScaleRadius;
+                return _smallSphereRadius;
             }
 
             float surfaceArea = 4f * Mathf.PI * _largeSphereRadius * _largeSphereRadius;
             float smallArea = surfaceArea / _smallSphereCount;
-            return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * smallSphereRadiusScale;
+            return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * _smallSphereScale;
         }
 
-        private Vector3 GeneratePosition(int index)
+        protected Vector3 GeneratePosition(int index)
         {
             float offset = 2f / _smallSphereCount;
             float increment = Mathf.PI * (3f - Mathf.Sqrt(5f));

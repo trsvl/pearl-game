@@ -6,17 +6,13 @@ namespace Utils.SphereData
     {
         public int _smallSphereCount {get; set;}
         public float _largeSphereRadius {get; set;}
-        protected float _smallSphereScale;
-        protected float _smallSphereRadius;
 
 
         public void GenerateSmallSpherePositions(SphereJSON json, Color[] levelColors,
-            AllSpheresData allSpheresData, float smallSphereRadiusScale, float smallSphereRadius, int bigSphereIndex)
+            AllSpheresData allSpheresData, int bigSphereIndex)
         {
             _smallSphereCount = json.smallSphereCount;
             _largeSphereRadius = json.largeSphereRadius;
-            _smallSphereScale = smallSphereRadiusScale;
-            _smallSphereRadius = smallSphereRadius;
 
             for (int i = 0; i < _smallSphereCount; i++)
             {
@@ -35,16 +31,12 @@ namespace Utils.SphereData
             sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
         }
 
-        protected float CalculateSmallSphereRadius()
+        private float CalculateSmallSphereRadius()
         {
-            if (!Mathf.Approximately(_smallSphereRadius, default))
-            {
-                return _smallSphereRadius;
-            }
-
             float surfaceArea = 4f * Mathf.PI * _largeSphereRadius * _largeSphereRadius;
             float smallArea = surfaceArea / _smallSphereCount;
-            return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * _smallSphereScale;
+            const float smallRadiusScale = 2f;
+            return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * smallRadiusScale;
         }
 
         protected Vector3 GeneratePosition(int index)

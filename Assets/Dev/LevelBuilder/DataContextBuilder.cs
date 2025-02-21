@@ -15,8 +15,6 @@ namespace Dev.LevelBuilder
         {
             var spheresJson = new SpheresJSON
             {
-                smallSphereRadius = generatorBuilder._smallSphereRadius,
-                smallSphereScale = generatorBuilder._smallSphereScale,
                 colorNames = newColorNames,
                 spheres = new SphereJSON[generatorBuilder._bigSpheres.Length]
             };

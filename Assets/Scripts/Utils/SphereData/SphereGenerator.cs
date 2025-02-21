@@ -4,12 +4,9 @@ namespace Utils.SphereData
 {
     public class SphereGenerator : MonoBehaviour
     {
-        public float _smallSphereRadius { get; protected set; }
-        public float _smallSphereScale { get; protected set; }
-
         public Color[] _levelColors { get; private set; }
-        public AllColors _allColors {get; private set;}
-        public AllSpheresData _allSpheresData {get; private set;}
+        public AllColors _allColors { get; private set; }
+        public AllSpheresData _allSpheresData { get; private set; }
         public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
 
         private GameObject _prefabSphere;
@@ -43,9 +40,7 @@ namespace Utils.SphereData
 
         public virtual void LoadSpheresFromJSON(SpheresJSON json)
         {
-            _smallSphereScale = json.smallSphereScale;
             _levelColors = new Color[json.colorNames.Length];
-            _smallSphereRadius = json.smallSphereRadius;
 
             BigSphere[] bigSpheres = new BigSphere[json.spheres.Length];
 
@@ -66,8 +61,7 @@ namespace Utils.SphereData
             for (int i = 0; i < json.spheres.Length; i++)
             {
                 BigSphere newBigSphere = new BigSphere();
-                newBigSphere.GenerateSmallSpherePositions(json.spheres[i], _levelColors, _allSpheresData,
-                    _smallSphereScale, _smallSphereRadius, i);
+                newBigSphere.GenerateSmallSpherePositions(json.spheres[i], _levelColors, _allSpheresData, i);
                 bigSpheres[i] = newBigSphere;
             }
         }

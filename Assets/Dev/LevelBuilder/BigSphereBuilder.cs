@@ -31,8 +31,6 @@ namespace Dev.LevelBuilder
         {
             _smallSphereCount = smallSphereCountRuntime;
             _largeSphereRadius = largeSphereRadiusRuntime;
-            _smallSphereScale = generator._smallSphereScaleRuntime;
-            _smallSphereRadius = generator._smallSphereRadius;
             
             _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
 

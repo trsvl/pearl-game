@@ -7,8 +7,6 @@ namespace Dev.LevelBuilder
 {
     public class SphereGeneratorBuilder : SphereGenerator
     {
-        public float _smallSphereRadiusRuntime;
-        public float _smallSphereScaleRuntime;
         public BigSphereBuilder[] _bigSpheres;
 
         protected override void Update()
@@ -19,9 +17,7 @@ namespace Dev.LevelBuilder
             {
                 if (sphere._smallSphereCount == sphere.smallSphereCountRuntime &&
                     Mathf.Approximately(sphere._largeSphereRadius, sphere.largeSphereRadiusRuntime) &&
-                    Mathf.Approximately(sphere._maxSpheresPerChunk, sphere.maxSpheresPerChunkRuntime) &&
-                    Mathf.Approximately(_smallSphereRadius, _smallSphereRadiusRuntime) &&
-                    Mathf.Approximately(_smallSphereScale, _smallSphereScaleRuntime)) continue;
+                    Mathf.Approximately(sphere._maxSpheresPerChunk, sphere.maxSpheresPerChunkRuntime)) continue;
 
                 print("Generating sphere");
 
@@ -35,9 +31,6 @@ namespace Dev.LevelBuilder
             {
                 Destroy(transform.GetChild(i).gameObject);
             }
-
-            _smallSphereScale = _smallSphereScaleRuntime;
-            _smallSphereRadius = _smallSphereRadiusRuntime;
 
             for (int i = 0; i < _bigSpheres.Length; i++)
             {

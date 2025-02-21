@@ -27,13 +27,14 @@ namespace Dev.LevelBuilder
         private Vector3[] localSpherePositions;
 
 
-        public void GenerateSmallSpherePositions(SphereGeneratorBuilder generator, float smallSphereScale,
-            float smallSphereRadius, int bigSphereIndex)
+        public void GenerateSmallSpherePositions(SphereGeneratorBuilder generator, int bigSphereIndex)
         {
             _smallSphereCount = smallSphereCountRuntime;
             _largeSphereRadius = largeSphereRadiusRuntime;
-            _smallSphereScale = smallSphereScale;
-            _smallSphereRadius = smallSphereRadius;
+            _smallSphereScale = generator._smallSphereScaleRuntime;
+            _smallSphereRadius = generator._smallSphereRadius;
+            
+            _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
 
             GeneratePositions();
             GenerateColors(generator, bigSphereIndex);
@@ -52,7 +53,8 @@ namespace Dev.LevelBuilder
         private void GenerateColors(SphereGeneratorBuilder generator, int bigSphereIndex)
         {
             ColorName[] sphereColorNames = colorData.Select(mc => mc.colorName).ToArray();
-            Color[] sphereColors = colorData.Select(mc => generator._allColors.GetColor(mc.colorName.ToString())).ToArray();
+            Color[] sphereColors = colorData.Select(mc => generator._allColors.GetColor(mc.colorName.ToString()))
+                .ToArray();
             float[] percentages = colorData.Select(mc => mc.colorPercentage).ToArray();
 
             bool[] isAssigned = new bool[_smallSphereCount];
@@ -90,7 +92,7 @@ namespace Dev.LevelBuilder
 
                     foreach (int idx in availableIndices)
                     {
-                        colorIds[seedIndex] = colorIndex;
+                        colorIds[idx] = colorIndex;
                         isAssigned[idx] = true;
                         remaining--;
                     }

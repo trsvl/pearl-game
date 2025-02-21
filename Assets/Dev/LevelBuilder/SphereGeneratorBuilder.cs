@@ -25,12 +25,6 @@ namespace Dev.LevelBuilder
 
                 print("Generating sphere");
 
-                sphere._smallSphereCount = sphere.smallSphereCountRuntime;
-                sphere._largeSphereRadius = sphere.largeSphereRadiusRuntime;
-                sphere._maxSpheresPerChunk = sphere.maxSpheresPerChunkRuntime;
-                _smallSphereScale = _smallSphereRadiusRuntime;
-                _smallSphereRadius = _smallSphereScaleRuntime;
-
                 GenerateNewSpheres();
             }
         }
@@ -42,9 +36,12 @@ namespace Dev.LevelBuilder
                 Destroy(transform.GetChild(i).gameObject);
             }
 
+            _smallSphereScale = _smallSphereScaleRuntime;
+            _smallSphereRadius = _smallSphereRadiusRuntime;
+
             for (int i = 0; i < _bigSpheres.Length; i++)
             {
-                _bigSpheres[i].GenerateSmallSpherePositions(this, _smallSphereScale, _smallSphereRadius, i);
+                _bigSpheres[i].GenerateSmallSpherePositions(this, i);
             }
 
             GenerateSpheres(_bigSpheres);

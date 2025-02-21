@@ -886,12 +886,12 @@ MonoBehaviour:
   _bigSpheres:
   - smallSphereCountRuntime: 247
     largeSphereRadiusRuntime: 2.37
-    maxSpheresPerChunkRuntime: 122
+    maxSpheresPerChunkRuntime: 32
     colorData:
     - colorPercentage: 0.1
       colorName: 0
-    - colorPercentage: 0.119
-      colorName: 0
+    - colorPercentage: 0.327
+      colorName: 3
 --- !u!4 &673427681
 Transform:
   m_ObjectHideFlags: 0

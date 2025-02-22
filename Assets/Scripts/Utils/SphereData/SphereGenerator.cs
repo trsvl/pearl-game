@@ -4,7 +4,7 @@ namespace Utils.SphereData
 {
     public class SphereGenerator : MonoBehaviour
     {
-        public Color[] _levelColors { get; private set; }
+        public Color[] _levelColors { get; protected set; }
         public AllColors _allColors { get; private set; }
         public AllSpheresData _allSpheresData { get; private set; }
         public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
@@ -51,37 +51,17 @@ namespace Utils.SphereData
                 _levelColors[i] = color;
             }
 
-            FillSpheresData(json, bigSpheres);
-
-            GenerateSpheres(bigSpheres);
+            GenerateSpheres(json);
         }
 
-        private void FillSpheresData(SpheresJSON json, BigSphere[] bigSpheres)
+        protected void GenerateSpheres(SpheresJSON json)
         {
             for (int i = 0; i < json.spheres.Length; i++)
             {
                 BigSphere newBigSphere = new BigSphere();
-                newBigSphere.GenerateSmallSpherePositions(json.spheres[i], _levelColors, _allSpheresData, i);
-                bigSpheres[i] = newBigSphere;
-            }
-        }
-
-        protected void GenerateSpheres(BigSphere[] bigSpheres)
-        {
-            var materialPropertyBlock = new MaterialPropertyBlock();
-
-            foreach (var pair in _allSpheresData.Get())
-            {
-                materialPropertyBlock.SetColor(AllColors.BaseColor, pair.Key);
-
-                for (int i = 0; i < pair.Value.Length; i++)
-                {
-                    foreach (Vector3 localPosition in pair.Value[i])
-                    {
-                        GameObject sphere = Instantiate(_prefabSphere, transform);
-                        bigSpheres[i].CreateSmallSphere(sphere, localPosition, materialPropertyBlock);
-                    }
-                }
+                
+                var sphere = Instantiate(_prefabSphere, transform);
+                newBigSphere.CreateSmallSpheres(sphere, json.spheres[i], _levelColors, _allSpheresData, i);
             }
         }
     }

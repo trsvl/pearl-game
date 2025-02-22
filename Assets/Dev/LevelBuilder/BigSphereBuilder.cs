@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Utils.SphereData;
@@ -8,7 +9,8 @@ namespace Dev.LevelBuilder
     [Serializable]
     public class ColorData
     {
-        [Range(0.1f, 1f)] public float colorPercentage;
+        public float colorPercentage { get; set; }
+        [Range(0.1f, 1f)] public float colorPercentageRuntime;
         public ColorName colorName;
     }
 
@@ -18,11 +20,13 @@ namespace Dev.LevelBuilder
         [Range(1, 1000)] public int smallSphereCountRuntime = 500;
         [Range(0.1f, 10f)] public float largeSphereRadiusRuntime = 2f;
         [Range(10, 500)] public int maxSpheresPerChunkRuntime = 20;
+        [Space] [Range(0f, 3f)] public float smallSphereScaleRuntime;
 
         public int _maxSpheresPerChunk { get; set; }
+        public float _smallSphereScale { get; set; }
         public int[] colorIds { get; private set; }
 
-        public ColorData[] colorData;
+        public List<ColorData> colorData;
 
         private Vector3[] localSpherePositions;
 
@@ -31,11 +35,51 @@ namespace Dev.LevelBuilder
         {
             _smallSphereCount = smallSphereCountRuntime;
             _largeSphereRadius = largeSphereRadiusRuntime;
-            
             _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
+            _smallSphereScale = smallSphereScaleRuntime;
 
             GeneratePositions();
             GenerateColors(generator, bigSphereIndex);
+        }
+
+        public void GenerateSmallSpherePositions(SphereJSON json, Color[] levelColors,
+            ColorName[] colorNames, AllSpheresData allSpheresData, int bigSphereIndex)
+        {
+            _smallSphereCount = json.smallSphereCount;
+            smallSphereCountRuntime = json.smallSphereCount;
+
+            _largeSphereRadius = json.largeSphereRadius;
+            largeSphereRadiusRuntime = json.largeSphereRadius;
+
+            _maxSpheresPerChunk = 50;
+            maxSpheresPerChunkRuntime = 50;
+
+            _smallSphereScale = SPHERE_SCALE;
+            smallSphereScaleRuntime = SPHERE_SCALE;
+
+            HashSet<ColorName> sphereColorNames = new HashSet<ColorName>();
+
+            for (int i = 0; i < _smallSphereCount; i++)
+            {
+                int index = json.colorIndexes[i];
+                Color color = levelColors[index];
+                sphereColorNames.Add(colorNames[index]);
+                allSpheresData.AddSphere(color, GeneratePosition(i), bigSphereIndex);
+            }
+
+            colorData = new List<ColorData>(sphereColorNames.Count);
+
+            foreach (ColorName name in sphereColorNames)
+            {
+                var newColorData = new ColorData()
+                {
+                    colorPercentage = 0.1f,
+                    colorPercentageRuntime = 0.1f,
+                    colorName = name,
+                };
+
+                colorData.Add(newColorData);
+            }
         }
 
         private void GeneratePositions()
@@ -110,6 +154,12 @@ namespace Dev.LevelBuilder
                 if (!assigned[i])
                     return i;
             return -1;
+        }
+
+        protected override Vector3 GetLocalScale(GameObject sphere, float additionalScale)
+        {
+            float scale = smallSphereScaleRuntime == 0f ? SPHERE_SCALE : smallSphereScaleRuntime;
+            return base.GetLocalScale(sphere, scale);
         }
     }
 }

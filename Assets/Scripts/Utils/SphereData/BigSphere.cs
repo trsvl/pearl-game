@@ -4,31 +4,29 @@ namespace Utils.SphereData
 {
     public class BigSphere
     {
-        public int _smallSphereCount {get; set;}
-        public float _largeSphereRadius {get; set;}
+        public int _smallSphereCount { get; protected set; }
+        public float _largeSphereRadius { get; protected set; }
+        protected const float SPHERE_SCALE = 2.3f;
 
 
-        public void GenerateSmallSpherePositions(SphereJSON json, Color[] levelColors,
+        public void CreateSmallSpheres(GameObject sphere, SphereJSON json, Color[] levelColors,
             AllSpheresData allSpheresData, int bigSphereIndex)
         {
             _smallSphereCount = json.smallSphereCount;
             _largeSphereRadius = json.largeSphereRadius;
+            
+            var materialPropertyBlock = new MaterialPropertyBlock();
 
             for (int i = 0; i < _smallSphereCount; i++)
             {
+                sphere.transform.localPosition = GeneratePosition(i);
+                sphere.transform.localScale = GetLocalScale(sphere, SPHERE_SCALE);
+                sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
+                
                 Color color = levelColors[json.colorIndexes[i]];
-                allSpheresData.AddSphere(color, GeneratePosition(i), bigSphereIndex);
+                materialPropertyBlock.SetColor(AllColors.BaseColor, color);
+                allSpheresData.AddSphere(color, sphere, bigSphereIndex);
             }
-        }
-
-        public void CreateSmallSphere(GameObject sphere, Vector3 localPosition,
-            MaterialPropertyBlock materialPropertyBlock)
-        {
-            float smallSphereRadius = CalculateSmallSphereRadius();
-
-            sphere.transform.localPosition = localPosition;
-            sphere.transform.localScale = Vector3.one * (smallSphereRadius * 2.3f);
-            sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
         }
 
         private float CalculateSmallSphereRadius()
@@ -37,6 +35,13 @@ namespace Utils.SphereData
             float smallArea = surfaceArea / _smallSphereCount;
             const float smallRadiusScale = 2f;
             return Mathf.Sqrt(smallArea / (4f * Mathf.PI)) * smallRadiusScale;
+        }
+
+        protected virtual Vector3 GetLocalScale(GameObject sphere, float additionalScale)
+        {
+            float smallSphereRadius = CalculateSmallSphereRadius();
+
+            return sphere.transform.localScale = Vector3.one * (smallSphereRadius * additionalScale);
         }
 
         protected Vector3 GeneratePosition(int index)

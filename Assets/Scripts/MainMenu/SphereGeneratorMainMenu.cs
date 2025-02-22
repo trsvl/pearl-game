@@ -1,5 +1,4 @@
-﻿using UnityEngine;
-using Utils.SphereData;
+﻿using Utils.SphereData;
 
 namespace MainMenu
 {
@@ -7,11 +6,6 @@ namespace MainMenu
     {
         public override void LoadSpheresFromJSON(SpheresJSON json)
         {
-            foreach (Transform child in transform)
-            {
-                Destroy(child.gameObject);
-            }
-
             base.LoadSpheresFromJSON(json);
         }
     }

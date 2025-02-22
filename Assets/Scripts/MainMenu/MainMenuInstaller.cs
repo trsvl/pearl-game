@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Utils.Loader;
@@ -42,7 +43,7 @@ namespace MainMenu
             CheckButtons();
             levelText.SetText($"Level {levelNumber}");
 
-            LoadSpheres();
+            StartCoroutine(LoadSpheres());
         }
 
         private void CheckButtons()
@@ -67,8 +68,15 @@ namespace MainMenu
             nextLevelButton.onClick.RemoveAllListeners();
         }
 
-        private void LoadSpheres()
+        private IEnumerator LoadSpheres()
         {
+            for (int i = 0; i < sphereGenerator.transform.childCount; i++)
+            {
+                DestroyImmediate(sphereGenerator.transform.GetChild(i).gameObject);
+            }
+
+            yield return null;
+
             StartCoroutine(dataContext.LoadSpheres(levelNumber, sphereGenerator));
         }
     }

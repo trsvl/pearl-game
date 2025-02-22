@@ -5,28 +5,36 @@ namespace Utils.SphereData
 {
     public class AllSpheresData
     {
-        private readonly Dictionary<Color, List<Vector3>[]> allSpheres = new();
+        private readonly Dictionary<Color, List<GameObject>[]> allSpheres = new();
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
             if (allSpheres.ContainsKey(color)) return;
-            
-            var sphereListArray = new List<Vector3>[bigSpheresCount];
+
+            var sphereListArray = new List<GameObject>[bigSpheresCount];
 
             for (int i = 0; i < bigSpheresCount; i++)
             {
-                sphereListArray[i] = new List<Vector3>();
+                sphereListArray[i] = new List<GameObject>();
             }
 
             allSpheres.Add(color, sphereListArray);
         }
 
-        public void AddSphere(Color color, Vector3 sphereLocalPosition, int index)
+        public void AddSphere(Color color, GameObject sphere, int index)
         {
-            allSpheres[color][index].Add(sphereLocalPosition);
+            allSpheres[color][index].Add(sphere);
         }
 
-        public Dictionary<Color, List<Vector3>[]> Get()
+        public void RemoveSphere(Color color, GameObject sphere, int index)
+        {
+            if (allSpheres.TryGetValue(color, out List<GameObject>[] allSphere))
+            {
+                allSphere[index].Remove(sphere);
+            }
+        }
+
+        public Dictionary<Color, List<GameObject>[]> Get()
         {
             return allSpheres;
         }

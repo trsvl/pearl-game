@@ -383,7 +383,7 @@
         {
             "smallSphereCount": 440,
             "largeSphereRadius": 2.0399999618530275,
-            "materialIndexes": [
+            "colorIndexes": [
                 3,
                 3,
                 3,
@@ -829,7 +829,7 @@
         {
             "smallSphereCount": 358,
             "largeSphereRadius": 3.069999933242798,
-            "materialIndexes": [
+            "colorIndexes": [
                 0,
                 0,
                 0,

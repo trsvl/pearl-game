@@ -881,17 +881,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _childQuaternion: {x: 0.19, y: -0.9, z: 0.17}
-  _smallSphereRadiusRuntime: 0
-  _smallSphereScaleRuntime: 1
-  _bigSpheres:
-  - smallSphereCountRuntime: 247
-    largeSphereRadiusRuntime: 2.37
-    maxSpheresPerChunkRuntime: 32
-    colorData:
-    - colorPercentage: 0.1
-      colorName: 0
-    - colorPercentage: 0.327
-      colorName: 3
+  _bigSpheres: []
 --- !u!4 &673427681
 Transform:
   m_ObjectHideFlags: 0

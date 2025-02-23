@@ -3,14 +3,14 @@
 namespace Utils.SphereData
 {
     [Serializable]
-    public class SpheresJSON
+    public class SpheresData
     {
         public string[] colorNames;
-        public SphereJSON[] spheres;
+        public BigSphereData[] spheres;
     }
 
     [Serializable]
-    public class SphereJSON
+    public class BigSphereData
     {
         public int smallSphereCount;
         public float largeSphereRadius;

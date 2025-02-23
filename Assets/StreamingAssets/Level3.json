@@ -194,7 +194,7 @@
         {
             "smallSphereCount": 106,
             "largeSphereRadius": 3.0,
-            "materialIndexes": [
+            "colorIndexes": [
                 2,
                 2,
                 2,

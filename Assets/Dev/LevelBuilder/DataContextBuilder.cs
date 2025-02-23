@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 using Utils.SphereData;
 
@@ -7,29 +6,9 @@ namespace Dev.LevelBuilder
 {
     public class DataContextBuilder : DataContext
     {
-        public void SaveSpheresJSON(
-            SphereGeneratorBuilder generatorBuilder,
-            string[] newColorNames,
-            List<int[]> colorIndexesList,
-            int levelNumber)
+        public void SaveSpheresDataToJSON(SpheresData spheresData, int levelNumber)
         {
-            var spheresJson = new SpheresJSON
-            {
-                colorNames = newColorNames,
-                spheres = new SphereJSON[generatorBuilder._bigSpheres.Length]
-            };
-
-            for (var i = 0; i < generatorBuilder._bigSpheres.Length; i++)
-            {
-                spheresJson.spheres[i] = new SphereJSON
-                {
-                    smallSphereCount = generatorBuilder._bigSpheres[i]._smallSphereCount,
-                    largeSphereRadius = generatorBuilder._bigSpheres[i]._largeSphereRadius,
-                    colorIndexes = colorIndexesList[i]
-                };
-            }
-
-            string json = JsonUtility.ToJson(spheresJson, true);
+            string json = JsonUtility.ToJson(spheresData, true);
             Debug.Log(json);
             File.WriteAllText(FilePath(levelNumber), json);
         }

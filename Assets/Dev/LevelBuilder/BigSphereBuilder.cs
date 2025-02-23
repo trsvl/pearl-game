@@ -17,39 +17,26 @@ namespace Dev.LevelBuilder
     [Serializable]
     public class BigSphereBuilder : BigSphere
     {
-        [Range(1, 1000)] public int smallSphereCountRuntime = 500;
-        [Range(0.1f, 10f)] public float largeSphereRadiusRuntime = 2f;
-        [Range(10, 500)] public int maxSpheresPerChunkRuntime = 20;
+        [Range(1, 1000)] public int smallSphereCountRuntime;
+        [Range(0.1f, 10f)] public float largeSphereRadiusRuntime;
+        [Range(10, 500)] public int maxSpheresPerChunkRuntime;
         [Space] [Range(0f, 3f)] public float smallSphereScaleRuntime;
+
+        public List<ColorData> colorData;
 
         public int _maxSpheresPerChunk { get; set; }
         public float _smallSphereScale { get; set; }
-        public int[] colorIds { get; private set; }
-
-        public List<ColorData> colorData;
 
         private Vector3[] localSpherePositions;
 
 
-        public void GenerateSmallSpherePositions(SphereGeneratorBuilder generator, int bigSphereIndex)
+        public BigSphereBuilder(BigSphereData data, ColorName[] colorNames) : base(data)
         {
-            _smallSphereCount = smallSphereCountRuntime;
-            _largeSphereRadius = largeSphereRadiusRuntime;
-            _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
-            _smallSphereScale = smallSphereScaleRuntime;
+            _smallSphereCount = data.smallSphereCount;
+            smallSphereCountRuntime = data.smallSphereCount;
 
-            GeneratePositions();
-            GenerateColors(generator, bigSphereIndex);
-        }
-
-        public void GenerateSmallSpherePositions(SphereJSON json, Color[] levelColors,
-            ColorName[] colorNames, AllSpheresData allSpheresData, int bigSphereIndex)
-        {
-            _smallSphereCount = json.smallSphereCount;
-            smallSphereCountRuntime = json.smallSphereCount;
-
-            _largeSphereRadius = json.largeSphereRadius;
-            largeSphereRadiusRuntime = json.largeSphereRadius;
+            _largeSphereRadius = data.largeSphereRadius;
+            largeSphereRadiusRuntime = data.largeSphereRadius;
 
             _maxSpheresPerChunk = 50;
             maxSpheresPerChunkRuntime = 50;
@@ -58,50 +45,64 @@ namespace Dev.LevelBuilder
             smallSphereScaleRuntime = SPHERE_SCALE;
 
             HashSet<ColorName> sphereColorNames = new HashSet<ColorName>();
+            Dictionary<ColorName, int> colorCounts = new Dictionary<ColorName, int>();
 
-            for (int i = 0; i < _smallSphereCount; i++)
+
+            foreach (int colorIndex in data.colorIndexes)
             {
-                int index = json.colorIndexes[i];
-                Color color = levelColors[index];
-                sphereColorNames.Add(colorNames[index]);
-                allSpheresData.AddSphere(color, GeneratePosition(i), bigSphereIndex);
+                ColorName colorName = colorNames[colorIndex];
+                sphereColorNames.Add(colorName);
+
+                if (!colorCounts.ContainsKey(colorName)) colorCounts.Add(colorName, colorIndex + 1);
+                else colorCounts[colorName]++;
             }
 
             colorData = new List<ColorData>(sphereColorNames.Count);
 
-            foreach (ColorName name in sphereColorNames)
+            foreach (ColorName colorName in sphereColorNames)
             {
                 var newColorData = new ColorData()
                 {
-                    colorPercentage = 0.1f,
-                    colorPercentageRuntime = 0.1f,
-                    colorName = name,
+                    colorPercentage = colorCounts[colorName] / (float)_smallSphereCount,
+                    colorPercentageRuntime = colorCounts[colorName] / (float)_smallSphereCount,
+                    colorName = colorName,
                 };
 
                 colorData.Add(newColorData);
             }
         }
 
-        private void GeneratePositions()
+        public BigSphereData GenerateBigSphereDataRuntime(AllColors allColors)
         {
-            localSpherePositions = new Vector3[_smallSphereCount];
+            _smallSphereCount = smallSphereCountRuntime;
+            _largeSphereRadius = largeSphereRadiusRuntime;
+            _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
+            _smallSphereScale = smallSphereScaleRuntime;
 
-            for (int i = 0; i < _smallSphereCount; i++)
+            GenerateLocalSpherePositions();
+            int[] colorIndexes = GenerateColorIndexes(allColors);
+
+            BigSphereData bigSphereData = new BigSphereData()
             {
-                localSpherePositions[i] = GeneratePosition(i);
-            }
+                smallSphereCount = _smallSphereCount,
+                largeSphereRadius = _largeSphereRadius,
+                colorIndexes = colorIndexes
+            };
+//            ColorName[] sphereColorNames = colorData.Select(mc => mc.colorName).ToArray();
+
+//            Color color = generator._allColors.GetColor(sphereColorNames[colorIndexes[i]].ToString());
+
+            return bigSphereData;
         }
 
-        private void GenerateColors(SphereGeneratorBuilder generator, int bigSphereIndex)
+        private int[] GenerateColorIndexes(AllColors allColors)
         {
-            ColorName[] sphereColorNames = colorData.Select(mc => mc.colorName).ToArray();
-            Color[] sphereColors = colorData.Select(mc => generator._allColors.GetColor(mc.colorName.ToString()))
+            Color[] sphereColors = colorData.Select(mc => allColors.GetColor(mc.colorName.ToString()))
                 .ToArray();
             float[] percentages = colorData.Select(mc => mc.colorPercentage).ToArray();
 
             bool[] isAssigned = new bool[_smallSphereCount];
-            colorIds = new int[_smallSphereCount];
-            generator._allSpheresData.Get().Clear();
+            var colorIndexes = new int[_smallSphereCount];
 
             for (int colorIndex = 0; colorIndex < sphereColors.Length; colorIndex++)
             {
@@ -111,8 +112,6 @@ namespace Dev.LevelBuilder
                 int numChunks = Mathf.CeilToInt((float)totalSpheres / _maxSpheresPerChunk);
                 int remaining = totalSpheres;
 
-                generator._allSpheresData.AddColorToDictionary(sphereColors[colorIndex], generator._bigSpheres.Length);
-
                 for (int chunk = 0; chunk < numChunks; chunk++)
                 {
                     int chunkSize = Mathf.Min(_maxSpheresPerChunk, remaining);
@@ -121,7 +120,7 @@ namespace Dev.LevelBuilder
                     int seedIndex = FindFirstUnassigned(isAssigned);
                     if (seedIndex == -1) break;
 
-                    colorIds[seedIndex] = colorIndex;
+                    colorIndexes[seedIndex] = colorIndex;
                     isAssigned[seedIndex] = true;
                     remaining--;
                     chunkSize--;
@@ -134,17 +133,23 @@ namespace Dev.LevelBuilder
 
                     foreach (int idx in availableIndices)
                     {
-                        colorIds[idx] = colorIndex;
+                        colorIndexes[idx] = colorIndex;
                         isAssigned[idx] = true;
                         remaining--;
                     }
                 }
             }
 
+            return colorIndexes;
+        }
+
+        private void GenerateLocalSpherePositions()
+        {
+            localSpherePositions = new Vector3[_smallSphereCount];
+
             for (int i = 0; i < _smallSphereCount; i++)
             {
-                Color color = generator._allColors.GetColor(sphereColorNames[colorIds[i]].ToString());
-                generator._allSpheresData.AddSphere(color, localSpherePositions[i], bigSphereIndex);
+                localSpherePositions[i] = GeneratePosition(i);
             }
         }
 

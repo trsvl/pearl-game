@@ -70,7 +70,7 @@ namespace Dev.LevelBuilder
 
         private void GenerateNewSpheres()
         {
-            sphereGenerator.GenerateNewSpheres();
+            sphereGenerator.GetSpheresData(true);
         }
 
         private void LoadSpheresFromJSON()
@@ -80,11 +80,10 @@ namespace Dev.LevelBuilder
 
         private void SaveSpheresJSON()
         {
-            (SphereGeneratorBuilder generator, string[] newColorNames, List<int[]> newColorsIds) =
-                sphereGenerator.GetDataForJSON();
-            dataContext.SaveSpheresJSON(generator, newColorNames, newColorsIds, levelNumber);
+            SpheresData spheresData = sphereGenerator.GetSpheresData(false);
+            dataContext.SaveSpheresDataToJSON(spheresData, levelNumber);
 
-            UpdateLevel(0);
+            UpdateLevel(levelNumber);
         }
 
         private void DeleteSpheresJSON()

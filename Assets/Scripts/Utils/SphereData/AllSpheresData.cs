@@ -26,15 +26,26 @@ namespace Utils.SphereData
             allSpheres[color][index].Add(sphere);
         }
 
-        public void RemoveSphere(Color color, GameObject sphere, int index)
+        public void DestroyAllSpheres()
         {
-            if (allSpheres.TryGetValue(color, out List<GameObject>[] allSphere))
+            foreach (var pair in allSpheres)
             {
-                allSphere[index].Remove(sphere);
+                foreach (var sphereList in pair.Value)
+                {
+                    foreach (var sphere in sphereList)
+                    {
+                        if (sphere)
+                        {
+                            Object.Destroy(sphere);
+                        }
+                    }
+                }
             }
+
+            allSpheres.Clear();
         }
 
-        public Dictionary<Color, List<GameObject>[]> Get()
+        public Dictionary<Color, List<GameObject>[]> Get() //!!!
         {
             return allSpheres;
         }

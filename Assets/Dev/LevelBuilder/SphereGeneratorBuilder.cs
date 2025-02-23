@@ -10,13 +10,21 @@ namespace Dev.LevelBuilder
     {
         public BigSphereBuilder[] _bigSpheres;
 
+        private SpheresData _spheresData;
+
+
         protected override void Update()
         {
             base.Update();
 
+            foreach (Transform child in transform)
+            {
+                child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+            }
+
             foreach (var sphere in _bigSpheres)
             {
-                foreach (var colorData in sphere.colorData)
+                foreach (var colorData in sphere.colorData) //!!!
                 {
                     if (sphere._smallSphereCount == sphere.smallSphereCountRuntime &&
                         Mathf.Approximately(sphere._largeSphereRadius, sphere.largeSphereRadiusRuntime) &&
@@ -26,77 +34,64 @@ namespace Dev.LevelBuilder
 
                     colorData.colorPercentage = colorData.colorPercentageRuntime;
 
-                    print("Generating sphere");
-
-                    GenerateNewSpheres();
+                    var data = GenerateSpheresData(true);
+                    LoadSpheres(data);
                 }
             }
         }
 
-        public void GenerateNewSpheres()
+        private SpheresData GenerateSpheresData(bool destroySpheres)
         {
-            for (int i = 0; i < transform.childCount; i++)
+            if (destroySpheres)
             {
-                Destroy(transform.GetChild(i).gameObject);
+                ClearSpheres();
             }
+
+            SpheresData spheresData = new SpheresData();
+
+            spheresData.spheres = new BigSphereData[_bigSpheres.Length];
+
+            HashSet<string> colorNames = new();
 
             for (int i = 0; i < _bigSpheres.Length; i++)
             {
-                _bigSpheres[i].GenerateSmallSpherePositions(this, i);
-            }
+                BigSphereData sphereData = _bigSpheres[i].GenerateBigSphereDataRuntime(_allColors);
+                spheresData.spheres[i] = sphereData;
 
-            GenerateSpheres(_bigSpheres);
-        }
-
-        public override void LoadSpheresFromJSON(SpheresJSON json)
-        {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                Destroy(transform.GetChild(i).gameObject);
-            }
-            
-            print("load from json");
-
-            _levelColors = new Color[json.colorNames.Length];
-            var colorNames = new ColorName[json.colorNames.Length];
-            _bigSpheres = new BigSphereBuilder[json.spheres.Length];
-
-            for (int i = 0; i < json.colorNames.Length; i++)
-            {
-                Color color = _allColors.GetColor(json.colorNames[i]);
-                _allSpheresData.AddColorToDictionary(color, json.spheres.Length);
-                colorNames[i] = Enum.Parse<ColorName>(json.colorNames[i]);
-                _levelColors[i] = color;
-            }
-
-            for (int i = 0; i < json.spheres.Length; i++)
-            {
-                BigSphereBuilder newBigSphere = new BigSphereBuilder();
-                newBigSphere.GenerateSmallSpherePositions(json.spheres[i], _levelColors, colorNames, _allSpheresData,
-                    i);
-                _bigSpheres[i] = newBigSphere;
-            }
-
-            GenerateSpheres(_bigSpheres);
-        }
-
-        public (SphereGeneratorBuilder sphereGenerator, string[] colorNames, List<int[]> colorIds)
-            GetDataForJSON()
-        {
-            HashSet<string> newColorNames = new HashSet<string>();
-            List<int[]> newColorIds = new List<int[]>();
-
-            foreach (BigSphereBuilder sphere in _bigSpheres)
-            {
-                foreach (var colorData in sphere.colorData)
+                foreach (var colorData in _bigSpheres[i].colorData)
                 {
-                    newColorNames.Add(colorData.ToString());
+                    colorNames.Add(colorData.colorName.ToString());
                 }
-
-                newColorIds.Add(sphere.colorIds);
             }
 
-            return (this, newColorNames.ToArray(), newColorIds);
+            spheresData.colorNames = colorNames.ToArray();
+
+            _spheresData = spheresData;
+            return spheresData;
+        }
+
+        protected override void GenerateBigSphereData(SpheresData data)
+        {
+            var colorNames = new ColorName[data.colorNames.Length];
+
+            for (int i = 0; i < data.colorNames.Length; i++)
+            {
+                colorNames[i] = Enum.Parse<ColorName>(data.colorNames[i]);
+            }
+
+            _bigSpheres = new BigSphereBuilder[data.spheres.Length];
+
+            for (int i = 0; i < _bigSpheres.Length; i++)
+            {
+                var bigSphere = new BigSphereBuilder(data.spheres[i], colorNames);
+                _bigSpheres[i] = bigSphere;
+                GenerateSmallSpheres(data, bigSphere, i);
+            }
+        }
+
+        public SpheresData GetSpheresData(bool destroySpheres)
+        {
+            return _spheresData ?? GenerateSpheresData(destroySpheres);
         }
     }
 }

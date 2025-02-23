@@ -4,18 +4,18 @@ namespace Utils.SphereData
 {
     public class SphereGenerator : MonoBehaviour
     {
-        public Color[] _levelColors { get; protected set; }
+        public Color[] _levelColors { get; private set; }
         public AllColors _allColors { get; private set; }
         public AllSpheresData _allSpheresData { get; private set; }
         public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
 
-        private GameObject _prefabSphere;
+        private GameObject _spherePrefab;
         private Quaternion _sphereRotation;
 
 
-        public void Init(GameObject prefabSphere, AllColors allColors, AllSpheresData allSpheresData)
+        public void Init(GameObject spherePrefab, AllColors allColors, AllSpheresData allSpheresData)
         {
-            _prefabSphere = prefabSphere;
+            _spherePrefab = spherePrefab;
             _allColors = allColors;
             _allSpheresData = allSpheresData;
             _sphereRotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
@@ -29,20 +29,13 @@ namespace Utils.SphereData
             {
                 transform.GetChild(i).rotation = _sphereRotation;
             }
-
-            //EDIT LIFETIME ROTATION
-
-            // foreach (Transform child in transform)
-            // {
-            //     child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
-            // }
         }
 
-        public virtual void LoadSpheresFromJSON(SpheresJSON json)
+        public void LoadSpheres(SpheresData json)
         {
-            _levelColors = new Color[json.colorNames.Length];
+            ClearSpheres();
 
-            BigSphere[] bigSpheres = new BigSphere[json.spheres.Length];
+            _levelColors = new Color[json.colorNames.Length];
 
             for (int i = 0; i < json.colorNames.Length; i++)
             {
@@ -51,18 +44,27 @@ namespace Utils.SphereData
                 _levelColors[i] = color;
             }
 
-            GenerateSpheres(json);
+            GenerateBigSphereData(json);
         }
 
-        protected void GenerateSpheres(SpheresJSON json)
+        protected virtual void GenerateBigSphereData(SpheresData data)
         {
-            for (int i = 0; i < json.spheres.Length; i++)
+            for (int i = 0; i < data.spheres.Length; i++)
             {
-                BigSphere newBigSphere = new BigSphere();
-                
-                var sphere = Instantiate(_prefabSphere, transform);
-                newBigSphere.CreateSmallSpheres(sphere, json.spheres[i], _levelColors, _allSpheresData, i);
+                var bigSphere = new BigSphere(data.spheres[i]);
+                GenerateSmallSpheres(data, bigSphere, i);
             }
+        }
+
+        protected void GenerateSmallSpheres(SpheresData data, BigSphere bigSphere, int bigSphereIndex)
+        {
+            bigSphere.CreateSmallSpheres(_spherePrefab, transform, data.spheres[bigSphereIndex], _levelColors,
+                _allSpheresData, bigSphereIndex);
+        }
+
+        protected void ClearSpheres()
+        {
+            _allSpheresData.DestroyAllSpheres();
         }
     }
 }

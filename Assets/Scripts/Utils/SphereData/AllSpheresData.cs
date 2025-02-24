@@ -7,6 +7,7 @@ namespace Utils.SphereData
     {
         private readonly Dictionary<Color, List<GameObject>[]> allSpheres = new();
 
+
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
             if (allSpheres.ContainsKey(color)) return;
@@ -43,11 +44,6 @@ namespace Utils.SphereData
             }
 
             allSpheres.Clear();
-        }
-
-        public Dictionary<Color, List<GameObject>[]> Get() //!!!
-        {
-            return allSpheres;
         }
     }
 }

@@ -61,7 +61,6 @@ namespace Utils.SphereData
             return position;
         }
 
-
         protected virtual Vector3 GetLocalScale(GameObject sphere, float additionalScale)
         {
             float smallSphereRadius = CalculateSmallSphereRadius();

@@ -24,7 +24,7 @@ namespace Dev.LevelBuilder
 
             foreach (var sphere in _bigSpheres)
             {
-                foreach (var colorData in sphere.colorData) //!!!
+                foreach (var colorData in sphere.colorData)
                 {
                     if (sphere._smallSphereCount == sphere.smallSphereCountRuntime &&
                         Mathf.Approximately(sphere._largeSphereRadius, sphere.largeSphereRadiusRuntime) &&

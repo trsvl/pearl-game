@@ -88,9 +88,6 @@ namespace Dev.LevelBuilder
                 largeSphereRadius = _largeSphereRadius,
                 colorIndexes = colorIndexes
             };
-//            ColorName[] sphereColorNames = colorData.Select(mc => mc.colorName).ToArray();
-
-//            Color color = generator._allColors.GetColor(sphereColorNames[colorIndexes[i]].ToString());
 
             return bigSphereData;
         }

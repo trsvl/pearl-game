@@ -45,5 +45,10 @@ namespace Utils.SphereData
 
             allSpheres.Clear();
         }
+
+        public Dictionary<Color, List<GameObject>[]>.ValueCollection GetSpheres()
+        {
+            return allSpheres.Values;
+        }
     }
 }

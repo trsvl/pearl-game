@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Utils.SphereData
 {
@@ -17,8 +18,11 @@ namespace Utils.SphereData
         }
 
         public void CreateSmallSpheres(GameObject spherePrefab, Transform parent, BigSphereData data,
-            Color[] levelColors, AllSpheresData allSpheresData, int bigSphereIndex)
+            Color[] levelColors, AllSpheresData allSpheresData, Quaternion sphereRotation, int bigSphereIndex)
         {
+            string currentScene = SceneManager.GetActiveScene().name;
+            bool isGameplayScene = currentScene == SceneName.Gameplay.ToString();
+
             var materialPropertyBlock = new MaterialPropertyBlock();
 
             for (int i = 0; i < _smallSphereCount; i++)
@@ -26,12 +30,15 @@ namespace Utils.SphereData
                 GameObject sphere = Object.Instantiate(spherePrefab, parent);
                 sphere.transform.localPosition = GeneratePosition(i);
                 sphere.transform.localScale = GetLocalScale(sphere, SPHERE_SCALE);
+                sphere.transform.rotation = sphereRotation;
 
                 Color color = levelColors[data.colorIndexes[i]];
                 materialPropertyBlock.SetColor(AllColors.BaseColor, color);
                 allSpheresData.AddSphere(color, sphere, bigSphereIndex);
 
                 sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
+
+                sphere.SetActive(!isGameplayScene);
             }
         }
 

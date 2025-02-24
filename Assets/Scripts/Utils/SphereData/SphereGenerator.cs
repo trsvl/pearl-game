@@ -2,16 +2,17 @@ using UnityEngine;
 
 namespace Utils.SphereData
 {
-    public class SphereGenerator : MonoBehaviour
+    public class SphereGenerator : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
         public Color[] _levelColors { get; private set; }
-        public AllColors _allColors { get; private set; }
-        public AllSpheresData _allSpheresData { get; private set; }
         public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
+
+        protected AllColors _allColors { get; private set; }
 
         private GameObject _spherePrefab;
         private Quaternion _sphereRotation;
-
+        private AllSpheresData _allSpheresData;
+        private bool _isAllowedToRotate;
 
         public void Init(GameObject spherePrefab, AllColors allColors, AllSpheresData allSpheresData)
         {
@@ -23,6 +24,8 @@ namespace Utils.SphereData
 
         protected virtual void Update()
         {
+            if (!_isAllowedToRotate) return;
+
             transform.rotation *= Quaternion.Euler(12f * Time.deltaTime, 12f * Time.deltaTime, 0);
 
             for (int i = 0; i < transform.childCount; i++)
@@ -59,12 +62,37 @@ namespace Utils.SphereData
         protected void GenerateSmallSpheres(SpheresData data, BigSphere bigSphere, int bigSphereIndex)
         {
             bigSphere.CreateSmallSpheres(_spherePrefab, transform, data.spheres[bigSphereIndex], _levelColors,
-                _allSpheresData, bigSphereIndex);
+                _allSpheresData, _sphereRotation, bigSphereIndex);
         }
 
         protected void ClearSpheres()
         {
             _allSpheresData.DestroyAllSpheres();
+        }
+
+        public void StartGame()
+        {
+            _isAllowedToRotate = true;
+        }
+
+        public void LoseGame()
+        {
+            _isAllowedToRotate = false;
+        }
+
+        public void PauseGame()
+        {
+            _isAllowedToRotate = false;
+        }
+
+        public void ResumeGame()
+        {
+            _isAllowedToRotate = true;
+        }
+
+        public void FinishGame()
+        {
+            _isAllowedToRotate = false;
         }
     }
 }

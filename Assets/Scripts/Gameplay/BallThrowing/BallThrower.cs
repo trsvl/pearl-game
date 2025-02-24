@@ -8,7 +8,7 @@ using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
 {
-    public class BallThrower : MonoBehaviour
+    public class BallThrower : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
         [SerializeField] private SphereDestroyer sphereDestroyer;
 
@@ -32,24 +32,21 @@ namespace Gameplay.BallThrowing
         private Vector3 initialMousePosition;
         private Color[] _levelColors;
         private ShotsData _shotData;
-        private GameplayStateObserver _gameplayStateObserver;
+        private bool _isAllowedToDrag;
 
 
-        public void Init(Color[] levelColors, ShotsData shotData, GameplayStateObserver gameplayStateObserver)
+        public void Init(Color[] levelColors, ShotsData shotData)
         {
             _levelColors = levelColors;
             _shotData = shotData;
-            _gameplayStateObserver = gameplayStateObserver;
             lineRenderer = GetComponent<LineRenderer>();
             dragAreaBounds = throwAreaObject.GetComponent<Collider>().bounds;
-
-            SpawnBall();
         }
 
         private void Update()
         {
+            if (!_isAllowedToDrag) return;
             if (!currentBall) return;
-            if (_gameplayStateObserver.GameplayState != GameplayState.PLAY) return;
 
             HandleInput();
 
@@ -243,6 +240,32 @@ namespace Gameplay.BallThrowing
         private bool IsEqualTo(Color a, Color b)
         {
             return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+        }
+
+        public void StartGame()
+        {
+            SpawnBall();
+            _isAllowedToDrag = true;
+        }
+
+        public void LoseGame()
+        {
+            _isAllowedToDrag = false;
+        }
+
+        public void PauseGame()
+        {
+            _isAllowedToDrag = false;
+        }
+
+        public void ResumeGame()
+        {
+            _isAllowedToDrag = true;
+        }
+
+        public void FinishGame()
+        {
+            _isAllowedToDrag = false;
         }
     }
 }

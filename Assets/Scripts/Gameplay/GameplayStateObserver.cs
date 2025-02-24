@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Gameplay
 {
     public class GameplayStateObserver
     {
-        public GameplayState GameplayState { get; set; } = GameplayState.OFF;
+        private GameplayState GameplayState = GameplayState.OFF;
 
         private readonly List<object> listeners = new();
 

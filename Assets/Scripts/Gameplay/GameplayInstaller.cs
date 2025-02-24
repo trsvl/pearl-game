@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using _Project.Scripts.Utils.UI.Buttons;
+using Gameplay.Animations;
 using Gameplay.BallThrowing;
 using Gameplay.Header;
 using TMPro;
@@ -41,10 +42,11 @@ namespace Gameplay
             pearlsData = new PearlsData(pearlsText);
             gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
             var allColors = new AllColors();
-            var allSpheres = new AllSpheresData();
+            var allSpheresData = new AllSpheresData();
+            var spawnAnimation = new SpawnSmallSpheresAnimation();
 
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
-            sphereGenerator.Init(spherePrefab, allColors, allSpheres);
+            sphereGenerator.Init(spherePrefab, allColors, allSpheresData);
             sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
 
             int level = PlayerData.Instance.CurrentLevel;
@@ -53,10 +55,15 @@ namespace Gameplay
             int shotsCount = sphereGenerator._levelColors.Length * 2;
             shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
 
-            ballThrower.Init(sphereGenerator._levelColors, shotsData, gameplayStateObserver);
+            ballThrower.Init(sphereGenerator._levelColors, shotsData);
             sphereDestroyer.Init(pearlsData);
 
+            gameplayStateObserver.AddListener(sphereGenerator);
+            gameplayStateObserver.AddListener(ballThrower);
             gameplayStateObserver.AddListener(gamePopup);
+
+            var allSpheres = allSpheresData.GetSpheres();
+            yield return StartCoroutine(spawnAnimation.MoveSpheresToCenter(allSpheres, sphereGenerator.transform));
 
             gameplayStateObserver.StartGame();
         }

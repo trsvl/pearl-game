@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
@@ -24,10 +25,16 @@ namespace Gameplay.BallThrowing
         {
             if (collision.gameObject.CompareTag("Ball"))
             {
-                var touchedBallMaterial = collision.gameObject.GetComponent<Renderer>().material;
-                if (_renderer.material.GetColor(AllColors.BaseColor) == touchedBallMaterial.GetColor(AllColors.BaseColor))
+                var materialPropertyBlock = new MaterialPropertyBlock();
+                Renderer sphereRenderer = collision.gameObject.GetComponent<Renderer>();
+                sphereRenderer.GetPropertyBlock(materialPropertyBlock);
+
+                Color ballColor = _renderer.sharedMaterial.GetColor(AllColors.BaseColor);
+                Color touchedSphereColor = materialPropertyBlock.GetColor(AllColors.BaseColor);
+
+                if (ballColor == touchedSphereColor)
                 {
-                    _sphereDestroyer.TryInitiateWave(collision);
+                    _sphereDestroyer.DestroySpheresSegment(collision, ballColor);
                     Destroy(gameObject);
                 }
                 else
@@ -37,14 +44,6 @@ namespace Gameplay.BallThrowing
             }
         }
 
-        public void InvokeDestroy()
-        {
-            Invoke(nameof(SelfDestruct), 5f);
-        }
-
-        private void SelfDestruct()
-        {
-            Destroy(gameObject);
-        }
+    
     }
 }

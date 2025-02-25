@@ -151,7 +151,8 @@ namespace Gameplay.BallThrowing
 
             if (!currentBall) return;
 
-            currentBall.InvokeDestroy();
+            StartCoroutine(DestroyBallAfterDelay(currentBall.gameObject));
+
             Vector3 currentMousePos = Input.mousePosition;
             Vector3 dragVector = currentMousePos - initialMousePosition;
             float dragMagnitude = Mathf.Clamp(dragVector.magnitude, 0, maxDragDistance);
@@ -240,6 +241,12 @@ namespace Gameplay.BallThrowing
         private bool IsEqualTo(Color a, Color b)
         {
             return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
+        }
+
+        private IEnumerator DestroyBallAfterDelay(GameObject ball)
+        {
+            yield return new WaitForSeconds(4f);
+            Destroy(ball);
         }
 
         public void StartGame()

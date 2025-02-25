@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using Utils.SphereData;
 
 namespace Gameplay.Animations
 {
@@ -11,11 +12,12 @@ namespace Gameplay.Animations
         private const float distance = 5f;
 
 
-        public IEnumerator MoveSpheresToCenter(Dictionary<Color, List<GameObject>[]>.ValueCollection allSpheres,
-            Transform parent)
+        public IEnumerator MoveSpheresToCenter(AllSpheresData allSpheresData, Transform parent)
         {
             const float moveDuration = 0.3f;
             const float delayBetweenIterations = 0.3f;
+
+            var allSpheres = allSpheresData.GetSpheres();
 
             int length = allSpheres.First().Length;
             int directionX = 1;
@@ -44,7 +46,7 @@ namespace Gameplay.Animations
             }
         }
 
-        private GameObject CreateSegmentObject(Transform parent, List<GameObject> allSpheres)
+        private GameObject CreateSegmentObject(Transform parent, HashSet<GameObject> allSpheres)
         {
             GameObject sphereSegment = new GameObject();
             sphereSegment.transform.SetParent(parent, false);
@@ -58,7 +60,7 @@ namespace Gameplay.Animations
             return sphereSegment;
         }
 
-        private void DestroySegmentObject(List<GameObject> allSpheres, GameObject sphereSegment)
+        private void DestroySegmentObject(HashSet<GameObject> allSpheres, GameObject sphereSegment)
         {
             foreach (var sphere in allSpheres)
             {

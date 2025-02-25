@@ -36,7 +36,7 @@ namespace Utils.SphereData
                 materialPropertyBlock.SetColor(AllColors.BaseColor, color);
                 allSpheresData.AddSphere(color, sphere, bigSphereIndex);
 
-                sphere.GetComponent<MeshRenderer>().SetPropertyBlock(materialPropertyBlock);
+                sphere.GetComponent<Renderer>().SetPropertyBlock(materialPropertyBlock);
 
                 sphere.SetActive(!isGameplayScene);
             }

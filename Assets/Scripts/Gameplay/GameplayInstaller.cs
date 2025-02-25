@@ -56,14 +56,13 @@ namespace Gameplay
             shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
 
             ballThrower.Init(sphereGenerator._levelColors, shotsData);
-            sphereDestroyer.Init(pearlsData);
+            sphereDestroyer.Init(pearlsData, allSpheresData);
 
             gameplayStateObserver.AddListener(sphereGenerator);
             gameplayStateObserver.AddListener(ballThrower);
             gameplayStateObserver.AddListener(gamePopup);
 
-            var allSpheres = allSpheresData.GetSpheres();
-            yield return StartCoroutine(spawnAnimation.MoveSpheresToCenter(allSpheres, sphereGenerator.transform));
+            yield return StartCoroutine(spawnAnimation.MoveSpheresToCenter(allSpheresData, sphereGenerator.transform));
 
             gameplayStateObserver.StartGame();
         }

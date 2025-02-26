@@ -11,51 +11,59 @@ namespace Gameplay.BallThrowing
     public class BallThrower : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
         [SerializeField] private SphereDestroyer sphereDestroyer;
+        [SerializeField] private float dragSensitivity = 0.1f;
+        [SerializeField] private float verticalMultiplier = 3f;
+        [SerializeField] private int trajectoryPoints = 40;
+        [SerializeField] private float timeStep = 0.07f;
+        [SerializeField] private float respawnDelay = 0.3f;
+        [SerializeField] private LayerMask collisionMaskLine;
+        [SerializeField] private RectTransform dragArea;
+        [SerializeField] private Camera throwingBallCamera;
 
-        [Header("Settings")] public GameObject ballPrefab;
-        public Transform launchPoint;
-        public float forceMultiplier = 0.3f;
-        public float maxForce = 50f;
-        public float verticalMultiplier = 1.5f;
-        public float maxDragDistance = 300f;
-        public int trajectoryPoints = 40;
-        public float timeStep = 0.07f;
-        public float respawnDelay = 0.3f;
-        public LayerMask collisionMaskLine;
-        public GameObject throwAreaObject;
-
-        private Color previousColor = new(0, 0, 0, 0);
-        private Bounds dragAreaBounds;
-        private LineRenderer lineRenderer;
-        private Ball currentBall;
-        private bool isDragging;
-        private Vector3 initialMousePosition;
+        private Camera _mainCamera;
+        private GameObject _ballPrefab;
+        private Vector3 _lineStartPosition;
+        private Vector3 _ballSpawnPoint;
+        private Color _previousColor = new(0, 0, 0, 0);
+        private LineRenderer _lineRenderer;
+        private Ball _currentBall;
+        private bool _isDragging;
+        private Vector3 _initialMousePosition;
         private Color[] _levelColors;
         private ShotsData _shotData;
         private bool _isAllowedToDrag;
+        private Vector3 _velocity;
+        private const float _minimalForce = 3f;
+        private const float _maxForce = 50f;
 
 
         public void Init(Color[] levelColors, ShotsData shotData)
         {
+            _ballPrefab = Resources.Load<GameObject>("Prefabs/ThrowingBall");
+
             _levelColors = levelColors;
             _shotData = shotData;
-            lineRenderer = GetComponent<LineRenderer>();
-            dragAreaBounds = throwAreaObject.GetComponent<Collider>().bounds;
+            _lineRenderer = GetComponent<LineRenderer>();
+            _mainCamera = Camera.main;
+
+            Vector3 ballSpawnPointScreen = new(0.8f, 0.3f, 12f);
+
+            _ballSpawnPoint = throwingBallCamera.ScreenToWorldPoint(ballSpawnPointScreen);
+            _lineStartPosition = _mainCamera.ScreenToWorldPoint(ballSpawnPointScreen);
         }
 
         private void Update()
         {
-            if (!_isAllowedToDrag) return;
-            if (!currentBall) return;
+            if (!_isAllowedToDrag || !_currentBall) return;
 
             HandleInput();
 
-            if (isDragging)
+            if (_isDragging)
             {
                 if (!IsMouseInDragArea())
                 {
-                    isDragging = false;
-                    lineRenderer.positionCount = 0;
+                    _isDragging = false;
+                    _lineRenderer.positionCount = 0;
                 }
                 else
                 {
@@ -69,144 +77,124 @@ namespace Gameplay.BallThrowing
             if (Input.GetMouseButtonDown(0))
             {
                 if (!IsMouseInDragArea()) return;
+                if (IsPointerOverUIElement()) return;
 
-                isDragging = true;
-                initialMousePosition = Input.mousePosition;
-                lineRenderer.positionCount = trajectoryPoints;
-                lineRenderer.startColor = currentBall._renderer.material.GetColor(AllColors.BaseColor);
-                lineRenderer.endColor = currentBall._renderer.material.GetColor(AllColors.BaseColor);
+                _isDragging = true;
+                _initialMousePosition = Input.mousePosition;
+                _lineRenderer.positionCount = trajectoryPoints;
+
+                Color color = _currentBall._renderer.material.GetColor(AllColors.BaseColor);
+                _lineRenderer.startColor = color;
+                _lineRenderer.endColor = color;
             }
 
-            if (Input.GetMouseButtonUp(0) && isDragging)
+            if (Input.GetMouseButtonUp(0) && _isDragging)
             {
-                if (IsPointerOverUIElement())
-                {
-                    isDragging = false;
-                    lineRenderer.positionCount = 0;
-                }
-                else
-                {
-                    ReleaseBall();
-                    StartCoroutine(SpawnBallAfterDelay(respawnDelay));
-                }
+                _isDragging = false;
+                _lineRenderer.positionCount = 0;
+
+                ReleaseBall();
+                StartCoroutine(SpawnBallAfterDelay(respawnDelay));
             }
         }
 
         private void UpdateTrajectory()
         {
-            Vector3 currentMousePos = Input.mousePosition;
-            Vector3 dragVector = currentMousePos - initialMousePosition;
-            float dragMagnitude = Mathf.Clamp(dragVector.magnitude, 0, maxDragDistance);
-            float forceMagnitude = Mathf.Min(dragMagnitude * forceMultiplier, maxForce);
+            float fovRatio = _mainCamera.fieldOfView / 60f;
+            Vector2 dragDelta = (Input.mousePosition - _initialMousePosition) * (dragSensitivity * fovRatio);
 
-            Vector3 launchScreenPos = Camera.main.WorldToScreenPoint(launchPoint.position);
-            Vector3 screenDelta = currentMousePos - launchScreenPos;
+            Vector3 cameraForward = _mainCamera.transform.forward;
+            Vector3 cameraRight = _mainCamera.transform.right;
+            Vector3 cameraUp = _mainCamera.transform.up;
 
-            Vector3 throwDir = new Vector3(
-                -screenDelta.x,
-                screenDelta.magnitude * verticalMultiplier,
-                -screenDelta.y
+            Vector3 throwDir = (
+                cameraForward * 100f +
+                cameraRight * dragDelta.x +
+                cameraUp * (dragDelta.y * verticalMultiplier)
             ).normalized;
 
-            UpdateTrajectoryLine(launchPoint.position, throwDir * forceMagnitude);
+
+            float dragMagnitude = Mathf.Clamp(dragDelta.magnitude, 0, 200f);
+            float forceMagnitude = Mathf.Max(_minimalForce, Mathf.Min(dragMagnitude, _maxForce));
+            _velocity = throwDir * forceMagnitude;
+            UpdateTrajectoryLine(_lineStartPosition, _velocity);
         }
 
         private void UpdateTrajectoryLine(Vector3 startPos, Vector3 initialVelocity)
         {
-            if (!lineRenderer) return;
+            if (!_lineRenderer) return;
 
-            Vector3[] points = new Vector3[trajectoryPoints];
+            var points = new Vector3[trajectoryPoints];
             points[0] = startPos;
             int actualPoints = trajectoryPoints;
 
-            Vector3 currentPosition = startPos;
-
-            Vector3 currentVelocity = new Vector3(initialVelocity.x, initialVelocity.y * 1.2f, initialVelocity.z);
-
-            for (int i = 1; i < trajectoryPoints; i++)
+            for (var i = 1; i < trajectoryPoints; i++)
             {
-                currentVelocity += Physics.gravity * timeStep;
-                Vector3 newPosition = currentPosition + currentVelocity * timeStep;
+                float time = i * timeStep;
 
-                if (Physics.Linecast(currentPosition, newPosition, out RaycastHit hit, collisionMaskLine))
+                points[i] = CalculatePositionAtTime(startPos, initialVelocity, time, Physics.gravity);
+
+                if (Physics.Raycast(points[i - 1], (points[i] - points[i - 1]).normalized, out RaycastHit hit,
+                        Vector3.Distance(points[i - 1], points[i]), collisionMaskLine))
                 {
                     points[i] = hit.point;
                     actualPoints = i + 1;
                     break;
                 }
-
-                points[i] = newPosition;
-                currentPosition = newPosition;
             }
 
-            lineRenderer.positionCount = actualPoints;
-            lineRenderer.SetPositions(points);
+            _lineRenderer.positionCount = actualPoints;
+            _lineRenderer.SetPositions(points);
+            _lineRenderer.startWidth = 0.1f;
+            _lineRenderer.endWidth = 0.1f;
+        }
+
+        private Vector3 CalculatePositionAtTime(Vector3 startPos, Vector3 startVelocity, float time, Vector3 gravity)
+        {
+            return startPos + startVelocity * time + gravity * (0.5f * time * time);
         }
 
         private void ReleaseBall()
         {
-            isDragging = false;
-            lineRenderer.positionCount = 0;
+            _isDragging = false;
+            _lineRenderer.positionCount = 0;
             _shotData.Count -= 1;
 
-            if (!currentBall) return;
+            if (!_currentBall) return;
+            StartCoroutine(DestroyBallAfterDelay(_currentBall.gameObject));
 
-            StartCoroutine(DestroyBallAfterDelay(currentBall.gameObject));
-
-            Vector3 currentMousePos = Input.mousePosition;
-            Vector3 dragVector = currentMousePos - initialMousePosition;
-            float dragMagnitude = Mathf.Clamp(dragVector.magnitude, 0, maxDragDistance);
-            float forceMagnitude = Mathf.Min(dragMagnitude * forceMultiplier, maxForce);
-
-            Vector3 launchScreenPos = Camera.main.WorldToScreenPoint(launchPoint.position);
-            Vector3 screenDelta = currentMousePos - launchScreenPos;
-
-            Vector3 throwDir = new Vector3(
-                -screenDelta.x,
-                screenDelta.magnitude * verticalMultiplier,
-                -screenDelta.y
-            ).normalized;
-
-            ApplyThrowForce(throwDir * forceMagnitude);
+            ApplyThrowForce(_velocity);
         }
 
         private void ApplyThrowForce(Vector3 force)
         {
-            Rigidbody rb = currentBall.GetComponent<Rigidbody>();
-            if (rb)
-            {
-                rb.isKinematic = false;
-                rb.velocity = new Vector3(force.x, force.y * 1.2f, force.z);
-            }
-
-            currentBall = null;
+            var rb = _currentBall.GetComponent<Rigidbody>();
+            rb.isKinematic = false;
+            rb.AddForce(force, ForceMode.VelocityChange);
+            _currentBall = null;
         }
 
         private void SpawnBall()
         {
             if (_shotData.Count <= 0) return;
 
-            currentBall = Instantiate(ballPrefab, launchPoint.position, Quaternion.identity).AddComponent<Ball>();
-            currentBall.GetComponent<Renderer>().material.SetColor(AllColors.BaseColor, GetBallColor());
-
-            currentBall.Init(sphereDestroyer, LayerMask.NameToLayer("Ignore Raycast"));
+            _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, Quaternion.identity).AddComponent<Ball>();
+            _currentBall.GetComponent<Renderer>().material.SetColor(AllColors.BaseColor, GetBallColor());
+            _currentBall.Init(sphereDestroyer);
         }
 
         public void RespawnBall()
         {
-            if (currentBall != null) Destroy(currentBall.gameObject);
-
+            if (_currentBall != null) Destroy(_currentBall.gameObject);
             SpawnBall();
         }
 
         private Color GetBallColor()
         {
             if (_levelColors.Length <= 1) return _levelColors[0];
-
-            Color[] filteredColors = _levelColors.Where(color => !IsEqualTo(color, previousColor)).ToArray();
+            Color[] filteredColors = _levelColors.Where(color => color != _previousColor).ToArray();
             int randomIndex = Random.Range(0, filteredColors.Length);
-            previousColor = filteredColors[randomIndex];
-
+            _previousColor = filteredColors[randomIndex];
             return filteredColors[randomIndex];
         }
 
@@ -218,29 +206,26 @@ namespace Gameplay.BallThrowing
 
         private bool IsMouseInDragArea()
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, LayerMask.GetMask("DragArea")))
-            {
-                return dragAreaBounds.Contains(hit.point);
-            }
+            Vector3 worldMousePosition = Input.mousePosition;
 
-            return false;
+
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(dragArea, worldMousePosition, _mainCamera,
+                out Vector3 worldPoint);
+
+
+            Vector2 localMousePosition = dragArea.InverseTransformPoint(worldPoint);
+
+            return dragArea.rect.Contains(localMousePosition);
         }
 
         private bool IsPointerOverUIElement()
         {
             if (!EventSystem.current) return false;
-
-            PointerEventData eventData = new PointerEventData(EventSystem.current);
+            var eventData = new PointerEventData(EventSystem.current);
             eventData.position = Input.mousePosition;
-            List<RaycastResult> results = new List<RaycastResult>();
+            var results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0;
-        }
-
-        private bool IsEqualTo(Color a, Color b)
-        {
-            return a.r == b.r && a.g == b.g && a.b == b.b && a.a == b.a;
         }
 
         private IEnumerator DestroyBallAfterDelay(GameObject ball)

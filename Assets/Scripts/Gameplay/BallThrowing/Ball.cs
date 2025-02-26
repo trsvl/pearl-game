@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
@@ -9,14 +8,12 @@ namespace Gameplay.BallThrowing
         public Renderer _renderer { get; private set; }
 
         private SphereDestroyer _sphereDestroyer;
-        private LayerMask _layerMask;
         private Collider _collider;
 
 
-        public void Init(SphereDestroyer sphereDestroyer, LayerMask layerMask)
+        public void Init(SphereDestroyer sphereDestroyer)
         {
             _sphereDestroyer = sphereDestroyer;
-            _layerMask = layerMask;
             _renderer = GetComponent<Renderer>();
             _collider = GetComponent<Collider>();
         }
@@ -39,11 +36,9 @@ namespace Gameplay.BallThrowing
                 }
                 else
                 {
-                    _collider.excludeLayers += _layerMask;
+                    _collider.enabled = false;
                 }
             }
         }
-
-    
     }
 }

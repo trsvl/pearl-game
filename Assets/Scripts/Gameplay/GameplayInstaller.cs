@@ -47,7 +47,7 @@ namespace Gameplay
 
             sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
             sphereGenerator.Init(spherePrefab, allColors, allSpheresData);
-            sphereGenerator.transform.position = new Vector3(0f, 3f, 0f);
+            sphereGenerator.transform.position = new Vector3(0f, 1f, 20f);
 
             int level = PlayerData.Instance.CurrentLevel;
             yield return StartCoroutine(dataContext.LoadSpheres(level, sphereGenerator));

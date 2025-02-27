@@ -9,15 +9,15 @@ namespace Gameplay.Animations
 {
     public class SpawnSmallSpheresAnimation
     {
-        private const float distance = 5f;
+        private const float distance = 10f;
 
 
-        public IEnumerator MoveSpheresToCenter(AllSpheresData allSpheresData, Transform parent)
+        public IEnumerator MoveSpheresToCenter(SpheresDictionary spheresDictionary, Transform parent)
         {
-            const float moveDuration = 0.3f;
-            const float delayBetweenIterations = 0.3f;
+            const float moveDuration = 0.2f;
+            const float delayBetweenIterations = 0.1f;
 
-            var allSpheres = allSpheresData.GetSpheres();
+            var allSpheres = spheresDictionary.GetSpheres();
 
             int length = allSpheres.First().Length;
             int directionX = 1;

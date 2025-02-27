@@ -19,7 +19,7 @@ namespace Dev.LevelBuilder
 
             foreach (Transform child in transform)
             {
-                child.rotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+                child.rotation = SphereRotation.GetQuaternion;
             }
 
             foreach (var sphere in _bigSpheres)

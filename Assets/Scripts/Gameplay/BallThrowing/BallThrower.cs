@@ -18,11 +18,10 @@ namespace Gameplay.BallThrowing
         [SerializeField] private float respawnDelay = 0.3f;
         [SerializeField] private LayerMask collisionMaskLine;
         [SerializeField] private RectTransform dragArea;
-        [SerializeField] private Camera throwingBallCamera;
+        [SerializeField] private Camera uiCamera;
 
         private Camera _mainCamera;
         private GameObject _ballPrefab;
-        private Vector3 _lineStartPosition;
         private Vector3 _ballSpawnPoint;
         private Color _previousColor = new(0, 0, 0, 0);
         private LineRenderer _lineRenderer;
@@ -33,23 +32,28 @@ namespace Gameplay.BallThrowing
         private ShotsData _shotData;
         private bool _isAllowedToDrag;
         private Vector3 _velocity;
+
+        private float _ballSize;
+        private Vector3 _ballLocalScale;
+
         private const float _minimalForce = 3f;
         private const float _maxForce = 50f;
 
 
-        public void Init(Color[] levelColors, ShotsData shotData)
+        public void Init(Color[] levelColors, ShotsData shotData, SpheresDictionary spheresDictionary)
         {
             _ballPrefab = Resources.Load<GameObject>("Prefabs/ThrowingBall");
 
             _levelColors = levelColors;
             _shotData = shotData;
+
             _lineRenderer = GetComponent<LineRenderer>();
-            _mainCamera = Camera.main;
+            _lineRenderer.startWidth = 0.1f;
+            _lineRenderer.endWidth = 0.1f;
 
-            Vector3 ballSpawnPointScreen = new(0.8f, 0.3f, 12f);
-
-            _ballSpawnPoint = throwingBallCamera.ScreenToWorldPoint(ballSpawnPointScreen);
-            _lineStartPosition = _mainCamera.ScreenToWorldPoint(ballSpawnPointScreen);
+            Vector3 lowestScale = spheresDictionary.GetLowestSphereScale();
+            InitBallData(lowestScale);
+            InitCameraData();
         }
 
         private void Update()
@@ -100,8 +104,7 @@ namespace Gameplay.BallThrowing
 
         private void UpdateTrajectory()
         {
-            float fovRatio = _mainCamera.fieldOfView / 60f;
-            Vector2 dragDelta = (Input.mousePosition - _initialMousePosition) * (dragSensitivity * fovRatio);
+            Vector2 dragDelta = (Input.mousePosition - _initialMousePosition) * dragSensitivity;
 
             Vector3 cameraForward = _mainCamera.transform.forward;
             Vector3 cameraRight = _mainCamera.transform.right;
@@ -109,15 +112,15 @@ namespace Gameplay.BallThrowing
 
             Vector3 throwDir = (
                 cameraForward * 100f +
-                cameraRight * dragDelta.x +
-                cameraUp * (dragDelta.y * verticalMultiplier)
+                cameraRight * (dragDelta.x * 0.2f) +
+                cameraUp * (dragDelta.y * verticalMultiplier * 0.2f)
             ).normalized;
-
 
             float dragMagnitude = Mathf.Clamp(dragDelta.magnitude, 0, 200f);
             float forceMagnitude = Mathf.Max(_minimalForce, Mathf.Min(dragMagnitude, _maxForce));
             _velocity = throwDir * forceMagnitude;
-            UpdateTrajectoryLine(_lineStartPosition, _velocity);
+
+            UpdateTrajectoryLine(_ballSpawnPoint, _velocity);
         }
 
         private void UpdateTrajectoryLine(Vector3 startPos, Vector3 initialVelocity)
@@ -145,8 +148,6 @@ namespace Gameplay.BallThrowing
 
             _lineRenderer.positionCount = actualPoints;
             _lineRenderer.SetPositions(points);
-            _lineRenderer.startWidth = 0.1f;
-            _lineRenderer.endWidth = 0.1f;
         }
 
         private Vector3 CalculatePositionAtTime(Vector3 startPos, Vector3 startVelocity, float time, Vector3 gravity)
@@ -179,13 +180,58 @@ namespace Gameplay.BallThrowing
             if (_shotData.Count <= 0) return;
 
             _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, Quaternion.identity).AddComponent<Ball>();
-            _currentBall.GetComponent<Renderer>().material.SetColor(AllColors.BaseColor, GetBallColor());
             _currentBall.Init(sphereDestroyer);
+
+            _currentBall.transform.localScale = _ballLocalScale;
+            _currentBall._renderer.material.SetColor(AllColors.BaseColor, GetBallColor());
+        }
+
+        private void InitBallData(Vector3 ballLocalScale)
+        {
+            _ballLocalScale = ballLocalScale;
+
+            var initialBall = Instantiate(_ballPrefab).AddComponent<Ball>();
+            initialBall.transform.localScale = _ballLocalScale;
+            initialBall.gameObject.SetActive(false);
+            Renderer ballRenderer = initialBall.GetComponent<Renderer>();
+            Bounds bounds = ballRenderer.bounds;
+            const float ballScale = 0.3f;
+            Vector3 objectSizes = (bounds.max - bounds.min) / ballScale;
+
+            _ballSize = Mathf.Max(objectSizes.x, objectSizes.y, objectSizes.z);
+
+            Destroy(initialBall.gameObject);
+        }
+
+        private void InitCameraData()
+        {
+            _mainCamera = Camera.main;
+            UpdateCameraFOV();
+        }
+
+        private void UpdateCameraFOV()
+        {
+            float cameraView =
+                2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * _mainCamera.fieldOfView);
+            float distance = 2f * _ballSize / cameraView;
+            distance += 0.5f * _ballSize;
+            _mainCamera.transform.position = new Vector3(0, 0, distance);
+
+            Vector3 ballPosition = new Vector3(0.8f, 0.15f, distance);
+            _ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
+
+            if (!_currentBall) return;
+
+            _currentBall.transform.position = _ballSpawnPoint;
         }
 
         public void RespawnBall()
         {
+            if (!_isAllowedToDrag) return;
+            
             if (_currentBall != null) Destroy(_currentBall.gameObject);
+
+            UpdateCameraFOV();
             SpawnBall();
         }
 
@@ -208,10 +254,8 @@ namespace Gameplay.BallThrowing
         {
             Vector3 worldMousePosition = Input.mousePosition;
 
-
-            RectTransformUtility.ScreenPointToWorldPointInRectangle(dragArea, worldMousePosition, _mainCamera,
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(dragArea, worldMousePosition, uiCamera,
                 out Vector3 worldPoint);
-
 
             Vector2 localMousePosition = dragArea.InverseTransformPoint(worldPoint);
 
@@ -221,8 +265,11 @@ namespace Gameplay.BallThrowing
         private bool IsPointerOverUIElement()
         {
             if (!EventSystem.current) return false;
-            var eventData = new PointerEventData(EventSystem.current);
-            eventData.position = Input.mousePosition;
+            
+            var eventData = new PointerEventData(EventSystem.current)
+            {
+                position = Input.mousePosition
+            };
             var results = new List<RaycastResult>();
             EventSystem.current.RaycastAll(eventData, results);
             return results.Count > 0;

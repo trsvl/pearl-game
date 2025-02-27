@@ -7,9 +7,11 @@ using Object = UnityEngine.Object;
 
 namespace Utils.SphereData
 {
-    public class AllSpheresData
+    public class SpheresDictionary
     {
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
+        private Vector3 lowestSphereScale = Vector3.one;
+
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
@@ -75,6 +77,19 @@ namespace Utils.SphereData
         public Dictionary<Color, HashSet<GameObject>[]>.ValueCollection GetSpheres()
         {
             return allSpheres.Values;
+        }
+
+        public void SetLowestSphereScale(Vector3 sphereScale)
+        {
+            if (sphereScale.x < lowestSphereScale.x)
+            {
+                lowestSphereScale = sphereScale;
+            }
+        }
+
+        public Vector3 GetLowestSphereScale()
+        {
+            return lowestSphereScale;
         }
     }
 }

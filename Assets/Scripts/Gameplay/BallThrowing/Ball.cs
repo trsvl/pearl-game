@@ -18,6 +18,11 @@ namespace Gameplay.BallThrowing
             _collider = GetComponent<Collider>();
         }
 
+        private void Update()
+        {
+            transform.rotation = SphereRotation.GetQuaternion;
+        }
+
         private void OnCollisionEnter(Collision collision)
         {
             if (collision.gameObject.CompareTag("Ball"))

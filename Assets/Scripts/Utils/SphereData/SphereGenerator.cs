@@ -5,21 +5,20 @@ namespace Utils.SphereData
     public class SphereGenerator : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
         public Color[] _levelColors { get; private set; }
-        public Vector3 _childQuaternion = new(0.19f, -0.9f, 0.17f);
 
         protected AllColors _allColors { get; private set; }
 
         private GameObject _spherePrefab;
         private Quaternion _sphereRotation;
-        private AllSpheresData _allSpheresData;
+        private SpheresDictionary _spheresDictionary;
         private bool _isAllowedToRotate;
 
-        public void Init(GameObject spherePrefab, AllColors allColors, AllSpheresData allSpheresData)
+        public void Init(GameObject spherePrefab, AllColors allColors, SpheresDictionary spheresDictionary)
         {
             _spherePrefab = spherePrefab;
             _allColors = allColors;
-            _allSpheresData = allSpheresData;
-            _sphereRotation = new Quaternion(_childQuaternion.x, _childQuaternion.y, _childQuaternion.z, 1f);
+            _spheresDictionary = spheresDictionary;
+            _sphereRotation = SphereRotation.GetQuaternion;
         }
 
         protected virtual void Update()
@@ -43,7 +42,7 @@ namespace Utils.SphereData
             for (int i = 0; i < json.colorNames.Length; i++)
             {
                 Color color = _allColors.GetColor(json.colorNames[i]);
-                _allSpheresData.AddColorToDictionary(color, json.spheres.Length);
+                _spheresDictionary.AddColorToDictionary(color, json.spheres.Length);
                 _levelColors[i] = color;
             }
 
@@ -62,12 +61,12 @@ namespace Utils.SphereData
         protected void GenerateSmallSpheres(SpheresData data, BigSphere bigSphere, int bigSphereIndex)
         {
             bigSphere.CreateSmallSpheres(_spherePrefab, transform, data.spheres[bigSphereIndex], _levelColors,
-                _allSpheresData, _sphereRotation, bigSphereIndex);
+                _spheresDictionary, _sphereRotation, bigSphereIndex);
         }
 
         protected void ClearSpheres()
         {
-            _allSpheresData.DestroyAllSpheres();
+            _spheresDictionary.DestroyAllSpheres();
         }
 
         public void StartGame()

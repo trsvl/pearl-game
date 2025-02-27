@@ -18,7 +18,7 @@ namespace Utils.SphereData
         }
 
         public void CreateSmallSpheres(GameObject spherePrefab, Transform parent, BigSphereData data,
-            Color[] levelColors, AllSpheresData allSpheresData, Quaternion sphereRotation, int bigSphereIndex)
+            Color[] levelColors, SpheresDictionary spheresDictionary, Quaternion sphereRotation, int bigSphereIndex)
         {
             string currentScene = SceneManager.GetActiveScene().name;
             bool isGameplayScene = currentScene == SceneName.Gameplay.ToString();
@@ -34,7 +34,9 @@ namespace Utils.SphereData
 
                 Color color = levelColors[data.colorIndexes[i]];
                 materialPropertyBlock.SetColor(AllColors.BaseColor, color);
-                allSpheresData.AddSphere(color, sphere, bigSphereIndex);
+                
+                spheresDictionary.AddSphere(color, sphere, bigSphereIndex);
+                spheresDictionary.SetLowestSphereScale(sphere.transform.localScale);
 
                 sphere.GetComponent<Renderer>().SetPropertyBlock(materialPropertyBlock);
 

@@ -9,19 +9,19 @@ namespace Gameplay.BallThrowing
     {
         private const float fallDuration = 5f;
         private PearlsData _pearlsData;
-        private AllSpheresData _allSpheresData;
+        private SpheresDictionary _spheresDictionary;
 
 
-        public void Init(PearlsData pearlsData, AllSpheresData allSpheresData)
+        public void Init(PearlsData pearlsData, SpheresDictionary spheresDictionary)
         {
             _pearlsData = pearlsData;
-            _allSpheresData = allSpheresData;
+            _spheresDictionary = spheresDictionary;
         }
 
         public void DestroySpheresSegment(Collision targetCollision, Color targetColor)
         {
             GameObject targetSphere = targetCollision.gameObject;
-            StartCoroutine(_allSpheresData.DestroySpheresSegment(targetColor, targetSphere, DestroySphere));
+            StartCoroutine(_spheresDictionary.DestroySpheresSegment(targetColor, targetSphere, DestroySphere));
         }
 
         private void DestroySphere(GameObject sphere)
@@ -32,6 +32,9 @@ namespace Gameplay.BallThrowing
             {
                 rb.isKinematic = false;
                 rb.useGravity = true;
+                
+                Vector3 direction = sphere.transform.position - sphere.transform.parent.transform.position;
+                rb.AddForce(direction.normalized * 2f, ForceMode.Impulse);
             }
 
             _pearlsData.Count += 1;

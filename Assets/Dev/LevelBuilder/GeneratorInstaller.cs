@@ -28,7 +28,7 @@ namespace Dev.LevelBuilder
         {
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             var allColors = new AllColors();
-            var allSpheres = new AllSpheresData();
+            var allSpheres = new SpheresDictionary();
 
             dataContext = new DataContextBuilder();
             sphereGenerator.Init(spherePrefab, allColors, allSpheres);

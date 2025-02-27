@@ -25,7 +25,7 @@ namespace MainMenu
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             dataContext = new DataContext();
             var allColors = new AllColors();
-            var allSpheres = new AllSpheresData();
+            var allSpheres = new SpheresDictionary();
 
             sphereGenerator = new GameObject().AddComponent<SphereGeneratorMainMenu>();
             sphereGenerator.Init(spherePrefab, allColors, allSpheres);

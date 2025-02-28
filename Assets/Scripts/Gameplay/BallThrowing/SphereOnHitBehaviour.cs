@@ -1,30 +1,20 @@
 ﻿using System.Collections;
 using Gameplay.Header;
 using UnityEngine;
-using Utils.SphereData;
 
 namespace Gameplay.BallThrowing
 {
-    public class SphereDestroyer : MonoBehaviour
+    public class SphereOnHitBehaviour : MonoBehaviour
     {
         private const float fallDuration = 5f;
-        private PearlsData _pearlsData;
-        private SpheresDictionary _spheresDictionary;
 
 
-        public void Init(PearlsData pearlsData, SpheresDictionary spheresDictionary)
+        public void Init(PearlsData pearlsData)
         {
             _pearlsData = pearlsData;
-            _spheresDictionary = spheresDictionary;
         }
 
-        public void DestroySpheresSegment(Collision targetCollision, Color targetColor)
-        {
-            GameObject targetSphere = targetCollision.gameObject;
-            StartCoroutine(_spheresDictionary.DestroySpheresSegment(targetColor, targetSphere, DestroySphere));
-        }
-
-        private void DestroySphere(GameObject sphere)
+        public void DestroySphere(GameObject sphere)
         {
             sphere.layer = LayerMask.NameToLayer("Ignore Raycast");
 

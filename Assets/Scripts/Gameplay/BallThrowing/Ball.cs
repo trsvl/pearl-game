@@ -7,13 +7,13 @@ namespace Gameplay.BallThrowing
     {
         public Renderer _renderer { get; private set; }
 
-        private SphereDestroyer _sphereDestroyer;
+        private SphereOnHitBehaviour _sphereOnHitBehaviour;
         private Collider _collider;
 
 
-        public void Init(SphereDestroyer sphereDestroyer)
+        public void Init(SphereOnHitBehaviour sphereOnHitBehaviour)
         {
-            _sphereDestroyer = sphereDestroyer;
+            _sphereOnHitBehaviour = sphereOnHitBehaviour;
             _renderer = GetComponent<Renderer>();
             _collider = GetComponent<Collider>();
         }
@@ -36,7 +36,7 @@ namespace Gameplay.BallThrowing
 
                 if (ballColor == touchedSphereColor)
                 {
-                    _sphereDestroyer.DestroySpheresSegment(collision, ballColor);
+                    _sphereOnHitBehaviour.DestroySpheresSegment(collision, ballColor);
                     Destroy(gameObject);
                 }
                 else

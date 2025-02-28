@@ -18,14 +18,6 @@ namespace Gameplay
             }
         }
 
-        public void RemoveListener(object listener)
-        {
-            if (listener is IStartGame or IPauseGame or IResumeGame or IFinishGame or ILoseGame)
-            {
-                listeners.Remove(listener);
-            }
-        }
-
         public void StartGame()
         {
             NotifyListeners<IStartGame>(GameplayState == GameplayState.OFF, GameplayState.PLAY,

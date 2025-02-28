@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using _Project.Scripts.Utils.UI.Buttons;
-using Gameplay.Animations;
 using Gameplay.BallThrowing;
+using Gameplay.Effects;
 using Gameplay.Header;
 using TMPro;
 using UnityEngine;
@@ -16,7 +16,7 @@ namespace Gameplay
         [SerializeField] private TextMeshProUGUI pearlsText;
         [SerializeField] private TextMeshProUGUI shotsText;
         [SerializeField] private BallThrower ballThrower;
-        [SerializeField] private SphereDestroyer sphereDestroyer;
+        [SerializeField] private SphereOnHitBehaviour _sphereOnHitBehaviour;
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button changeBallButton;
 
@@ -27,25 +27,20 @@ namespace Gameplay
         [SerializeField] private GameObject popup;
 
         private GameplayStateObserver gameplayStateObserver;
-        private GamePopup gamePopup;
-        private SphereGenerator sphereGenerator;
-        private DataContext dataContext;
-        private PearlsData pearlsData;
-        private ShotsData shotsData;
 
 
         private IEnumerator Start()
         {
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
-            dataContext = new DataContext();
+            var dataContext = new DataContext();
             gameplayStateObserver = new GameplayStateObserver();
-            pearlsData = new PearlsData(pearlsText);
-            gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
+            var pearlsData = new PearlsData(pearlsText);
+            var gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
             var allColors = new AllColors();
             var spheresDictionary = new SpheresDictionary();
             var spawnAnimation = new SpawnSmallSpheresAnimation();
 
-            sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
+            var sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
             sphereGenerator.Init(spherePrefab, allColors, spheresDictionary);
             sphereGenerator.transform.position = new Vector3(0f, 1f, 40f);
 
@@ -53,18 +48,23 @@ namespace Gameplay
             yield return StartCoroutine(dataContext.LoadSpheres(level, sphereGenerator));
 
             int shotsCount = sphereGenerator._levelColors.Length * 2;
-            shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
+            var shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
 
             ballThrower.Init(sphereGenerator._levelColors, shotsData, spheresDictionary);
-            sphereDestroyer.Init(pearlsData, spheresDictionary);
+            _sphereOnHitBehaviour.Init(pearlsData, spheresDictionary);
 
             gameplayStateObserver.AddListener(sphereGenerator);
             gameplayStateObserver.AddListener(ballThrower);
             gameplayStateObserver.AddListener(gamePopup);
 
-            yield return StartCoroutine(spawnAnimation.MoveSpheresToCenter(spheresDictionary, sphereGenerator.transform));
+            yield return StartCoroutine(
+                spawnAnimation.MoveSpheresToCenter(spheresDictionary, sphereGenerator.transform));
 
             gameplayStateObserver.StartGame();
+        }
+
+        private void UpdateCameraFOV()
+        {
         }
 
         private void OnEnable()

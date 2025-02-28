@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -50,9 +51,10 @@ namespace Utils.SphereData
             allSpheres.Clear();
         }
 
-        public IEnumerator DestroySpheresSegment(Color color, GameObject targetSphere, Action<GameObject> onDestroy)
+        public async void DestroySpheresSegment(Color color, GameObject targetSphere,
+            Action<GameObject> onDestroySphere)
         {
-            if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresLists)) yield break;
+            if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresLists)) return;
 
             foreach (HashSet<GameObject> spheresSegment in spheresLists)
             {
@@ -66,12 +68,11 @@ namespace Utils.SphereData
                     GameObject sphere = sortedSegmentByDistance[i];
 
                     spheresSegment.Remove(sphere);
-                    onDestroy?.Invoke(sphere);
-                    yield return new WaitForSeconds(0.05f / ((i + 1) * 0.5f));
+                    onDestroySphere?.Invoke(sphere);
+                    await Task.Delay((int)(1000 * 0.05f / ((i + 1) * 0.5f)));
+                    await Task.Yield();
                 }
             }
-
-            yield return null;
         }
 
         public Dictionary<Color, HashSet<GameObject>[]>.ValueCollection GetSpheres()

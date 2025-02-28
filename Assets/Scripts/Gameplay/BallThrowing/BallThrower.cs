@@ -10,7 +10,9 @@ namespace Gameplay.BallThrowing
 {
     public class BallThrower : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
-        [SerializeField] private SphereDestroyer sphereDestroyer;
+        public float _ballSize { get; private set; }
+
+        [SerializeField] private SphereOnHitBehaviour _sphereOnHitBehaviour;
         [SerializeField] private float dragSensitivity = 0.1f;
         [SerializeField] private float verticalMultiplier = 3f;
         [SerializeField] private int trajectoryPoints = 40;
@@ -20,7 +22,6 @@ namespace Gameplay.BallThrowing
         [SerializeField] private RectTransform dragArea;
         [SerializeField] private Camera uiCamera;
 
-        private Camera _mainCamera;
         private GameObject _ballPrefab;
         private Vector3 _ballSpawnPoint;
         private Color _previousColor = new(0, 0, 0, 0);
@@ -33,7 +34,6 @@ namespace Gameplay.BallThrowing
         private bool _isAllowedToDrag;
         private Vector3 _velocity;
 
-        private float _ballSize;
         private Vector3 _ballLocalScale;
 
         private const float _minimalForce = 3f;
@@ -53,7 +53,6 @@ namespace Gameplay.BallThrowing
 
             Vector3 lowestScale = spheresDictionary.GetLowestSphereScale();
             InitBallData(lowestScale);
-            InitCameraData();
         }
 
         private void Update()
@@ -180,7 +179,7 @@ namespace Gameplay.BallThrowing
             if (_shotData.Count <= 0) return;
 
             _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, Quaternion.identity).AddComponent<Ball>();
-            _currentBall.Init(sphereDestroyer);
+            _currentBall.Init(_sphereOnHitBehaviour);
 
             _currentBall.transform.localScale = _ballLocalScale;
             _currentBall._renderer.material.SetColor(AllColors.BaseColor, GetBallColor());
@@ -203,36 +202,21 @@ namespace Gameplay.BallThrowing
             Destroy(initialBall.gameObject);
         }
 
-        private void InitCameraData()
-        {
-            _mainCamera = Camera.main;
-            UpdateCameraFOV();
-        }
-
-        private void UpdateCameraFOV()
-        {
-            float cameraView =
-                2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * _mainCamera.fieldOfView);
-            float distance = 2f * _ballSize / cameraView;
-            distance += 0.5f * _ballSize;
-            _mainCamera.transform.position = new Vector3(0, 0, distance);
-
-            Vector3 ballPosition = new Vector3(0.8f, 0.15f, distance);
-            _ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
-
-            if (!_currentBall) return;
-
-            _currentBall.transform.position = _ballSpawnPoint;
-        }
-
         public void RespawnBall()
         {
             if (!_isAllowedToDrag) return;
-            
+
             if (_currentBall != null) Destroy(_currentBall.gameObject);
 
-            UpdateCameraFOV();
             SpawnBall();
+        }
+
+        public void UpdateData(Vector3 newBallPosition)
+        {
+            if (!_currentBall) return;
+
+            _ballSpawnPoint = newBallPosition;
+            _currentBall.transform.position = _ballSpawnPoint;
         }
 
         private Color GetBallColor()
@@ -265,7 +249,7 @@ namespace Gameplay.BallThrowing
         private bool IsPointerOverUIElement()
         {
             if (!EventSystem.current) return false;
-            
+
             var eventData = new PointerEventData(EventSystem.current)
             {
                 position = Input.mousePosition

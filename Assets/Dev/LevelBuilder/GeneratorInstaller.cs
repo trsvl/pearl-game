@@ -1,7 +1,7 @@
-﻿using TMPro;
+﻿using Gameplay.SphereData;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.SphereData;
 
 namespace Dev.LevelBuilder
 {

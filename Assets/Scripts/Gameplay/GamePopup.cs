@@ -1,7 +1,8 @@
-﻿using _Project.Scripts.Utils.UI.Buttons;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
-using Utils.Loader;
+using Utils.Bootstrap.Loader;
+using Utils.GameSystemLogic.Installers;
+using Utils.UI.Buttons;
 
 namespace Gameplay
 {

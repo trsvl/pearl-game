@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gameplay.SphereData;
 using UnityEngine;
-using Utils.SphereData;
 
 namespace Dev.LevelBuilder
 {

@@ -1,20 +1,14 @@
-﻿using System.Collections;
-using Gameplay.Header;
+﻿using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Gameplay.BallThrowing
 {
-    public class SphereOnHitBehaviour : MonoBehaviour
+    public class SphereOnHitBehaviour
     {
-        private const float fallDuration = 5f;
+        private const int fallDuration = 5000;
 
 
-        public void Init(PearlsData pearlsData)
-        {
-            _pearlsData = pearlsData;
-        }
-
-        public void DestroySphere(GameObject sphere)
+        public void ChangeSphere(GameObject sphere)
         {
             sphere.layer = LayerMask.NameToLayer("Ignore Raycast");
 
@@ -22,20 +16,18 @@ namespace Gameplay.BallThrowing
             {
                 rb.isKinematic = false;
                 rb.useGravity = true;
-                
+
                 Vector3 direction = sphere.transform.position - sphere.transform.parent.transform.position;
                 rb.AddForce(direction.normalized * 2f, ForceMode.Impulse);
             }
 
-            _pearlsData.Count += 1;
-
-            StartCoroutine(DestructAfterDelay(sphere));
+            DestructAfterDelay(sphere);
         }
 
-        private IEnumerator DestructAfterDelay(GameObject sphere)
+        private async void DestructAfterDelay(GameObject sphere)
         {
-            yield return new WaitForSeconds(fallDuration);
-            Destroy(sphere);
+            await Task.Delay(fallDuration);
+            Object.Destroy(sphere);
         }
     }
 }

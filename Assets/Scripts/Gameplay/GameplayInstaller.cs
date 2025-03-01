@@ -1,13 +1,14 @@
 ﻿using System.Collections;
-using _Project.Scripts.Utils.UI.Buttons;
+using Gameplay.Animations;
 using Gameplay.BallThrowing;
-using Gameplay.Effects;
 using Gameplay.Header;
+using Gameplay.SphereData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.PlayerData;
-using Utils.SphereData;
+using Utils.Bootstrap.PlayerData;
+using Utils.GameSystemLogic.Installers;
+using Utils.UI.Buttons;
 
 namespace Gameplay
 {

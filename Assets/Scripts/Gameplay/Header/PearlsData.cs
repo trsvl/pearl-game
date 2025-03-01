@@ -3,21 +3,11 @@ using TMPro;
 
 namespace Gameplay.Header
 {
-    public class PearlsData
+    public class PearlsData : IDestroySphere
     {
-        public int Count
-        {
-            get => count;
-            set
-            {
-                count = value;
-                UpdateText();
-            }
-        }
-
         private readonly TextMeshProUGUI _pearlsText;
         private readonly StringBuilder textBuilder;
-        private int count;
+        private int _currentNumber;
 
 
         public PearlsData(TextMeshProUGUI pearlsText)
@@ -29,8 +19,14 @@ namespace Gameplay.Header
         private void UpdateText()
         {
             textBuilder.Clear();
-            textBuilder.Append($"{count}");
+            textBuilder.Append($"{_currentNumber}");
             _pearlsText.SetText(textBuilder);
+        }
+
+        public void OnDestroySphere()
+        {
+            _currentNumber += 1;
+            UpdateText();
         }
     }
 }

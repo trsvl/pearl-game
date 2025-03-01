@@ -1,10 +1,10 @@
 ﻿using System.Collections;
+using Gameplay.SphereData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.Loader;
-using Utils.PlayerData;
-using Utils.SphereData;
+using Utils.Bootstrap.Loader;
+using Utils.Bootstrap.PlayerData;
 
 namespace MainMenu
 {

@@ -1,62 +1,44 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using TMPro;
+using Utils.GameSystemLogic.Installers;
 
 namespace Gameplay.Header
 {
     public class ShotsData
     {
-        public int Count
+        public int CurrentNumber
         {
-            get => count;
+            get => _currentNumber;
             set
             {
-                count = value;
+                _currentNumber = value;
                 UpdateText();
                 CheckLoseGame();
             }
         }
 
         private readonly TextMeshProUGUI _shotsText;
-        private int count;
+        private int _currentNumber;
         private readonly GameplayStateObserver _gameplayStateObserver;
 
 
-        public ShotsData(TextMeshProUGUI shotsText, int initialCount, GameplayStateObserver gameplayStateObserver)
+        public ShotsData(TextMeshProUGUI shotsText, int initialNumber, GameplayStateObserver gameplayStateObserver)
         {
             _shotsText = shotsText;
-            Count = initialCount;
+            _currentNumber = initialNumber;
             _gameplayStateObserver = gameplayStateObserver;
         }
 
         private void UpdateText()
         {
-            _shotsText.SetText($"{count}");
+            _shotsText.SetText($"{_currentNumber}");
         }
 
         private async void CheckLoseGame()
         {
-            try
-            {
-                if (count < 1)
-                {
-                    await LoseGameWithDelay();
-                }
-            }
-            catch (Exception)
-            {
-                // ignored
-            }
-        }
+            if (_currentNumber > 0) return;
 
-        private async Task LoseGameWithDelay()
-        {
-            await Task.Delay(4000);
-            LoseGame();
-        }
-
-        private void LoseGame()
-        {
+            await Task.Delay(1000);
             _gameplayStateObserver.LoseGame();
         }
     }

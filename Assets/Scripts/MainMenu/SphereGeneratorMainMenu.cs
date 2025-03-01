@@ -1,4 +1,4 @@
-﻿using Utils.SphereData;
+﻿using Gameplay.SphereData;
 
 namespace MainMenu
 {

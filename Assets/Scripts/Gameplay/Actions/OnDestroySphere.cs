@@ -1,38 +1,43 @@
 ﻿using System;
-using Gameplay.BallThrowing;
+using System.Collections.Generic;
 using UnityEngine;
-using Utils.SphereData;
 
-namespace Gameplay
+namespace Gameplay.Actions
 {
     public class OnDestroySphere
     {
-        private Action<GameObject> onDestroySegment;
+        private Action<GameObject> action;
+        private readonly List<IDestroySphere> listeners = new();
 
 
-        public OnDestroySphere(BallThrower ballThrower, CameraManager cameraManager,
-            SpheresDictionary spheresDictionary, SphereOnHitBehaviour sphereOnHitBehaviour)
+        public void AddListener(IDestroySphere listener)
         {
-            AddListener((_, _) =>
-                ballThrower.UpdateData(cameraManager.UpdateFOV(ballThrower._BallSize)));
-
-            AddListener((targetColor, targetSphere) =>
-                spheresDictionary.DestroySpheresSegment(targetColor, targetSphere, sphereOnHitBehaviour.DestroySphere));
+            listeners.Add(listener);
         }
 
-        private void AddListener(Action<GameObject> action)
+        public void SubscribeEvent(Action<GameObject> newAction)
         {
-            onDestroySegment += action;
+            action += newAction;
         }
 
-        public void UnsubscribeAllActions()
+        public void RemoveAllListeners()
         {
-            onDestroySegment = null;
+            for (int i = listeners.Count - 1; i >= 0; i--)
+            {
+                listeners.RemoveAt(i);
+            }
+
+            action = null;
         }
 
-        public void Notify(GameObject sphere)
+        public void NotifyAll(GameObject sphere)
         {
-            onDestroySegment?.Invoke(sphere);
+            foreach (var listener in listeners)
+            {
+                listener.OnDestroySphere();
+            }
+
+            action?.Invoke(sphere);
         }
     }
 }

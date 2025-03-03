@@ -1,8 +1,7 @@
-﻿using Gameplay.Actions;
-using Gameplay.Header;
-using Gameplay.SphereData;
+﻿using Gameplay.SphereData;
 using UnityEngine;
-using Utils.GameSystemLogic.ContainerDI;
+using VContainer;
+using VContainer.Unity;
 
 namespace Gameplay.BallThrowing
 {
@@ -12,21 +11,15 @@ namespace Gameplay.BallThrowing
         [SerializeField] private BallThrower _ballThrower;
 
 
-        public void Register(Container container)
+        public void Install(IContainerBuilder builder)
         {
-            var spheresDictionary = container.GetService<SpheresDictionary>();
-            Vector3 lowestSphereScale = spheresDictionary.GetLowestSphereScale();
+            builder.Register<SphereOnHitBehaviour>(Lifetime.Scoped);
 
-            var shotsData = container.GetService<ShotsData>();
-            var onDestroySphereSegment = container.GetService<OnDestroySphereSegment>();
+            builder.RegisterComponentOnNewGameObject<BallFactory>(Lifetime.Scoped, "Ball Factory")
+                .WithParameter(_ballPrefab)
+                .WithParameter(resolver => resolver.Resolve<SpheresDictionary>().LowestSphereScale);
 
-
-            var ballFactory = new GameObject("BallFactory").AddComponent<BallFactory>();
-            ballFactory.Init(_ballPrefab, shotsData, onDestroySphereSegment, lowestSphereScale);
-            _ballThrower.Init(ballFactory);
-
-            container.Bind(ballFactory, isSingleton: true);
-            container.Bind(_ballThrower, isSingleton: true);
+            builder.RegisterComponent(_ballThrower);
         }
     }
 }

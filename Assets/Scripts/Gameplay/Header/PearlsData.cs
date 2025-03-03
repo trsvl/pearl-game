@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using TMPro;
+using UnityEngine;
+using Utils.EventBusSystem;
 
 namespace Gameplay.Header
 {
@@ -10,8 +12,10 @@ namespace Gameplay.Header
         private int _currentNumber;
 
 
-        public PearlsData(TextMeshProUGUI pearlsText)
+        public PearlsData(EventBus eventBus, TextMeshProUGUI pearlsText)
         {
+            eventBus.Subscribe(this);
+
             _pearlsText = pearlsText;
             textBuilder = new StringBuilder();
         }
@@ -23,7 +27,7 @@ namespace Gameplay.Header
             _pearlsText.SetText(textBuilder);
         }
 
-        public void OnDestroySphere()
+        public void OnDestroySphere(GameObject sphere)
         {
             _currentNumber += 1;
             UpdateText();

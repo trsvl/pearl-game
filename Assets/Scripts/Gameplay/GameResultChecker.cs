@@ -1,5 +1,4 @@
 ﻿using Gameplay.Header;
-using Utils.GameSystemLogic.Installers;
 
 namespace Gameplay
 {
@@ -19,7 +18,7 @@ namespace Gameplay
 
         public void CheckGameResult()
         {
-            if (_pearlData.CurrentNumber == )
+         //!!!   if (_pearlData.CurrentNumber == )
         }
 
     }

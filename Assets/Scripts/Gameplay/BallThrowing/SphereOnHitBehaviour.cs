@@ -1,14 +1,20 @@
 ﻿using System.Threading.Tasks;
 using UnityEngine;
+using Utils.EventBusSystem;
 
 namespace Gameplay.BallThrowing
 {
-    public class SphereOnHitBehaviour
+    public class SphereOnHitBehaviour : IDestroySphere
     {
         private const int fallDuration = 5000;
 
 
-        public void ChangeSphere(GameObject sphere)
+        public SphereOnHitBehaviour(EventBus eventBus)
+        {
+            eventBus.Subscribe(this);
+        }
+
+        private void ChangeSphere(GameObject sphere)
         {
             sphere.layer = LayerMask.NameToLayer("Ignore Raycast");
 
@@ -28,6 +34,11 @@ namespace Gameplay.BallThrowing
         {
             await Task.Delay(fallDuration);
             Object.Destroy(sphere);
+        }
+
+        public void OnDestroySphere(GameObject sphere)
+        {
+            ChangeSphere(sphere);
         }
     }
 }

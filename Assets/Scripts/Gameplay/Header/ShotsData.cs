@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using TMPro;
-using Utils.GameSystemLogic.Installers;
 
 namespace Gameplay.Header
 {
@@ -34,7 +33,7 @@ namespace Gameplay.Header
             _shotsText.SetText($"{_currentNumber}");
         }
 
-        private async void CheckLoseGame()
+        private async void CheckLoseGame() //!!!
         {
             if (_currentNumber > 0) return;
 

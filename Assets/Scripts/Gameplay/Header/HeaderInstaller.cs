@@ -1,11 +1,22 @@
-﻿using Utils.GameSystemLogic.ContainerDI;
+﻿using TMPro;
+using UnityEngine;
+using VContainer;
+using VContainer.Unity;
 
 namespace Gameplay.Header
 {
-    public class HeaderInstaller : IInstaller
+    public class HeaderInstaller : MonoBehaviour, IInstaller
     {
-        public void Register(Container container)
+        [SerializeField] private TextMeshProUGUI pearlsText;
+        [SerializeField] private TextMeshProUGUI shotsText;
+
+        public void Install(IContainerBuilder builder)
         {
+            builder.Register<PearlsData>(Lifetime.Scoped)
+                .WithParameter(pearlsText);
+            builder.Register<ShotsData>(Lifetime.Scoped)
+                .WithParameter(shotsText)
+                .WithParameter(5); //!!!
         }
     }
 }

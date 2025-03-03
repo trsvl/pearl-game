@@ -1,22 +1,24 @@
 ﻿using System.Collections;
 using System.Linq;
-using Gameplay.Actions;
 using Gameplay.Header;
 using Gameplay.SphereData;
 using UnityEngine;
+using Utils.EventBusSystem;
+using VContainer;
+using Random = UnityEngine.Random;
 
 namespace Gameplay.BallThrowing
 {
-    public class BallFactory : MonoBehaviour, IStartGame
+    public class BallFactory : MonoBehaviour
     {
         public Ball CurrentBall => _currentBall;
         public float BallSize => _ballSize;
         public Vector3 BallSpawnPoint => _ballSpawnPoint;
         public Color BallColor => _currentBall.GetColor();
 
-        private Ball _ballPrefab;
-        private ShotsData _shotsData;
-        private OnDestroySphereSegment _onDestroySphereSegment;
+        private readonly Ball _ballPrefab;
+        private readonly ShotsData _shotsData;
+        private readonly EventBus _eventBus;
         private Color[] _levelColors;
         private Vector3 _ballLocalScale;
         private Color _previousColor;
@@ -26,12 +28,13 @@ namespace Gameplay.BallThrowing
         private Vector3 _ballSpawnPoint;
 
 
-        public void Init(Ball ballPrefab, ShotsData shotsData,
-            OnDestroySphereSegment onDestroySphereSegment, Vector3 ballLocalScale)
+        [Inject]
+        public BallFactory(Ball ballPrefab, ShotsData shotsData,
+            EventBus eventBus, Vector3 ballLocalScale)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
-            _onDestroySphereSegment = onDestroySphereSegment;
+            _eventBus = eventBus;
 
             InitBallData(ballLocalScale);
         }
@@ -90,7 +93,7 @@ namespace Gameplay.BallThrowing
             var ballRenderer = _currentBall.GetComponent<Renderer>();
             var ballCollider = _currentBall.GetComponent<Collider>();
             var ballRigidbody = _currentBall.GetComponent<Rigidbody>();
-            _currentBall.Init(_onDestroySphereSegment, ballRenderer, ballCollider, ballRigidbody);
+            _currentBall.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody);
 
             _currentBall.transform.localScale = _ballLocalScale;
             ballRenderer.material.SetColor(AllColors.BaseColor, GenerateBallColor());
@@ -117,11 +120,6 @@ namespace Gameplay.BallThrowing
 
             Destroy(ball);
             _currentBall = null;
-        }
-
-        public void StartGame()
-        {
-            SpawnBall(); //!!!
         }
     }
 }

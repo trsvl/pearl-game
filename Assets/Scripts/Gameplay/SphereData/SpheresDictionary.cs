@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using VContainer;
 using Object = UnityEngine.Object;
 
 namespace Gameplay.SphereData
 {
     public class SpheresDictionary
     {
+        public Vector3 LowestSphereScale => lowestSphereScale;
+
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
-        private Vector3 lowestSphereScale = Vector3.one;
+        private Vector3 lowestSphereScale;
 
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
@@ -85,11 +88,6 @@ namespace Gameplay.SphereData
             {
                 lowestSphereScale = sphereScale;
             }
-        }
-
-        public Vector3 GetLowestSphereScale()
-        {
-            return lowestSphereScale;
         }
     }
 }

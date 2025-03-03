@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
-using Gameplay.CameraLogic;
 using UnityEngine;
+using Utils.EventBusSystem;
 
 namespace Gameplay.Animations
 {
@@ -10,13 +10,15 @@ namespace Gameplay.Animations
     {
         private readonly BallFactory _ballFactory;
         private readonly CameraManager _cameraManager;
+        private readonly EventBus _eventBus;
         private Tweener _tweener;
 
 
-        public DecreaseFOVAnimation(BallFactory ballFactory, CameraManager cameraManager)
+        public DecreaseFOVAnimation(BallFactory ballFactory, CameraManager cameraManager, EventBus eventBus)
         {
-            _cameraManager = cameraManager;
             _ballFactory = ballFactory;
+            _cameraManager = cameraManager;
+            _eventBus = eventBus;
         }
 
         private void Update(float newFOV)
@@ -31,6 +33,7 @@ namespace Gameplay.Animations
 
             float initialFOV = _cameraManager.GetInitialFOV();
             float targetFOV = _cameraManager.GetNewFOV();
+            _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnStartChangeFOV());
 
             _tweener = DOVirtual.Float(initialFOV, targetFOV, duration, Update);
 
@@ -38,6 +41,7 @@ namespace Gameplay.Animations
 
             _tweener?.Kill();
             _cameraManager.AssignNewFOV();
+            _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnEndChangeFOV());
         }
     }
 }

@@ -1,0 +1,64 @@
+﻿using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+namespace Bootstrap
+{
+    public class Loader
+    {
+        private readonly GameObject _loadingScreenPrefab;
+        private GameObject loadingScreen;
+
+
+        public Loader(GameObject loadingScreenPrefab)
+        {
+            _loadingScreenPrefab = loadingScreenPrefab;
+        }
+
+        public async Task LoadScene(SceneName scene)
+        {
+            CreateLoadingScreen();
+
+            var sceneName = scene.ToString();
+
+            AsyncOperation loadingScene = SceneManager.LoadSceneAsync(sceneName);
+
+            if (loadingScene == null)
+            {
+                Debug.LogError($"Failed to load scene {sceneName}");
+                return;
+            }
+
+            loadingScene.allowSceneActivation = false;
+
+            while (!loadingScene.isDone)
+            {
+                if (loadingScene.progress >= 0.9f)
+                {
+                    loadingScene.allowSceneActivation = true;
+                }
+
+                await Task.Yield();
+            }
+
+            DestroyLoadingScreen();
+        }
+
+        public void CreateLoadingScreen()
+        {
+            if (!loadingScreen)
+            {
+                loadingScreen = Object.Instantiate(_loadingScreenPrefab);
+            }
+        }
+
+        public void DestroyLoadingScreen()
+        {
+            if (loadingScreen != null)
+            {
+                Object.Destroy(loadingScreen.gameObject);
+                loadingScreen = null;
+            }
+        }
+    }
+}

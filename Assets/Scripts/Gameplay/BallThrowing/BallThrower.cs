@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using VContainer;
 
 namespace Gameplay.BallThrowing
 {
@@ -15,20 +16,20 @@ namespace Gameplay.BallThrowing
         [SerializeField] private RectTransform _dragArea;
         [SerializeField] private Camera _uiCamera;
 
-        private BallFactory _ballFactory;
+        private readonly BallFactory _ballFactory;
 
-        private LineRenderer _lineRenderer;
+        private readonly LineRenderer _lineRenderer;
+        private readonly Camera _mainCamera;
         private bool _isDragging;
         private bool _isAllowedToDrag;
         private Vector3 _initialMousePosition;
         private Vector3 _throwDirection;
-        private Camera _mainCamera;
 
         private const float _minimalForce = 3f;
         private const float _maxForce = 50f;
 
-
-        public void Init(BallFactory ballFactory)
+        [Inject]
+        public BallThrower(BallFactory ballFactory)
         {
             _ballFactory = ballFactory;
 

@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
-using Utils.Bootstrap.Loader;
-using Utils.GameSystemLogic.Installers;
 using Utils.UI.Buttons;
 
 namespace Gameplay
 {
-    public class GamePopup : IPauseGame, IResumeGame, IFinishGame, ILoseGame
+    public class GamePopup : IPauseGame, IResumeGame, IFinishGame, ILoseGame //!!!
     {
         private readonly TextButton _firstButton;
         private readonly TextButton _secondButton;
@@ -63,12 +61,12 @@ namespace Gameplay
 
         private void RestartGameClick()
         {
-            _ = Loader.Instance.LoadScene(SceneName.Gameplay);
+          //  _ = Loader.Instance.LoadScene(SceneName.Gameplay);
         }
 
         private void MainMenuClick()
         {
-            _ = Loader.Instance.LoadScene(SceneName.MainMenu);
+         //   _ = Loader.Instance.LoadScene(SceneName.MainMenu);
         }
     }
 }

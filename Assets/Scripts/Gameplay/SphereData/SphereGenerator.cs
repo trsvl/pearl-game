@@ -1,4 +1,5 @@
 using UnityEngine;
+using VContainer;
 
 namespace Gameplay.SphereData
 {
@@ -14,12 +15,16 @@ namespace Gameplay.SphereData
         private SpheresDictionary _spheresDictionary;
         private bool _isAllowedToRotate;
 
+
+        [Inject]
         public void Init(GameObject spherePrefab, AllColors allColors, SpheresDictionary spheresDictionary)
         {
             _spherePrefab = spherePrefab;
             _allColors = allColors;
             _spheresDictionary = spheresDictionary;
             _sphereRotation = SphereRotation.GetQuaternion;
+
+            transform.position = new Vector3(0f, 1f, 40f);
         }
 
         protected virtual void Update()

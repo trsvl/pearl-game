@@ -1,13 +1,12 @@
 ﻿using System.Collections;
 using Gameplay.Animations;
+using Gameplay.Animations.EntryPoint;
 using Gameplay.BallThrowing;
 using Gameplay.Header;
 using Gameplay.SphereData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Utils.Bootstrap.PlayerData;
-using Utils.GameSystemLogic.Installers;
 using Utils.UI.Buttons;
 
 namespace Gameplay
@@ -35,31 +34,33 @@ namespace Gameplay
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             var dataContext = new DataContext();
             gameplayStateObserver = new GameplayStateObserver();
-            var pearlsData = new PearlsData(pearlsText);
             var gamePopup = new GamePopup(popup, firstButton, secondButton, gameplayStateObserver);
             var allColors = new AllColors();
             var spheresDictionary = new SpheresDictionary();
-            var spawnAnimation = new SpawnSmallSpheresAnimation();
 
             var sphereGenerator = new GameObject().AddComponent<SphereGenerator>();
             sphereGenerator.Init(spherePrefab, allColors, spheresDictionary);
-            sphereGenerator.transform.position = new Vector3(0f, 1f, 40f);
 
-            int level = PlayerData.Instance.CurrentLevel;
+            int level = 1;
+            
+            
+            
+            
             yield return StartCoroutine(dataContext.LoadSpheres(level, sphereGenerator));
 
+            
+            
+            
+            
             int shotsCount = sphereGenerator._levelColors.Length * 2;
             var shotsData = new ShotsData(shotsText, shotsCount, gameplayStateObserver);
 
-            ballThrower.Init(sphereGenerator._levelColors, shotsData, spheresDictionary);
-            _sphereOnHitBehaviour.Init(pearlsData, spheresDictionary);
+          
 
             gameplayStateObserver.AddListener(sphereGenerator);
             gameplayStateObserver.AddListener(ballThrower);
             gameplayStateObserver.AddListener(gamePopup);
 
-            yield return StartCoroutine(
-                spawnAnimation.MoveSpheresToCenter(spheresDictionary, sphereGenerator.transform));
 
             gameplayStateObserver.StartGame();
         }
@@ -71,7 +72,7 @@ namespace Gameplay
         private void OnEnable()
         {
             pauseButton.onClick.AddListener(() => gameplayStateObserver.PauseGame());
-            changeBallButton.onClick.AddListener(() => ballThrower.RespawnBall());
+          //  changeBallButton.onClick.AddListener(() => ballThrower.RespawnBall());
         }
 
         private void OnDisable()

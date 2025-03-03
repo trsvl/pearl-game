@@ -1,21 +1,21 @@
-﻿using Gameplay.Actions;
-using Gameplay.SphereData;
+﻿using Gameplay.SphereData;
 using UnityEngine;
+using Utils.EventBusSystem;
 
 namespace Gameplay.BallThrowing
 {
     public class Ball : MonoBehaviour
     {
-        private OnDestroySphereSegment _onDestroySphereSegment;
+        private EventBus _eventBus;
         private Renderer _renderer;
         private Collider _collider;
         private Rigidbody _rigidbody;
 
 
-        public void Init(OnDestroySphereSegment onDestroySphereSegment, Renderer ballRenderer, Collider ballCollider,
+        public void Init(EventBus eventBus, Renderer ballRenderer, Collider ballCollider,
             Rigidbody ballRigidbody)
         {
-            _onDestroySphereSegment = onDestroySphereSegment;
+            _eventBus = eventBus;
             _renderer = ballRenderer;
             _collider = ballCollider;
             _rigidbody = ballRigidbody;
@@ -34,7 +34,8 @@ namespace Gameplay.BallThrowing
 
                 if (ballColor == touchedSphereColor)
                 {
-                    _onDestroySphereSegment.NotifyAll(ballColor, collision.gameObject);
+                    _eventBus.RaiseEvent<IDestroySphereSegment>(handler =>
+                        handler.OnDestroySphereSegment(ballColor, collision.gameObject));
                     Destroy(gameObject);
                 }
                 else

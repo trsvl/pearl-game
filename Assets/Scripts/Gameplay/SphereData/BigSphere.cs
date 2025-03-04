@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Bootstrap;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Gameplay.SphereData
@@ -20,10 +21,8 @@ namespace Gameplay.SphereData
         public void CreateSmallSpheres(GameObject spherePrefab, Transform parent, BigSphereData data,
             Color[] levelColors, SpheresDictionary spheresDictionary, Quaternion sphereRotation, int bigSphereIndex)
         {
-            string currentScene = SceneManager.GetActiveScene().name;
-            bool isGameplayScene = currentScene == SceneName.Gameplay.ToString();
-
             var materialPropertyBlock = new MaterialPropertyBlock();
+            bool isGameplayScene = Loader.IsCurrentSceneEqual(SceneName.Gameplay);
 
             for (int i = 0; i < _smallSphereCount; i++)
             {
@@ -34,7 +33,7 @@ namespace Gameplay.SphereData
 
                 Color color = levelColors[data.colorIndexes[i]];
                 materialPropertyBlock.SetColor(AllColors.BaseColor, color);
-                
+
                 spheresDictionary.AddSphere(color, sphere, bigSphereIndex);
                 spheresDictionary.SetLowestSphereScale(sphere.transform.localScale);
 

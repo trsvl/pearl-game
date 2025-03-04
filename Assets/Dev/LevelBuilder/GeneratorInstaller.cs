@@ -28,10 +28,10 @@ namespace Dev.LevelBuilder
         {
             var spherePrefab = Resources.Load<GameObject>("Prefabs/Sphere");
             var allColors = new AllColors();
-            var allSpheres = new SpheresDictionary();
+            //var allSpheres = new SpheresDictionary();
 
             dataContext = new DataContextBuilder();
-            sphereGenerator.Init(spherePrefab, allColors, allSpheres);
+            //!!!       sphereGenerator.Init(spherePrefab, allColors, allSpheres);
             UpdateLevel(levelNumber);
         }
 
@@ -74,7 +74,7 @@ namespace Dev.LevelBuilder
 
         private void LoadSpheresFromJSON()
         {
-            StartCoroutine(dataContext.LoadSpheres(levelNumber, sphereGenerator));
+            _ = dataContext.LoadSpheres(levelNumber, sphereGenerator);
         }
 
         private void SaveSpheresJSON()

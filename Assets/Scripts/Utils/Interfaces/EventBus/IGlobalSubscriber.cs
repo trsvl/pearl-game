@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Threading.Tasks;
+using UnityEngine;
 
 public interface IGlobalSubscriber
 {
@@ -20,4 +21,11 @@ public interface IDestroySphere : IGlobalSubscriber
     void OnDestroySphere(GameObject sphere);
 }
 
+public interface IAnimation : IGlobalSubscriber
+{
+    Task DoAnimation();
+}
 
+public interface IStartAnimation : IAnimation
+{
+}

@@ -5,9 +5,9 @@ using DG.Tweening;
 using Gameplay.SphereData;
 using UnityEngine;
 
-namespace Gameplay.Animations.EntryPoint
+namespace Gameplay.Animations.StartAnimation
 {
-    public class SpawnSmallSpheresAnimation : IAnimation
+    public class SpawnSmallSpheresAnimation : IStartAnimation
     {
         private readonly SpheresDictionary _spheresDictionary;
         private readonly Transform _parent;

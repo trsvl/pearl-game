@@ -820,7 +820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: Bootstrap.BootstrapLifetimeScope
+    TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
   _installers:

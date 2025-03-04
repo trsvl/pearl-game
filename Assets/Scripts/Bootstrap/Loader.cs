@@ -44,7 +44,7 @@ namespace Bootstrap
             DestroyLoadingScreen();
         }
 
-        public void CreateLoadingScreen()
+        private void CreateLoadingScreen()
         {
             if (!loadingScreen)
             {
@@ -52,13 +52,19 @@ namespace Bootstrap
             }
         }
 
-        public void DestroyLoadingScreen()
+        private void DestroyLoadingScreen()
         {
             if (loadingScreen != null)
             {
                 Object.Destroy(loadingScreen.gameObject);
                 loadingScreen = null;
             }
+        }
+
+        public static bool IsCurrentSceneEqual(SceneName scene)
+        {
+            string currentScene = SceneManager.GetActiveScene().name;
+            return currentScene == scene.ToString();
         }
     }
 }

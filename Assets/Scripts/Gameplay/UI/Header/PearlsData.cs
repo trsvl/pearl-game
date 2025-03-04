@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using Utils.EventBusSystem;
 
-namespace Gameplay.Header
+namespace Gameplay.UI.Header
 {
     public class PearlsData : IDestroySphere
     {

@@ -1,3 +1,4 @@
+using Gameplay.Utils;
 using UnityEngine;
 using VContainer;
 
@@ -17,8 +18,10 @@ namespace Gameplay.SphereData
 
 
         [Inject]
-        public void Init(GameObject spherePrefab, AllColors allColors, SpheresDictionary spheresDictionary)
+        public void Init(GameplayStateObserver gameplayStateObserver, GameObject spherePrefab, AllColors allColors, SpheresDictionary spheresDictionary)
         {
+            gameplayStateObserver.AddListener(this);
+            
             _spherePrefab = spherePrefab;
             _allColors = allColors;
             _spheresDictionary = spheresDictionary;
@@ -51,7 +54,7 @@ namespace Gameplay.SphereData
                 _spheresDictionary.AddColorToDictionary(color, json.spheres.Length);
                 _levelColors[i] = color;
             }
-
+            
             GenerateBigSphereData(json);
         }
 

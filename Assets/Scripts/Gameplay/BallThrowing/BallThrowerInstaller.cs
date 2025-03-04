@@ -1,5 +1,4 @@
-﻿using Gameplay.SphereData;
-using UnityEngine;
+﻿using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -16,8 +15,7 @@ namespace Gameplay.BallThrowing
             builder.Register<SphereOnHitBehaviour>(Lifetime.Scoped);
 
             builder.RegisterComponentOnNewGameObject<BallFactory>(Lifetime.Scoped, "Ball Factory")
-                .WithParameter(_ballPrefab)
-                .WithParameter(resolver => resolver.Resolve<SpheresDictionary>().LowestSphereScale);
+                .WithParameter(_ballPrefab);
 
             builder.RegisterComponent(_ballThrower);
         }

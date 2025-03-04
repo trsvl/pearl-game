@@ -9,10 +9,9 @@ namespace MainMenu.DI
     {
         [SerializeField] private List<GameObject> _installers;
 
-        
+
         protected override void Configure(IContainerBuilder builder)
         {
-            Debug.Log("Configuring MainMenuLifetimeScope");
             foreach (GameObject gameObj in _installers)
             {
                 var installer = gameObj.GetComponent<IInstaller>();
@@ -20,6 +19,8 @@ namespace MainMenu.DI
             }
 
             builder.RegisterComponentInHierarchy<MainMenuManager>();
+
+            builder.RegisterEntryPoint<MainMenuEntryPoint>();
         }
     }
 }

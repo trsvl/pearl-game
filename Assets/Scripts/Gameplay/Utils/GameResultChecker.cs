@@ -1,6 +1,6 @@
-﻿using Gameplay.Header;
+﻿using Gameplay.UI.Header;
 
-namespace Gameplay
+namespace Gameplay.Utils
 {
     public class GameResultChecker
     {

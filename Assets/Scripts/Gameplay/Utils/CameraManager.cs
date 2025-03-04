@@ -2,7 +2,7 @@
 using Gameplay.SphereData;
 using UnityEngine;
 
-namespace Gameplay
+namespace Gameplay.Utils
 {
     public class CameraManager
     {

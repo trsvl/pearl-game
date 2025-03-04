@@ -16,8 +16,6 @@ namespace Gameplay.SphereData
 
             builder.Register<DataContext>(Lifetime.Scoped);
 
-            builder.Register<GameplayStateObserver>(Lifetime.Scoped);
-
             builder.RegisterComponentOnNewGameObject<SphereGenerator>(Lifetime.Scoped, "Sphere Generator")
                 .WithParameter(spherePrefab);
         }

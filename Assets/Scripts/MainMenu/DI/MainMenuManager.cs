@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Threading.Tasks;
 using Bootstrap;
 using Gameplay.SphereData;
 using TMPro;
@@ -15,10 +16,10 @@ namespace MainMenu.DI
         [SerializeField] private Button _previousLevelButton;
         [SerializeField] private Button _nextLevelButton;
 
-        private  PlayerData _playerData;
-        private  SphereGenerator _sphereGenerator;
-        private  DataContext _dataContext;
-        private  Loader _loader;
+        private PlayerData _playerData;
+        private SphereGenerator _sphereGenerator;
+        private DataContext _dataContext;
+        private Loader _loader;
         private int _levelNumber;
 
 
@@ -26,25 +27,23 @@ namespace MainMenu.DI
         public void Init(PlayerData playerData, SphereGenerator sphereGenerator, DataContext dataContext,
             Loader loader)
         {
-            Debug.LogError("Test");
             _playerData = playerData;
             _sphereGenerator = sphereGenerator;
             _dataContext = dataContext;
             _loader = loader;
 
             _levelNumber = _playerData.CurrentLevel;
-            UpdateLevel(_levelNumber);
         }
 
-        private void UpdateLevel(int newLevel)
+        public void UpdateLevel(int newLevel = 0)
         {
-            _levelNumber = newLevel;
+            _levelNumber = newLevel > 0 ? newLevel : _levelNumber;
             _playerData.CurrentLevel = _levelNumber;
 
             CheckButtons();
             _levelText.SetText($"Level {_levelNumber}");
 
-            StartCoroutine(LoadSpheres());
+            _ = _dataContext.LoadSpheres(_levelNumber, _sphereGenerator);
         }
 
         private void CheckButtons()
@@ -65,18 +64,6 @@ namespace MainMenu.DI
             _startGameButton.onClick.RemoveAllListeners();
             _previousLevelButton.onClick.RemoveAllListeners();
             _nextLevelButton.onClick.RemoveAllListeners();
-        }
-
-        private IEnumerator LoadSpheres()
-        {
-            for (int i = 0; i < _sphereGenerator.transform.childCount; i++)
-            {
-                DestroyImmediate(_sphereGenerator.transform.GetChild(i).gameObject);
-            }
-
-            yield return null;
-
-            StartCoroutine(_dataContext.LoadSpheres(_levelNumber, _sphereGenerator));
         }
     }
 }

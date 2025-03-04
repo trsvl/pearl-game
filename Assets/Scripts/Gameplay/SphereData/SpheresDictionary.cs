@@ -1,20 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
-using VContainer;
+using Utils.EventBusSystem;
 using Object = UnityEngine.Object;
 
 namespace Gameplay.SphereData
 {
-    public class SpheresDictionary
+    public class SpheresDictionary : IDestroySphereSegment
     {
         public Vector3 LowestSphereScale => lowestSphereScale;
 
+        private readonly EventBus _eventBus;
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
-        private Vector3 lowestSphereScale;
+        private Vector3 lowestSphereScale = Vector3.one;
 
+
+        public SpheresDictionary(EventBus eventBus)
+        {
+            _eventBus = eventBus;
+            _eventBus.Subscribe(this);
+        }
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
@@ -53,8 +59,7 @@ namespace Gameplay.SphereData
             allSpheres.Clear();
         }
 
-        public async void DestroySpheresSegment(Color color, GameObject targetSphere,
-            Action<GameObject> onDestroySphere)
+        private async Task DestroySpheresSegment(Color color, GameObject targetSphere)
         {
             if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresLists)) return;
 
@@ -70,7 +75,9 @@ namespace Gameplay.SphereData
                     GameObject sphere = sortedSegmentByDistance[i];
 
                     spheresSegment.Remove(sphere);
-                    onDestroySphere?.Invoke(sphere);
+
+                    _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
+
                     await Task.Delay((int)(1000 * 0.05f / ((i + 1) * 0.5f)));
                     await Task.Yield();
                 }
@@ -88,6 +95,11 @@ namespace Gameplay.SphereData
             {
                 lowestSphereScale = sphereScale;
             }
+        }
+
+        public void OnDestroySphereSegment(Color segmentColor, GameObject target)
+        {
+            _ = DestroySpheresSegment(segmentColor, target);
         }
     }
 }

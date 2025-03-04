@@ -1,12 +1,13 @@
 ﻿using System.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
+using Gameplay.Utils;
 using UnityEngine;
 using Utils.EventBusSystem;
 
 namespace Gameplay.Animations
 {
-    public class DecreaseFOVAnimation : IAnimation
+    public class DecreaseFOVAnimation : IAnimation //!!!
     {
         private readonly BallFactory _ballFactory;
         private readonly CameraManager _cameraManager;
@@ -19,6 +20,8 @@ namespace Gameplay.Animations
             _ballFactory = ballFactory;
             _cameraManager = cameraManager;
             _eventBus = eventBus;
+            
+            Update(_cameraManager.GetInitialFOV());
         }
 
         private void Update(float newFOV)

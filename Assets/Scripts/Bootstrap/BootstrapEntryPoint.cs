@@ -14,8 +14,11 @@ namespace Bootstrap
             _loader = loader;
         }
 
-        public async Task StartAsync(CancellationToken cancellation = new CancellationToken())
+        public async Task StartAsync(CancellationToken cancellation = new())
         {
+            bool isBootstrapScene = Loader.IsCurrentSceneEqual(SceneName.Bootstrap);
+            if (!isBootstrapScene) return;
+
             await _loader.LoadScene(SceneName.MainMenu);
         }
     }

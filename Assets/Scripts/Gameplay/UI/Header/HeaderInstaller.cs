@@ -3,7 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
-namespace Gameplay.Header
+namespace Gameplay.UI.Header
 {
     public class HeaderInstaller : MonoBehaviour, IInstaller
     {
@@ -14,6 +14,7 @@ namespace Gameplay.Header
         {
             builder.Register<PearlsData>(Lifetime.Scoped)
                 .WithParameter(pearlsText);
+            
             builder.Register<ShotsData>(Lifetime.Scoped)
                 .WithParameter(shotsText)
                 .WithParameter(5); //!!!

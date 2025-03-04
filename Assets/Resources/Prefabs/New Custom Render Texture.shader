@@ -33,8 +33,12 @@ Shader "Unlit/ColorBlend"
             };
 
             sampler2D _MainTex;
-            float4 _MainTex_ST;
-            int _Blend;
+            
+            // All material properties must be in UnityPerMaterial for SRP Batcher
+            CBUFFER_START(UnityPerMaterial)
+                float4 _MainTex_ST;
+                int _Blend;
+            CBUFFER_END
 
             // Define instanced color property
             UNITY_INSTANCING_BUFFER_START(Props)

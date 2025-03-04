@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Gameplay.Utils;
 using TMPro;
 
-namespace Gameplay.Header
+namespace Gameplay.UI.Header
 {
     public class ShotsData
     {

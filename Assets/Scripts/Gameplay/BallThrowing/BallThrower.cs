@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Gameplay.Utils;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using VContainer;
@@ -11,15 +12,13 @@ namespace Gameplay.BallThrowing
         [SerializeField] private float _verticalMultiplier = 3f;
         [SerializeField] private int _trajectoryPoints = 40;
         [SerializeField] private float _timeStep = 0.07f;
-        [SerializeField] private float _respawnDelay = 0.3f;
         [SerializeField] private LayerMask _collisionMaskLine;
         [SerializeField] private RectTransform _dragArea;
         [SerializeField] private Camera _uiCamera;
 
-        private readonly BallFactory _ballFactory;
-
-        private readonly LineRenderer _lineRenderer;
-        private readonly Camera _mainCamera;
+        private BallFactory _ballFactory;
+        private LineRenderer _lineRenderer;
+        private Camera _mainCamera;
         private bool _isDragging;
         private bool _isAllowedToDrag;
         private Vector3 _initialMousePosition;
@@ -29,8 +28,10 @@ namespace Gameplay.BallThrowing
         private const float _maxForce = 50f;
 
         [Inject]
-        public BallThrower(BallFactory ballFactory)
+        public void Init(GameplayStateObserver gameplayStateObserver, BallFactory ballFactory)
         {
+            gameplayStateObserver.AddListener(this);
+            
             _ballFactory = ballFactory;
 
             _lineRenderer = GetComponent<LineRenderer>();

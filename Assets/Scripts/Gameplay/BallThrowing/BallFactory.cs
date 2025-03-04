@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Linq;
-using Gameplay.Header;
 using Gameplay.SphereData;
+using Gameplay.UI.Header;
 using UnityEngine;
 using Utils.EventBusSystem;
 using VContainer;
@@ -16,12 +16,13 @@ namespace Gameplay.BallThrowing
         public Vector3 BallSpawnPoint => _ballSpawnPoint;
         public Color BallColor => _currentBall.GetColor();
 
-        private readonly Ball _ballPrefab;
-        private readonly ShotsData _shotsData;
-        private readonly EventBus _eventBus;
+        private Ball _ballPrefab;
+        private ShotsData _shotsData;
+        private EventBus _eventBus;
         private Color[] _levelColors;
         private Vector3 _ballLocalScale;
         private Color _previousColor;
+        private SphereGenerator _sphereGenerator;
 
         private Ball _currentBall;
         private float _ballSize;
@@ -29,20 +30,24 @@ namespace Gameplay.BallThrowing
 
 
         [Inject]
-        public BallFactory(Ball ballPrefab, ShotsData shotsData,
-            EventBus eventBus, Vector3 ballLocalScale)
+        public void Init(Ball ballPrefab, ShotsData shotsData,
+            EventBus eventBus)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
-
-            InitBallData(ballLocalScale);
         }
 
-        private void InitBallData(Vector3 ballLocalScale)
+        public void ReInit(Vector3 ballLocalScale, Color[] levelColors)
         {
             _ballLocalScale = ballLocalScale;
+            _levelColors = levelColors;
 
+            InitBallData();
+        }
+
+        private void InitBallData()
+        {
             var initialBall = Instantiate(_ballPrefab);
             initialBall.gameObject.SetActive(false);
 
@@ -68,6 +73,7 @@ namespace Gameplay.BallThrowing
 
         public void ReleaseBall(Vector3 direction)
         {
+            print("Releasing ball");
             _currentBall?.ApplyForce(direction);
             _shotsData.CurrentNumber -= 1;
 
@@ -79,14 +85,19 @@ namespace Gameplay.BallThrowing
 
         public void RespawnBall()
         {
-            if (_currentBall != null) Destroy(_currentBall.gameObject);
+            if (_currentBall) Destroy(_currentBall.gameObject);
 
             SpawnBall();
         }
 
-        private void SpawnBall()
+        public GameObject GetBall()
         {
-            if (_shotsData.CurrentNumber <= 0) return;
+            return _currentBall != null ? _currentBall.gameObject : SpawnBall();
+        }
+
+        private GameObject SpawnBall()
+        {
+            if (_shotsData.CurrentNumber <= 0) return null;
 
             _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, SphereRotation.GetQuaternion);
 
@@ -97,21 +108,26 @@ namespace Gameplay.BallThrowing
 
             _currentBall.transform.localScale = _ballLocalScale;
             ballRenderer.material.SetColor(AllColors.BaseColor, GenerateBallColor());
+
+            return _currentBall.gameObject;
         }
 
         private Color GenerateBallColor()
         {
             if (_levelColors.Length <= 1) return _levelColors[0];
+
             Color[] filteredColors = _levelColors.Where(color => color != _previousColor).ToArray();
             int randomIndex = Random.Range(0, filteredColors.Length);
-            _previousColor = filteredColors[randomIndex];
-            return filteredColors[randomIndex];
+            Color newColor = _levelColors[randomIndex];
+            _previousColor = newColor;
+            
+            return newColor;
         }
 
         private IEnumerator SpawnBallAfterDelay(float delay)
         {
             yield return new WaitForSeconds(delay);
-            SpawnBall();
+            RespawnBall();
         }
 
         private IEnumerator DestroyBallAfterDelay(GameObject ball)
@@ -119,7 +135,6 @@ namespace Gameplay.BallThrowing
             yield return new WaitForSeconds(4f);
 
             Destroy(ball);
-            _currentBall = null;
         }
     }
 }

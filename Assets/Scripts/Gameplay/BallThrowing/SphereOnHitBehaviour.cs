@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using UnityEngine;
-using Utils.EventBusSystem;
+using static UnityEngine.Random;
 
 namespace Gameplay.BallThrowing
 {
@@ -8,11 +8,6 @@ namespace Gameplay.BallThrowing
     {
         private const int fallDuration = 5000;
 
-
-        public SphereOnHitBehaviour(EventBus eventBus)
-        {
-            eventBus.Subscribe(this);
-        }
 
         private void ChangeSphere(GameObject sphere)
         {
@@ -23,8 +18,11 @@ namespace Gameplay.BallThrowing
                 rb.isKinematic = false;
                 rb.useGravity = true;
 
-                Vector3 direction = sphere.transform.position - sphere.transform.parent.transform.position;
-                rb.AddForce(direction.normalized * 2f, ForceMode.Impulse);
+                float randomX = Range(0f, 0.5f);
+                float randomZ = Range(0f, 0.5f);
+                Vector3 randomPos = new Vector3(randomX, 1f, randomZ);
+                
+                rb.AddForce(randomPos, ForceMode.Impulse);
             }
 
             DestructAfterDelay(sphere);

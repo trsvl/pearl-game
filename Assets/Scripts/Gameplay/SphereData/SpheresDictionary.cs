@@ -19,7 +19,6 @@ namespace Gameplay.SphereData
         public SpheresDictionary(EventBus eventBus)
         {
             _eventBus = eventBus;
-            _eventBus.Subscribe(this);
         }
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
@@ -79,7 +78,6 @@ namespace Gameplay.SphereData
                     _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
 
                     await Task.Delay((int)(1000 * 0.05f / ((i + 1) * 0.5f)));
-                    await Task.Yield();
                 }
             }
         }

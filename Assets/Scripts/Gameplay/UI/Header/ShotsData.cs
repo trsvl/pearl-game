@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Gameplay.Utils;
-using TMPro;
+﻿using TMPro;
 
 namespace Gameplay.UI.Header
 {
@@ -13,33 +11,22 @@ namespace Gameplay.UI.Header
             {
                 _currentNumber = value;
                 UpdateText();
-                CheckLoseGame();
             }
         }
 
         private readonly TextMeshProUGUI _shotsText;
         private int _currentNumber;
-        private readonly GameplayStateObserver _gameplayStateObserver;
 
 
-        public ShotsData(TextMeshProUGUI shotsText, int initialNumber, GameplayStateObserver gameplayStateObserver)
+        public ShotsData(TextMeshProUGUI shotsText, int initialNumber)
         {
             _shotsText = shotsText;
-            _currentNumber = initialNumber;
-            _gameplayStateObserver = gameplayStateObserver;
+            CurrentNumber = initialNumber;
         }
 
         private void UpdateText()
         {
             _shotsText.SetText($"{_currentNumber}");
-        }
-
-        private async void CheckLoseGame() //!!!
-        {
-            if (_currentNumber > 0) return;
-
-            await Task.Delay(1000);
-            _gameplayStateObserver.LoseGame();
         }
     }
 }

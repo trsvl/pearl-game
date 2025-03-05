@@ -73,7 +73,6 @@ namespace Gameplay.BallThrowing
 
         public void ReleaseBall(Vector3 direction)
         {
-            print("Releasing ball");
             _currentBall?.ApplyForce(direction);
             _shotsData.CurrentNumber -= 1;
 

@@ -12,10 +12,8 @@ namespace Gameplay.UI.Header
         private int _currentNumber;
 
 
-        public PearlsData(EventBus eventBus, TextMeshProUGUI pearlsText)
+        public PearlsData(TextMeshProUGUI pearlsText)
         {
-            eventBus.Subscribe(this);
-
             _pearlsText = pearlsText;
             textBuilder = new StringBuilder();
         }

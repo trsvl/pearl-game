@@ -670,7 +670,7 @@ MonoBehaviour:
   _timeStep: 0.07
   _collisionMaskLine:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1
   _dragArea: {fileID: 1584664436}
   _uiCamera: {fileID: 853203908}
 --- !u!1 &650825827
@@ -2041,7 +2041,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 1200}
+  m_SizeDelta: {x: 0, y: 1000}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!1 &1593508916
 GameObject:

@@ -2,6 +2,7 @@
 using Gameplay.Animations;
 using Gameplay.Utils;
 using UnityEngine;
+using Utils.EventBusSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -24,7 +25,11 @@ namespace Gameplay.DI
 
             new UtilsInstaller().Install(builder);
 
-            builder.RegisterEntryPoint<GameplayEntryPoint>();
+            builder.UseEntryPoints(points =>
+            {
+                points.Add<GameplayEventBusEntryPoint>();
+                points.Add<GameplayEntryPoint>();
+            });
         }
     }
 }

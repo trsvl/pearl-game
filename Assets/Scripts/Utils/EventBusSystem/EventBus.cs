@@ -29,7 +29,9 @@ namespace Utils.EventBusSystem
             foreach (Type t in subscriberTypes)
             {
                 if (globalSubscribers.ContainsKey(t))
+                {
                     globalSubscribers[t].Remove(subscriber);
+                }
             }
         }
 
@@ -39,6 +41,7 @@ namespace Utils.EventBusSystem
             SubscribersList<IGlobalSubscriber> subscribers = globalSubscribers[typeof(TSubscriber)];
 
             subscribers.Executing = true;
+
             foreach (IGlobalSubscriber subscriber in subscribers.List)
             {
                 try

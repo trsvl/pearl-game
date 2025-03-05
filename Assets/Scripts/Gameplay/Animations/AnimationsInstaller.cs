@@ -20,6 +20,8 @@ namespace Gameplay.Animations
                 });
 
             builder.Register<MoveThrowingBall>(Lifetime.Scoped);
+
+            builder.RegisterComponentInHierarchy<ParticlesFactory>();
         }
     }
 }

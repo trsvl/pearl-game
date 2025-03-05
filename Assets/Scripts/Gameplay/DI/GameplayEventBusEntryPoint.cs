@@ -1,5 +1,5 @@
 ﻿using System;
-using Gameplay.Animations.StartAnimation;
+using Gameplay.Animations;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
@@ -26,11 +26,9 @@ namespace Gameplay.DI
         {
             Subscribe(
                 typeof(PearlsData),
-                typeof(SphereOnHitBehaviour)
-            );
-
-            Subscribe(
-                typeof(SpheresDictionary)
+                typeof(SphereOnHitBehaviour),
+                typeof(SpheresDictionary),
+                typeof(ParticlesFactory)
             );
         }
 

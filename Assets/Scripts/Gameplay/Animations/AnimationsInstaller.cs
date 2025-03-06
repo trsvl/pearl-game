@@ -6,8 +6,13 @@ using VContainer.Unity;
 
 namespace Gameplay.Animations
 {
-    public class AnimationsInstaller : IInstaller
+    public class AnimationsInstaller : MonoBehaviour, IInstaller
     {
+        [SerializeField] private ParticleSystem _onDestroySphereParticlePrefab;
+        [SerializeField] private RectTransform _header;
+        [SerializeField] private RectTransform _buttons;
+
+
         public void Install(IContainerBuilder builder)
         {
             builder.Register<DecreaseFOVAnimation>(Lifetime.Scoped);
@@ -21,7 +26,12 @@ namespace Gameplay.Animations
 
             builder.Register<MoveThrowingBall>(Lifetime.Scoped);
 
-            builder.RegisterComponentInHierarchy<ParticlesFactory>();
+            builder.Register<ParticlesFactory>(Lifetime.Scoped)
+                .WithParameter(_onDestroySphereParticlePrefab);
+
+            builder.Register<MoveUIAnimation>(Lifetime.Scoped)
+                .WithParameter("header", _header)
+                .WithParameter("buttons", _buttons);
         }
     }
 }

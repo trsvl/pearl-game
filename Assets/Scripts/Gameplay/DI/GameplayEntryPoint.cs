@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using Bootstrap;
+using Gameplay.Animations;
 using Gameplay.Animations.StartAnimation;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
@@ -40,6 +41,9 @@ namespace Gameplay.DI
             InitBallFactory();
 
             await _container.Resolve<SpawnSmallSpheresAnimation>().DoAnimation();
+
+            _ = _container.Resolve<MoveUIAnimation>().DoAnimation();
+
             await _container.Resolve<MoveThrowingBall>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();

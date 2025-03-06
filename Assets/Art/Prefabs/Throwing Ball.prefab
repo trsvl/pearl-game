@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 4662423876019585698}
   - component: {fileID: -7870694317453957581}
   m_Layer: 0
-  m_Name: ThrowingBall
+  m_Name: Throwing Ball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

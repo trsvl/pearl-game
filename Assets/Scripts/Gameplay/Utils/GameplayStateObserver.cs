@@ -19,7 +19,7 @@ namespace Gameplay.Utils
             }
             else
             {
-                Debug.LogError($"{listener.GetType()} is not inherit from GameplayStateObserver");
+                Debug.LogError($"{listener} is not inherit from GameplayStateObserver");
             }
         }
 

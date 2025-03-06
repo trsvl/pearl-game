@@ -1,73 +1,43 @@
-﻿using Gameplay.Utils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Events;
 using Utils.UI.Buttons;
 
-namespace Gameplay
+namespace Gameplay.UI.Popup
 {
-    public class GamePopup : IPauseGame, IResumeGame, IFinishGame, ILoseGame //!!!
+    public class GamePopup : MonoBehaviour
     {
-        private readonly TextButton _firstButton;
-        private readonly TextButton _secondButton;
-        private readonly GameplayStateObserver _gameplayStateObserver;
-        private readonly GameObject _popup;
+        [SerializeField] private TextButton _buttonPrefab;
+        [SerializeField] private Transform buttonSpawnParent;
 
 
-        public GamePopup(GameObject popup, TextButton firstButton, TextButton secondButton,
-            GameplayStateObserver gameplayStateObserver)
+        public void PauseGame(UnityAction RestartGameClick, UnityAction ResumeGameCLick, UnityAction MainMenuClick)
         {
-            _popup = popup;
-            _firstButton = firstButton;
-            _secondButton = secondButton;
-            _gameplayStateObserver = gameplayStateObserver;
+            AssignButton(RestartGameClick, "Restart game");
+            AssignButton(ResumeGameCLick, "Resume game");
+            AssignButton(MainMenuClick, "Main menu");
         }
 
-        public void PauseGame()
+        public void FinishGame(UnityAction RestartGameClick, UnityAction MainMenuClick)
         {
-            _popup.SetActive(true);
-            AssignButton(_firstButton, ResumeGameCLick, "Resume game");
-            AssignButton(_secondButton, MainMenuClick, "Main menu");
+            AssignButton(RestartGameClick, "Play again");
+            AssignButton(MainMenuClick, "Main menu");
         }
 
-        public void FinishGame()
+        public void LoseGame(UnityAction RestartGameClick, UnityAction MainMenuClick)
         {
-            _popup.SetActive(true);
-            AssignButton(_firstButton, RestartGameClick, "Play again");
-            AssignButton(_secondButton, MainMenuClick, "Main menu");
-        }
-
-        public void LoseGame()
-        {
-            _popup.SetActive(true);
-            AssignButton(_firstButton, RestartGameClick, "Try again");
-            AssignButton(_secondButton, MainMenuClick, "Main menu");
+            AssignButton(RestartGameClick, "Try again");
+            AssignButton(MainMenuClick, "Main menu");
         }
 
         public void ResumeGame()
         {
-            _popup.SetActive(false);
-            _firstButton.RemoveListeners();
-            _secondButton.RemoveListeners();
+            Destroy(gameObject);
         }
 
-        private void AssignButton(TextButton button, UnityAction listener, string text)
+        private void AssignButton(UnityAction listener, string text)
         {
+            var button = Instantiate(_buttonPrefab, buttonSpawnParent);
             button.Set(listener, text);
-        }
-
-        private void ResumeGameCLick()
-        {
-            _gameplayStateObserver.ResumeGame();
-        }
-
-        private void RestartGameClick()
-        {
-          //  _ = Loader.Instance.LoadScene(SceneName.Gameplay);
-        }
-
-        private void MainMenuClick()
-        {
-         //   _ = Loader.Instance.LoadScene(SceneName.MainMenu);
         }
     }
 }

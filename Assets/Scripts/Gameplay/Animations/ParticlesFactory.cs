@@ -1,23 +1,27 @@
 ﻿using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
-using VContainer;
 
-namespace Gameplay
+namespace Gameplay.Animations
 {
-    public class ParticlesFactory : MonoBehaviour, IDestroySphere
+    public class ParticlesFactory : IDestroySphere
     {
-        [SerializeField] private ParticleSystem _onDestroySphereParticlePrefab;
-
-        private int count = 0;
+        private readonly ParticleSystem _onDestroySphereParticlePrefab;
         private IObjectPool<ParticleSystem> _onDestroySphereParticlesPool;
+        private int count;
 
 
-        [Inject]
-        private void Init()
+        public ParticlesFactory(ParticleSystem onDestroySphereParticlePrefab)
         {
-            int capacity = 20;
-            
+            _onDestroySphereParticlePrefab = onDestroySphereParticlePrefab;
+
+            InitializePool();
+        }
+
+        private void InitializePool()
+        {
+            const int capacity = 20;
+
             _onDestroySphereParticlesPool = new ObjectPool<ParticleSystem>(
                 OnCreate,
                 OnSpawn,
@@ -27,18 +31,10 @@ namespace Gameplay
                 capacity,
                 capacity
             );
-
-            for (int i = 0; i < capacity; i++)
-            {
-                ParticleSystem particle = _onDestroySphereParticlesPool.Get();
-                _onDestroySphereParticlesPool.Release(particle);
-            }
         }
 
         public async void OnDestroySphere(GameObject sphere)
         {
-            count += 1;
-            Debug.Log(count);
             ParticleSystem particle = _onDestroySphereParticlesPool.Get();
             particle.transform.position = sphere.transform.position;
             particle.Play();
@@ -56,7 +52,9 @@ namespace Gameplay
 
         private ParticleSystem OnCreate()
         {
-            var particle = Instantiate(_onDestroySphereParticlePrefab, transform);
+            count += 1;
+            Debug.Log(count);
+            var particle = Object.Instantiate(_onDestroySphereParticlePrefab);
             particle.gameObject.SetActive(false);
             return particle;
         }
@@ -73,7 +71,7 @@ namespace Gameplay
 
         private void OnDestroyObject(ParticleSystem particle)
         {
-            Destroy(particle.gameObject);
+            Object.Destroy(particle.gameObject);
         }
     }
 }

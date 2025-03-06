@@ -77,7 +77,7 @@ namespace Gameplay.SphereData
 
                     _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
 
-                    await Task.Delay((int)(1000 * 0.05f / ((i + 1) * 0.5f)));
+                    await Task.Delay((int)(1000 * 0.1f / ((i + 2) * 0.5f)));
                 }
             }
         }

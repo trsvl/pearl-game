@@ -21,13 +21,11 @@ namespace Gameplay.DI
                 installer?.Install(builder);
             }
 
-            new AnimationsInstaller().Install(builder);
-
             new UtilsInstaller().Install(builder);
 
             builder.UseEntryPoints(points =>
             {
-                points.Add<GameplayEventBusEntryPoint>();
+                points.Add<GameplaySubscriber>();
                 points.Add<GameplayEntryPoint>();
             });
         }

@@ -28,10 +28,8 @@ namespace Gameplay.BallThrowing
         private const float _maxForce = 50f;
 
         [Inject]
-        public void Init(GameplayStateObserver gameplayStateObserver, BallFactory ballFactory)
+        public void Init(BallFactory ballFactory)
         {
-            gameplayStateObserver.AddListener(this);
-            
             _ballFactory = ballFactory;
 
             _lineRenderer = GetComponent<LineRenderer>();

@@ -24,7 +24,7 @@ namespace Gameplay.SphereData
             _spheresDictionary = spheresDictionary;
             _sphereRotation = SphereRotation.GetQuaternion;
 
-            transform.position = new Vector3(0f, 1f, 40f);
+            transform.position = new Vector3(0f, 1f, 60f);
         }
 
         protected virtual void Update()

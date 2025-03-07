@@ -2,6 +2,7 @@
 using System.Linq;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
+using Gameplay.Utils;
 using UnityEngine;
 using Utils.EventBusSystem;
 using VContainer;
@@ -12,17 +13,19 @@ namespace Gameplay.BallThrowing
     public class BallFactory : MonoBehaviour
     {
         public Ball CurrentBall => _currentBall;
-        public float BallSize => _ballSize;
         public Vector3 BallSpawnPoint => _ballSpawnPoint;
         public Color BallColor => _currentBall.GetColor();
 
         private Ball _ballPrefab;
         private ShotsData _shotsData;
         private EventBus _eventBus;
-        private Color[] _levelColors;
-        private Vector3 _ballLocalScale;
-        private Color _previousColor;
+        private SpheresDictionary _spheresDictionary;
         private SphereGenerator _sphereGenerator;
+        private CameraManager _cameraManager;
+
+        private Vector3 _ballLocalScale;
+        private Color[] _levelColors;
+        private Color _previousColor;
 
         private Ball _currentBall;
         private float _ballSize;
@@ -30,28 +33,26 @@ namespace Gameplay.BallThrowing
 
 
         [Inject]
-        public void Init(Ball ballPrefab, ShotsData shotsData,
-            EventBus eventBus)
+        public void Init(Ball ballPrefab, ShotsData shotsData, EventBus eventBus, SpheresDictionary spheresDictionary,
+            SphereGenerator sphereGenerator, CameraManager cameraManager)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
+            _spheresDictionary = spheresDictionary;
+            _sphereGenerator = sphereGenerator;
+            _cameraManager = cameraManager;
         }
 
-        public void ReInit(Vector3 ballLocalScale, Color[] levelColors)
-        {
-            _ballLocalScale = ballLocalScale;
-            _levelColors = levelColors;
-
-            InitBallData();
-        }
-
-        private void InitBallData()
+        public GameObject InitBallData()
         {
             var initialBall = Instantiate(_ballPrefab);
             initialBall.gameObject.SetActive(false);
 
-            initialBall.transform.localScale = _ballLocalScale;
+            _ballLocalScale = _spheresDictionary.LowestSphereScale;
+            _levelColors = _sphereGenerator._levelColors;
+
+            initialBall.transform.localScale = Vector3.one;
             Renderer ballRenderer = initialBall.GetComponent<Renderer>();
             Bounds bounds = ballRenderer.bounds;
             const float ballScale = 0.3f;
@@ -60,10 +61,18 @@ namespace Gameplay.BallThrowing
             _ballSize = Mathf.Max(objectSizes.x, objectSizes.y, objectSizes.z);
 
             Destroy(initialBall.gameObject);
+
+            UpdateBallPosition(0f);
+
+            SpawnBall();
+
+            return _currentBall.gameObject;
         }
 
-        public void UpdateData(Vector3 newBallPosition)
+        public void UpdateBallPosition(float newFOV)
         {
+            Vector3 newBallPosition = _cameraManager.UpdateBallPositionAndFOV(_ballSize, newFOV);
+
             _ballSpawnPoint = newBallPosition;
 
             if (!_currentBall) return;
@@ -89,14 +98,9 @@ namespace Gameplay.BallThrowing
             SpawnBall();
         }
 
-        public GameObject GetBall()
+        private void SpawnBall()
         {
-            return _currentBall != null ? _currentBall.gameObject : SpawnBall();
-        }
-
-        private GameObject SpawnBall()
-        {
-            if (_shotsData.CurrentNumber <= 0) return null;
+            if (_shotsData.CurrentNumber <= 0) return;
 
             _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, SphereRotation.GetQuaternion);
 
@@ -107,8 +111,6 @@ namespace Gameplay.BallThrowing
 
             _currentBall.transform.localScale = _ballLocalScale;
             ballRenderer.material.SetColor(AllColors.BaseColor, GenerateBallColor());
-
-            return _currentBall.gameObject;
         }
 
         private Color GenerateBallColor()
@@ -119,7 +121,7 @@ namespace Gameplay.BallThrowing
             int randomIndex = Random.Range(0, filteredColors.Length);
             Color newColor = _levelColors[randomIndex];
             _previousColor = newColor;
-            
+
             return newColor;
         }
 

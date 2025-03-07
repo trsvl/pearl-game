@@ -23,13 +23,6 @@ namespace Gameplay.DI
             _container = container;
         }
 
-        private void InitBallFactory() //!!!
-        {
-            var sphereLowestScale = _container.Resolve<SpheresDictionary>().LowestSphereScale;
-            var levelColors = _container.Resolve<SphereGenerator>()._levelColors;
-            _container.Resolve<BallFactory>().ReInit(sphereLowestScale, levelColors);
-        }
-
         public async Task StartAsync(CancellationToken cancellation = new())
         {
             var dataContext = _container.Resolve<DataContext>();
@@ -38,13 +31,11 @@ namespace Gameplay.DI
 
             await dataContext.LoadSpheres(playerData.CurrentLevel, sphereGenerator);
 
-            InitBallFactory();
-
             await _container.Resolve<SpawnSmallSpheresAnimation>().DoAnimation();
 
             _ = _container.Resolve<MoveUIAnimation>().DoAnimation();
 
-            await _container.Resolve<MoveThrowingBall>().DoAnimation();
+            await _container.Resolve<InitializeThrowingBall>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();
         }

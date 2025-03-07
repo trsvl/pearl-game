@@ -20,14 +20,6 @@ namespace Gameplay.Animations
             _ballFactory = ballFactory;
             _cameraManager = cameraManager;
             _eventBus = eventBus;
-            
-            Update(_cameraManager.GetInitialFOV());
-        }
-
-        private void Update(float newFOV)
-        {
-            Vector3 newBallPosition = _cameraManager.UpdateBallPositionAndFOV(_ballFactory.BallSize, newFOV);
-            _ballFactory.UpdateData(newBallPosition);
         }
 
         public async Task DoAnimation()
@@ -38,7 +30,7 @@ namespace Gameplay.Animations
             float targetFOV = _cameraManager.GetNewFOV();
             _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnStartChangeFOV());
 
-            _tweener = DOVirtual.Float(initialFOV, targetFOV, duration, Update);
+            _tweener = DOVirtual.Float(initialFOV, targetFOV, duration, _ballFactory.UpdateBallPosition);
 
             await _tweener.AsyncWaitForCompletion();
 

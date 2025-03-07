@@ -64,9 +64,9 @@ namespace Gameplay.Utils
             return newFOV;
         }
 
-        public Vector3 UpdateBallPositionAndFOV(float _ballSize, float newFOV)
+        public Vector3 UpdateBallPositionAndFOV(float _ballSize, float newFOV = 0f)
         {
-            _mainCamera.fieldOfView = newFOV;
+            _mainCamera.fieldOfView = newFOV == 0f ? _initialFOV : newFOV;
 
             float cameraView =
                 2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * _mainCamera.fieldOfView);
@@ -76,6 +76,7 @@ namespace Gameplay.Utils
 
             Vector3 ballPosition = new Vector3(0.8f, 0.15f, distance);
             var ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
+            
             return ballSpawnPoint;
         }
     }

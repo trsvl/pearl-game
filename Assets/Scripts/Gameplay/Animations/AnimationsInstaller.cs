@@ -24,7 +24,7 @@ namespace Gameplay.Animations
                     return parent;
                 });
 
-            builder.Register<MoveThrowingBall>(Lifetime.Scoped);
+            builder.Register<InitializeThrowingBall>(Lifetime.Scoped);
 
             builder.Register<ParticlesFactory>(Lifetime.Scoped)
                 .WithParameter(_onDestroySphereParticlePrefab);

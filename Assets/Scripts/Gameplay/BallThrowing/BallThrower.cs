@@ -15,6 +15,8 @@ namespace Gameplay.BallThrowing
         [SerializeField] private LayerMask _collisionMaskLine;
         [SerializeField] private RectTransform _dragArea;
         [SerializeField] private Camera _uiCamera;
+        [SerializeField] private float _minimalForce = 1f;
+        [SerializeField] private float _maxForce = 30f;
 
         private BallFactory _ballFactory;
         private LineRenderer _lineRenderer;
@@ -24,8 +26,6 @@ namespace Gameplay.BallThrowing
         private Vector3 _initialMousePosition;
         private Vector3 _throwDirection;
 
-        private const float _minimalForce = 3f;
-        private const float _maxForce = 50f;
 
         [Inject]
         public void Init(BallFactory ballFactory)
@@ -93,14 +93,14 @@ namespace Gameplay.BallThrowing
             Vector3 cameraUp = _mainCamera.transform.up;
 
             Vector3 throwDir = (
-                cameraForward * 100f +
+                cameraForward * 30f +
                 cameraRight * (dragDelta.x * 0.2f) +
                 cameraUp * (dragDelta.y * _verticalMultiplier * 0.2f)
             ).normalized;
 
             float dragMagnitude = Mathf.Clamp(dragDelta.magnitude, 0, 200f);
             float forceMagnitude = Mathf.Max(_minimalForce, Mathf.Min(dragMagnitude, _maxForce));
-            _throwDirection = throwDir * forceMagnitude;
+            _throwDirection = throwDir * forceMagnitude / 1.5f;
 
             UpdateTrajectoryLine(_ballFactory.BallSpawnPoint, _throwDirection);
         }

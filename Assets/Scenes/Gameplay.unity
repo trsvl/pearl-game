@@ -603,6 +603,8 @@ MonoBehaviour:
     m_Bits: 1
   _dragArea: {fileID: 1584664436}
   _uiCamera: {fileID: 853203908}
+  _minimalForce: 70
+  _maxForce: 80
 --- !u!1 &655470746
 GameObject:
   m_ObjectHideFlags: 0
@@ -1290,7 +1292,7 @@ GameObject:
   - component: {fileID: 1366334602}
   - component: {fileID: 1366334603}
   m_Layer: 0
-  m_Name: Animation Installer
+  m_Name: Animations Installer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

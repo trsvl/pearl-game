@@ -5,19 +5,19 @@ using UnityEngine;
 
 namespace Gameplay.Animations.StartAnimation
 {
-    public class MoveThrowingBall : IStartAnimation
+    public class InitializeThrowingBall : IStartAnimation
     {
         private readonly BallFactory _ballFactory;
 
 
-        public MoveThrowingBall(BallFactory ballFactory)
+        public InitializeThrowingBall(BallFactory ballFactory)
         {
             _ballFactory = ballFactory;
         }
 
         public async Task DoAnimation()
         {
-            GameObject ball = _ballFactory.GetBall();
+            GameObject ball = _ballFactory.InitBallData();
             Vector3 targetPos = ball.transform.position;
             ball.transform.position = new Vector3(ball.transform.position.x, ball.transform.position.y - 5f,
                 ball.transform.position.z);

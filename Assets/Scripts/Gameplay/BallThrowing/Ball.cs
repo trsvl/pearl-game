@@ -10,6 +10,7 @@ namespace Gameplay.BallThrowing
         private Renderer _renderer;
         private Collider _collider;
         private Rigidbody _rigidbody;
+        private bool _isTouchedSphere;
 
 
         public void Init(EventBus eventBus, Renderer ballRenderer, Collider ballCollider,
@@ -23,8 +24,10 @@ namespace Gameplay.BallThrowing
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (collision.gameObject.CompareTag("Ball"))
+            if (!_isTouchedSphere && collision.gameObject.CompareTag("Ball"))
             {
+                _isTouchedSphere = true;
+
                 var materialPropertyBlock = new MaterialPropertyBlock();
                 Renderer sphereRenderer = collision.gameObject.GetComponent<Renderer>();
                 sphereRenderer.GetPropertyBlock(materialPropertyBlock);

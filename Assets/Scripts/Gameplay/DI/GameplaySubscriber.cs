@@ -42,7 +42,9 @@ namespace Gameplay.DI
                 typeof(PearlsData),
                 typeof(SphereOnHitBehaviour),
                 typeof(SpheresDictionary),
-                typeof(ParticlesFactory)
+                typeof(ParticlesFactory),
+                typeof(ThrowingBallAnimation),
+                typeof(RespawnBallButton)
             );
         }
 
@@ -91,7 +93,7 @@ namespace Gameplay.DI
         {
             foreach (var type in types)
             {
-                var handler = _container.Resolve(type) ;
+                var handler = _container.Resolve(type);
                 _gameplayStateObserver.AddListener(handler);
             }
         }

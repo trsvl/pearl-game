@@ -13,44 +13,43 @@ namespace Gameplay.BallThrowing
     public class BallFactory : MonoBehaviour
     {
         public Ball CurrentBall => _currentBall;
-        public Vector3 BallSpawnPoint => _ballSpawnPoint;
+        public Vector3 CurrentBallSpawnPoint => _currentBallSpawnPoint;
         public Color BallColor => _currentBall.GetColor();
 
         private Ball _ballPrefab;
         private ShotsData _shotsData;
         private EventBus _eventBus;
         private SpheresDictionary _spheresDictionary;
-        private SphereGenerator _sphereGenerator;
         private CameraManager _cameraManager;
 
+        private Color[] _levelColors => _spheresDictionary.GetLevelColors();
         private Vector3 _ballLocalScale;
-        private Color[] _levelColors;
         private Color _previousColor;
 
         private Ball _currentBall;
+        private Ball _nextBall;
         private float _ballSize;
-        private Vector3 _ballSpawnPoint;
+        private Vector3 _currentBallSpawnPoint;
+        private Vector3 _nextBallSpawnPoint;
 
 
         [Inject]
         public void Init(Ball ballPrefab, ShotsData shotsData, EventBus eventBus, SpheresDictionary spheresDictionary,
-            SphereGenerator sphereGenerator, CameraManager cameraManager)
+            CameraManager cameraManager)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
             _spheresDictionary = spheresDictionary;
-            _sphereGenerator = sphereGenerator;
             _cameraManager = cameraManager;
         }
 
-        public GameObject InitBallData()
+        public (GameObject currentBall, GameObject nextBall) InitBallData()
         {
             var initialBall = Instantiate(_ballPrefab);
             initialBall.gameObject.SetActive(false);
 
             _ballLocalScale = _spheresDictionary.LowestSphereScale;
-            _levelColors = _sphereGenerator._levelColors;
 
             initialBall.transform.localScale = Vector3.one;
             Renderer ballRenderer = initialBall.GetComponent<Renderer>();
@@ -64,20 +63,23 @@ namespace Gameplay.BallThrowing
 
             UpdateBallPosition(0f);
 
-            SpawnBall();
+            SpawnNextBall();
+            SpawnCurrentBall();
 
-            return _currentBall.gameObject;
+            return (_currentBall.gameObject, _nextBall.gameObject);
         }
 
         public void UpdateBallPosition(float newFOV)
         {
-            Vector3 newBallPosition = _cameraManager.UpdateBallPositionAndFOV(_ballSize, newFOV);
+            (Vector3 newBallPosition, Vector3 newNextBallPosition) =
+                _cameraManager.UpdateBallsPositionAndFOV(_ballSize, newFOV);
 
-            _ballSpawnPoint = newBallPosition;
+            _currentBallSpawnPoint = newBallPosition;
+            _nextBallSpawnPoint = newNextBallPosition;
 
             if (!_currentBall) return;
 
-            _currentBall.transform.position = _ballSpawnPoint;
+            _currentBall.transform.position = _currentBallSpawnPoint;
         }
 
         public void ReleaseBall(Vector3 direction)
@@ -85,57 +87,66 @@ namespace Gameplay.BallThrowing
             _currentBall?.ApplyForce(direction);
             _shotsData.CurrentNumber -= 1;
 
-            StartCoroutine(DestroyBallAfterDelay(_currentBall?.gameObject));
-            StartCoroutine(SpawnBallAfterDelay(1f));
-
+            Destroy(_currentBall?.gameObject, 3f); //!!!
+            
             _currentBall = null;
+
+            _eventBus.RaiseEvent<IReleaseBall>(handler => handler.OnReleaseBall(_nextBall?.gameObject));
         }
 
         public void RespawnBall()
         {
-            if (_currentBall) Destroy(_currentBall.gameObject);
+            if (_nextBall) Destroy(_nextBall.gameObject);
 
-            SpawnBall();
+            SpawnNextBall();
         }
 
-        private void SpawnBall()
+        public void SetCurrentBall()
         {
-            if (_shotsData.CurrentNumber <= 0) return;
+            _currentBall = _nextBall;
+            _nextBall = null;
+            RespawnBall();
+        }
 
-            _currentBall = Instantiate(_ballPrefab, _ballSpawnPoint, SphereRotation.GetQuaternion);
+        private void SpawnCurrentBall()
+        {
+            _currentBall = SpawnBall(_currentBallSpawnPoint);
+        }
 
-            var ballRenderer = _currentBall.GetComponent<Renderer>();
-            var ballCollider = _currentBall.GetComponent<Collider>();
-            var ballRigidbody = _currentBall.GetComponent<Rigidbody>();
-            _currentBall.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody);
+        private void SpawnNextBall()
+        {
+            _nextBall = SpawnBall(_nextBallSpawnPoint);
+        }
 
-            _currentBall.transform.localScale = _ballLocalScale;
+        private Ball SpawnBall(Vector3 spawnPoint)
+        {
+            if (_shotsData.CurrentNumber <= 2) return null;
+            if (_levelColors.Length == 0) return null;
+
+            Ball ball = Instantiate(_ballPrefab, spawnPoint, SphereRotation.GetQuaternion);
+
+            var ballRenderer = ball.GetComponent<Renderer>();
+            var ballCollider = ball.GetComponent<Collider>();
+            var ballRigidbody = ball.GetComponent<Rigidbody>();
+            ball.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody);
+
+            ball.transform.localScale = _ballLocalScale;
             ballRenderer.material.SetColor(AllColors.BaseColor, GenerateBallColor());
+
+            return ball;
         }
 
         private Color GenerateBallColor()
         {
-            if (_levelColors.Length <= 1) return _levelColors[0];
+            if (_levelColors.Length == 1) return _levelColors[0];
 
             Color[] filteredColors = _levelColors.Where(color => color != _previousColor).ToArray();
             int randomIndex = Random.Range(0, filteredColors.Length);
-            Color newColor = _levelColors[randomIndex];
+
+            Color newColor = filteredColors[randomIndex];
             _previousColor = newColor;
 
             return newColor;
-        }
-
-        private IEnumerator SpawnBallAfterDelay(float delay)
-        {
-            yield return new WaitForSeconds(delay);
-            RespawnBall();
-        }
-
-        private IEnumerator DestroyBallAfterDelay(GameObject ball)
-        {
-            yield return new WaitForSeconds(4f);
-
-            Destroy(ball);
         }
     }
 }

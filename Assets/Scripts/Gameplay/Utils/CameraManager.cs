@@ -64,7 +64,8 @@ namespace Gameplay.Utils
             return newFOV;
         }
 
-        public Vector3 UpdateBallPositionAndFOV(float _ballSize, float newFOV = 0f)
+        public (Vector3 ballPosition, Vector3 nextBallPosition) UpdateBallsPositionAndFOV(float _ballSize,
+            float newFOV = 0f)
         {
             _mainCamera.fieldOfView = newFOV == 0f ? _initialFOV : newFOV;
 
@@ -75,9 +76,11 @@ namespace Gameplay.Utils
             _mainCamera.transform.position = new Vector3(0, 0, distance);
 
             Vector3 ballPosition = new Vector3(0.8f, 0.15f, distance);
+            Vector3 nextBallPosition = new Vector3(0.65f, 0.05f, distance);
             var ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
-            
-            return ballSpawnPoint;
+            var nextBallSpawnPoint = _mainCamera.ViewportToWorldPoint(nextBallPosition);
+
+            return (ballSpawnPoint, nextBallSpawnPoint);
         }
     }
 }

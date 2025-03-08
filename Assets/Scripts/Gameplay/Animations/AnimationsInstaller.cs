@@ -1,5 +1,4 @@
-﻿using Gameplay.Animations.StartAnimation;
-using Gameplay.SphereData;
+﻿using Gameplay.SphereData;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -24,7 +23,7 @@ namespace Gameplay.Animations
                     return parent;
                 });
 
-            builder.Register<InitializeThrowingBall>(Lifetime.Scoped);
+            builder.Register<ThrowingBallAnimation>(Lifetime.Scoped);
 
             builder.Register<ParticlesFactory>(Lifetime.Scoped)
                 .WithParameter(_onDestroySphereParticlePrefab);

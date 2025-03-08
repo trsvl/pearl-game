@@ -5,7 +5,6 @@ namespace Gameplay.SphereData
 {
     public class SphereGenerator : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
-        public Color[] _levelColors { get; private set; }
         public int allPearlsCount { get; private set; }
 
         protected AllColors _allColors { get; private set; }
@@ -43,15 +42,12 @@ namespace Gameplay.SphereData
         {
             ClearSpheres();
 
-            _levelColors = new Color[json.colorNames.Length];
-
             for (int i = 0; i < json.colorNames.Length; i++)
             {
                 Color color = _allColors.GetColor(json.colorNames[i]);
                 _spheresDictionary.AddColorToDictionary(color, json.spheres.Length);
-                _levelColors[i] = color;
             }
-            
+
             GenerateBigSphereData(json);
         }
 
@@ -67,8 +63,8 @@ namespace Gameplay.SphereData
 
         protected void GenerateSmallSpheres(SpheresData data, BigSphere bigSphere, int bigSphereIndex)
         {
-            bigSphere.CreateSmallSpheres(_spherePrefab, transform, data.spheres[bigSphereIndex], _levelColors,
-                _spheresDictionary, _sphereRotation, bigSphereIndex);
+            bigSphere.CreateSmallSpheres(_spherePrefab, transform, data.spheres[bigSphereIndex],
+                _spheresDictionary.GetLevelColors(), _spheresDictionary, _sphereRotation, bigSphereIndex);
         }
 
         protected void ClearSpheres()

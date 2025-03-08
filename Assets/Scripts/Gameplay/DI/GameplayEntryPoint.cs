@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Bootstrap;
 using Gameplay.Animations;
-using Gameplay.Animations.StartAnimation;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using Gameplay.Utils;
@@ -35,7 +34,7 @@ namespace Gameplay.DI
 
             _ = _container.Resolve<MoveUIAnimation>().DoAnimation();
 
-            await _container.Resolve<InitializeThrowingBall>().DoAnimation();
+            await _container.Resolve<ThrowingBallAnimation>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();
         }

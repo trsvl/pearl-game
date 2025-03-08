@@ -5,7 +5,7 @@ using DG.Tweening;
 using Gameplay.SphereData;
 using UnityEngine;
 
-namespace Gameplay.Animations.StartAnimation
+namespace Gameplay.Animations
 {
     public class SpawnSmallSpheresAnimation : IStartAnimation
     {

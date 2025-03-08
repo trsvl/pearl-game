@@ -13,7 +13,8 @@ namespace Gameplay.SphereData
 
         private readonly EventBus _eventBus;
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
-        private Vector3 lowestSphereScale = Vector3.one;
+        private Vector3 lowestSphereScale = Vector3.one * 10f;
+        private List<Color> _levelColors;
 
 
         public SpheresDictionary(EventBus eventBus)
@@ -24,6 +25,7 @@ namespace Gameplay.SphereData
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
             if (allSpheres.ContainsKey(color)) return;
+
             var sphereListArray = new HashSet<GameObject>[bigSpheresCount];
 
             for (int i = 0; i < bigSpheresCount; i++)
@@ -60,10 +62,14 @@ namespace Gameplay.SphereData
 
         private async Task DestroySpheresSegment(Color color, GameObject targetSphere)
         {
-            if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresLists)) return;
+            if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresHashSetsArray)) return;
 
-            foreach (HashSet<GameObject> spheresSegment in spheresLists)
+            bool isDeleteColor = true;
+
+            foreach (HashSet<GameObject> spheresSegment in spheresHashSetsArray)
             {
+                if (spheresSegment.Count > 0 && !spheresSegment.Contains(targetSphere)) isDeleteColor = false;
+
                 if (!spheresSegment.Contains(targetSphere)) continue;
 
                 var sortedSegmentByDistance = spheresSegment
@@ -81,6 +87,14 @@ namespace Gameplay.SphereData
                     await Task.Delay(delay);
                 }
             }
+
+            if (isDeleteColor)
+            {
+                allSpheres.Remove(color);
+            }
+
+            _eventBus.RaiseEvent<IAfterDestroySphereSegment>(handler =>
+                handler.OnAfterDestroySphereSegment());
         }
 
         public Dictionary<Color, HashSet<GameObject>[]>.ValueCollection GetSpheres()
@@ -99,6 +113,11 @@ namespace Gameplay.SphereData
         public void OnDestroySphereSegment(Color segmentColor, GameObject target)
         {
             _ = DestroySpheresSegment(segmentColor, target);
+        }
+
+        public Color[] GetLevelColors()
+        {
+            return allSpheres.Keys.ToArray();
         }
     }
 }

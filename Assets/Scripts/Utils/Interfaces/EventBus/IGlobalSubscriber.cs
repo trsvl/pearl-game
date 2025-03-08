@@ -21,6 +21,26 @@ public interface IDestroySphere : IGlobalSubscriber
     void OnDestroySphere(GameObject sphere);
 }
 
+public interface IAfterDestroySphereSegment : IGlobalSubscriber
+{
+    void OnAfterDestroySphereSegment();
+}
+
+public interface IDestroySphereLayer : IGlobalSubscriber
+{
+    void OnDestroySphereLayer(bool isLayerDestroyed);
+}
+
+public interface IReleaseBall : IGlobalSubscriber
+{
+    void OnReleaseBall(GameObject nextBall);
+}
+
+public interface IAfterReleaseBall : IGlobalSubscriber
+{
+    void OnAfterReleaseBall();
+}
+
 public interface IAnimation : IGlobalSubscriber
 {
     Task DoAnimation();

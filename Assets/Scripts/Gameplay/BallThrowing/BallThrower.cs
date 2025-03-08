@@ -102,7 +102,7 @@ namespace Gameplay.BallThrowing
             float forceMagnitude = Mathf.Max(_minimalForce, Mathf.Min(dragMagnitude, _maxForce));
             _throwDirection = throwDir * forceMagnitude / 1.5f;
 
-            UpdateTrajectoryLine(_ballFactory.BallSpawnPoint, _throwDirection);
+            UpdateTrajectoryLine(_ballFactory.CurrentBallSpawnPoint, _throwDirection);
         }
 
         private void UpdateTrajectoryLine(Vector3 startPosition, Vector3 initialVelocity)

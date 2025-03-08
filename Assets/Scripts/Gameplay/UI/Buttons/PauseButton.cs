@@ -1,4 +1,5 @@
 ﻿using Gameplay.Utils;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Gameplay.UI.Buttons
@@ -13,12 +14,12 @@ namespace Gameplay.UI.Buttons
             _button = button;
 
             _button.onClick.AddListener(gameplayStateObserver.PauseGame);
-            _button.enabled = false;
+            _button.interactable = false;
         }
 
         public void StartGame()
         {
-            _button.enabled = true;
+            _button.interactable = true;
         }
     }
 }

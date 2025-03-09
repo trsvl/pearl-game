@@ -2,21 +2,23 @@
 using Gameplay.SphereData;
 using UnityEngine;
 
-namespace Gameplay.Utils
+namespace Gameplay.Animations
 {
     public class CameraManager
     {
         private readonly SpheresDictionary _spheresDictionary;
         private readonly Camera _mainCamera;
+        private readonly Camera _uiCamera; //!!!
         private float _initialFOV;
         private int alreadyTriggeredIndex;
 
 
-        public CameraManager(SpheresDictionary spheresDictionary)
+        public CameraManager(SpheresDictionary spheresDictionary, Camera uiCamera)
         {
             _mainCamera = Camera.main;
             _initialFOV = _mainCamera.fieldOfView;
             _spheresDictionary = spheresDictionary;
+            _uiCamera = uiCamera;
         }
 
         public float GetInitialFOV()
@@ -81,6 +83,11 @@ namespace Gameplay.Utils
             var nextBallSpawnPoint = _mainCamera.ViewportToWorldPoint(nextBallPosition);
 
             return (ballSpawnPoint, nextBallSpawnPoint);
+        }
+
+        public Camera GetMainCamera()
+        {
+            return _mainCamera;
         }
     }
 }

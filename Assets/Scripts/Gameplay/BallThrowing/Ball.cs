@@ -11,15 +11,17 @@ namespace Gameplay.BallThrowing
         private Collider _collider;
         private Rigidbody _rigidbody;
         private bool _isTouchedSphere;
+        private MaterialPropertyBlock _materialPropertyBlock;
 
 
-        public void Init(EventBus eventBus, Renderer ballRenderer, Collider ballCollider,
-            Rigidbody ballRigidbody)
+        public void Init(EventBus eventBus, Renderer ballRenderer, Collider ballCollider, Rigidbody ballRigidbody,
+            MaterialPropertyBlock materialPropertyBlock)
         {
             _eventBus = eventBus;
             _renderer = ballRenderer;
             _collider = ballCollider;
             _rigidbody = ballRigidbody;
+            _materialPropertyBlock = materialPropertyBlock;
         }
 
         private void OnCollisionEnter(Collision collision)
@@ -28,12 +30,12 @@ namespace Gameplay.BallThrowing
             {
                 _isTouchedSphere = true;
 
-                var materialPropertyBlock = new MaterialPropertyBlock();
                 Renderer sphereRenderer = collision.gameObject.GetComponent<Renderer>();
-                sphereRenderer.GetPropertyBlock(materialPropertyBlock);
+                sphereRenderer.GetPropertyBlock(_materialPropertyBlock);
+                Color touchedSphereColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
 
-                Color ballColor = _renderer.sharedMaterial.GetColor(AllColors.BaseColor);
-                Color touchedSphereColor = materialPropertyBlock.GetColor(AllColors.BaseColor);
+                _renderer.GetPropertyBlock(_materialPropertyBlock);
+                Color ballColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
 
                 if (ballColor == touchedSphereColor)
                 {
@@ -50,7 +52,8 @@ namespace Gameplay.BallThrowing
 
         public Color GetColor()
         {
-            return _renderer.material.GetColor(AllColors.BaseColor);
+            _renderer.GetPropertyBlock(_materialPropertyBlock);
+            return _materialPropertyBlock.GetColor(AllColors.BaseColor);
         }
 
         public void ApplyForce(Vector3 force)

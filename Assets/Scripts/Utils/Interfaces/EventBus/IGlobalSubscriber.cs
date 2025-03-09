@@ -33,7 +33,7 @@ public interface IDestroySphereLayer : IGlobalSubscriber
 
 public interface IReleaseBall : IGlobalSubscriber
 {
-    void OnReleaseBall(GameObject nextBall);
+    Task OnReleaseBall();
 }
 
 public interface IAfterReleaseBall : IGlobalSubscriber

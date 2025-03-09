@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using Gameplay.Animations;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
 using Gameplay.Utils;
@@ -13,6 +14,7 @@ namespace Gameplay.BallThrowing
     public class BallFactory : MonoBehaviour
     {
         public Ball CurrentBall => _currentBall;
+        public Ball NextBall => _nextBall;
         public Vector3 CurrentBallSpawnPoint => _currentBallSpawnPoint;
         public Color BallColor => _currentBall.GetColor();
 
@@ -31,6 +33,8 @@ namespace Gameplay.BallThrowing
         private float _ballSize;
         private Vector3 _currentBallSpawnPoint;
         private Vector3 _nextBallSpawnPoint;
+        private int _currentBallCount;
+        private bool _isRespawning;
 
 
         [Inject]
@@ -63,8 +67,8 @@ namespace Gameplay.BallThrowing
 
             UpdateBallPosition(0f);
 
-            SpawnNextBall();
             SpawnCurrentBall();
+            SpawnNextBall();
 
             return (_currentBall.gameObject, _nextBall.gameObject);
         }
@@ -85,19 +89,22 @@ namespace Gameplay.BallThrowing
         public void ReleaseBall(Vector3 direction)
         {
             _currentBall?.ApplyForce(direction);
-            _shotsData.CurrentNumber -= 1;
 
-            Destroy(_currentBall?.gameObject, 3f); //!!!
-            
+            _shotsData.CurrentNumber -= 1;
+            _currentBallCount -= 1;
+
+            Destroy(_currentBall?.gameObject, 3f);
+
             _currentBall = null;
 
-            _eventBus.RaiseEvent<IReleaseBall>(handler => handler.OnReleaseBall(_nextBall?.gameObject));
+            _eventBus.RaiseEvent<IReleaseBall>(handler => handler.OnReleaseBall());
         }
 
         public void RespawnBall()
         {
             if (_nextBall) Destroy(_nextBall.gameObject);
 
+            _isRespawning = true;
             SpawnNextBall();
         }
 
@@ -105,7 +112,7 @@ namespace Gameplay.BallThrowing
         {
             _currentBall = _nextBall;
             _nextBall = null;
-            RespawnBall();
+            StartCoroutine(SpawnNextBallDelay());
         }
 
         private void SpawnCurrentBall()
@@ -120,18 +127,25 @@ namespace Gameplay.BallThrowing
 
         private Ball SpawnBall(Vector3 spawnPoint)
         {
-            if (_shotsData.CurrentNumber <= 2) return null;
+            if (IsPreventedToSpawnBall()) return null;
             if (_levelColors.Length == 0) return null;
+
+            if (_isRespawning) _isRespawning = false;
+            else _currentBallCount += 1;
 
             Ball ball = Instantiate(_ballPrefab, spawnPoint, SphereRotation.GetQuaternion);
 
             var ballRenderer = ball.GetComponent<Renderer>();
             var ballCollider = ball.GetComponent<Collider>();
             var ballRigidbody = ball.GetComponent<Rigidbody>();
-            ball.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody);
 
             ball.transform.localScale = _ballLocalScale;
-            ballRenderer.material.SetColor(AllColors.BaseColor, GenerateBallColor());
+
+            MaterialPropertyBlock block = new MaterialPropertyBlock();
+            block.SetColor(AllColors.BaseColor, GenerateBallColor());
+            ballRenderer.SetPropertyBlock(block);
+
+            ball.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody, block);
 
             return ball;
         }
@@ -147,6 +161,17 @@ namespace Gameplay.BallThrowing
             _previousColor = newColor;
 
             return newColor;
+        }
+
+        private IEnumerator SpawnNextBallDelay()
+        {
+            yield return new WaitForSeconds(1f);
+            if (!_nextBall) SpawnNextBall();
+        }
+
+        public bool IsPreventedToSpawnBall()
+        {
+            return _shotsData.CurrentNumber == _currentBallCount;
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Bootstrap
 
         public async UniTask LoadScene(SceneName scene)
         {
+            Time.timeScale = 1;
+            
             CreateLoadingScreen();
 
             var sceneName = scene.ToString();

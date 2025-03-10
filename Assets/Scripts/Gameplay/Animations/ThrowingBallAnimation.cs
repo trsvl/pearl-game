@@ -42,9 +42,11 @@ namespace Gameplay.Animations
                 await UniTask.Yield();
             }
 
-            _ballFactory.NextBall.transform.DOMove(_ballFactory.CurrentBallSpawnPoint, 0.5f)
+            await _ballFactory.NextBall.transform.DOMove(_ballFactory.CurrentBallSpawnPoint, 0.5f)
                 .SetEase(Ease.OutQuad)
-                .OnComplete(() => _ballFactory.SetCurrentBall());
+                .ToUniTask();
+
+            _ballFactory.SetCurrentBall();
         }
 
         private async UniTask MoveBall(GameObject ball)

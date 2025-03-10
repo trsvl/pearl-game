@@ -26,7 +26,7 @@ namespace Gameplay.BallThrowing
                 rb.AddForce(randomPos, ForceMode.Impulse);
             }
 
-            DestructAfterDelay(sphere);
+            _ = DestructAfterDelay(sphere);
         }
 
         private async UniTask DestructAfterDelay(GameObject sphere)

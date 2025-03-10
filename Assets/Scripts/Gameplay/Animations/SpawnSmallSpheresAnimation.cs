@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.SphereData;
@@ -13,7 +12,7 @@ namespace Gameplay.Animations
         private readonly SpheresDictionary _spheresDictionary;
         private readonly Transform _parent;
 
-        private const float distance = 10f;
+        private const float distance = 50f;
 
 
         public SpawnSmallSpheresAnimation(SpheresDictionary spheresDictionary, Transform parent)
@@ -58,7 +57,7 @@ namespace Gameplay.Animations
 
         public async UniTask DoAnimation()
         {
-            const float moveDuration = 0.2f;
+            const float moveDuration = 0.3f;
             const int delayBetweenIterations = (int)moveDuration * 1000;
 
             var allSpheres = _spheresDictionary.GetSpheres();
@@ -80,12 +79,18 @@ namespace Gameplay.Animations
                     directionX *= -1;
                     sphereSegment.transform.position = GeneratePositionFromCenter(directionX, initialPosition);
 
-                    sphereSegment.transform.DOMove(initialPosition, moveDuration).OnComplete(() =>
+                    UniTask moveTask = sphereSegment.transform.DOMove(initialPosition, moveDuration)
+                        .SetEase(Ease.OutQuad)
+                        .ToUniTask();
+                    
+                    UniTask.Void(() =>
                     {
-                        DestroySegmentObject(sphereListArray[localIndex], sphereSegment);
+                        moveTask.ContinueWith(() => DestroySegmentObject(sphereListArray[localIndex], sphereSegment));
+                        return default;
                     });
-
+                   
                     await UniTask.Delay(delayBetweenIterations);
+
                 }
             }
         }

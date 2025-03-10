@@ -1,8 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
-using Gameplay.Utils;
 using UnityEngine;
 
 namespace Gameplay.Animations
@@ -10,24 +9,23 @@ namespace Gameplay.Animations
     public class ThrowingBallAnimation : IStartAnimation, IReleaseBall
     {
         private readonly BallFactory _ballFactory;
-        private readonly MoveUIAnimation _moveUIAnimation;
         private readonly CameraManager _cameraManager;
         private readonly RectTransform _respawnBallButton;
+        private readonly CancellationToken _cancellationToken;
 
 
-        public ThrowingBallAnimation(BallFactory ballFactory, MoveUIAnimation moveUIAnimation,
-            CameraManager cameraManager, RectTransform respawnBallButton)
+        public ThrowingBallAnimation(BallFactory ballFactory, CameraManager cameraManager,
+            RectTransform respawnBallButton, CancellationToken cancellationToken)
         {
             _ballFactory = ballFactory;
-            _moveUIAnimation = moveUIAnimation;
             _cameraManager = cameraManager;
             _respawnBallButton = respawnBallButton;
+            _cancellationToken = cancellationToken;
         }
 
         public async UniTask DoAnimation()
         {
             (GameObject currentBall, GameObject nextBall) = _ballFactory.InitBallData();
-
 
             MoveBallAndUI(nextBall);
 
@@ -44,9 +42,9 @@ namespace Gameplay.Animations
 
             await _ballFactory.NextBall.transform.DOMove(_ballFactory.CurrentBallSpawnPoint, 0.5f)
                 .SetEase(Ease.OutQuad)
-                .ToUniTask();
+                .ToUniTask(cancellationToken: _cancellationToken);
 
-            _ballFactory.SetCurrentBall();
+            _ballFactory?.SetCurrentBall();
         }
 
         private async UniTask MoveBall(GameObject ball)
@@ -58,7 +56,7 @@ namespace Gameplay.Animations
 
             await ball.transform.DOMove(targetPos, 1f)
                 .SetEase(Ease.OutQuad)
-                .ToUniTask();
+                .ToUniTask(cancellationToken: _cancellationToken);
         }
 
         private void MoveBallAndUI(GameObject ball)
@@ -70,6 +68,7 @@ namespace Gameplay.Animations
 
             var updateUIPosition = new UpdateUIPosition(_cameraManager.GetMainCamera(), _respawnBallButton);
             _respawnBallButton.anchoredPosition = initialPos;
+            _respawnBallButton.gameObject.SetActive(true);
 
             ball.transform.DOMove(targetPos, 1f)
                 .SetEase(Ease.OutQuad)

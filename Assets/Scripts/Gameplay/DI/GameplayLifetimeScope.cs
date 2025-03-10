@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using Gameplay.Animations;
 using Gameplay.Utils;
 using UnityEngine;
@@ -12,6 +13,8 @@ namespace Gameplay.DI
     {
         [SerializeField] private List<GameObject> _installers;
 
+        private readonly CancellationTokenSource _cts = new();
+
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -22,12 +25,22 @@ namespace Gameplay.DI
             }
 
             new UtilsInstaller().Install(builder);
+            
+            builder.RegisterComponent(_cts.Token);
 
             builder.UseEntryPoints(points =>
             {
                 points.Add<GameplaySubscriber>();
                 points.Add<GameplayEntryPoint>();
             });
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+
+            _cts.Cancel();
+            _cts.Dispose();
         }
     }
 }

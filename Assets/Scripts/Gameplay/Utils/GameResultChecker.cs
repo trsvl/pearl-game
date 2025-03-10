@@ -18,13 +18,13 @@ namespace Gameplay.Utils
             _spheresDictionary = spheresDictionary;
         }
 
-        public void CheckGameResult()
+        public void CheckGameResult(int currentShotsNumber)
         {
-            if (_spheresDictionary.GetLevelColors().Length == 0)
+            if (_spheresDictionary.GetLevelColors().Length == 0 && currentShotsNumber == _shotsData.CurrentNumber)
             {
                 _gameplayStateObserver.FinishGame();
             }
-            else if (_shotsData.CurrentNumber == 0)
+            else if (currentShotsNumber == 0)
             {
                 _gameplayStateObserver.LoseGame();
             }

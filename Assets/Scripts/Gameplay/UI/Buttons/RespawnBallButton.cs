@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using UnityEngine.UI;
@@ -23,28 +22,34 @@ namespace Gameplay.UI.Buttons
 
         public void StartGame()
         {
-            _button.interactable = true;
+            IsActiveButton(IsEnoughOfColors());
         }
 
         public void OnAfterDestroySphereSegment()
         {
-            _button.interactable = IsEnoughOfColors();
+            IsActiveButton(IsEnoughOfColors());
         }
 
         public UniTask OnReleaseBall()
         {
-            _button.interactable = false;
+            IsActiveButton(false);
             return UniTask.CompletedTask;
         }
 
         public void OnAfterReleaseBall()
         {
-            _button.interactable = IsEnoughOfColors();
+            IsActiveButton(IsEnoughOfColors());
         }
 
         private bool IsEnoughOfColors()
         {
-            return _spheresDictionary.GetLevelColors().Length > 1;
+            return _spheresDictionary.GetLevelColors().Length > 2;
+        }
+
+        private void IsActiveButton(bool isEnabled)
+        {
+            _button.interactable = isEnabled;
+            _button.gameObject.SetActive(isEnabled);
         }
     }
 }

@@ -97,7 +97,7 @@ namespace Gameplay.BallThrowing
             _shotsData.CurrentNumber -= 1;
             _currentBallCount -= 1;
 
-            StartCoroutine(DestroyBallDelay(_currentBall?.gameObject));
+            StartCoroutine(DestroyBallDelay(_currentBall?.gameObject, _shotsData.CurrentNumber));
 
             _currentBall = null;
 
@@ -159,7 +159,8 @@ namespace Gameplay.BallThrowing
         {
             if (_levelColors.Length == 1) return _levelColors[0];
 
-            Color[] filteredColors = _levelColors.Where(color => color != _previousColor).ToArray();
+            Color[] filteredColors = _levelColors
+                .Where(color => color != _previousColor && color != _currentBall?.GetColor()).ToArray();
             int randomIndex = Random.Range(0, filteredColors.Length);
 
             Color newColor = filteredColors[randomIndex];
@@ -174,12 +175,12 @@ namespace Gameplay.BallThrowing
             if (!_nextBall) SpawnNextBall();
         }
 
-        private IEnumerator DestroyBallDelay(GameObject ballObject)
+        private IEnumerator DestroyBallDelay(GameObject ballObject, int currentShotsNumber)
         {
             yield return new WaitForSeconds(3f);
 
             Destroy(ballObject);
-            _gameResultChecker.CheckGameResult();
+            _gameResultChecker.CheckGameResult(currentShotsNumber);
         }
 
         public bool IsPreventedToSpawnBall()

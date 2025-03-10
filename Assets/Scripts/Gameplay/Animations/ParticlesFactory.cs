@@ -1,21 +1,22 @@
-﻿using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Pool;
+using VContainer;
 
 namespace Gameplay.Animations
 {
-    public class ParticlesFactory : IDestroySphere
+    public class ParticlesFactory : MonoBehaviour, IDestroySphere
     {
-        private readonly ParticleSystem _onDestroySphereParticlePrefab;
+        private ParticleSystem _onDestroySphereParticlePrefab;
+
         private IObjectPool<ParticleSystem> _onDestroySphereParticlesPool;
-        private int count;
+        private int _count;
 
 
-        public ParticlesFactory(ParticleSystem onDestroySphereParticlePrefab)
+        [Inject]
+        public void Init(ParticleSystem onDestroySphereParticlePrefab)
         {
             _onDestroySphereParticlePrefab = onDestroySphereParticlePrefab;
-
             InitializePool();
         }
 
@@ -34,28 +35,26 @@ namespace Gameplay.Animations
             );
         }
 
-        public async void OnDestroySphere(GameObject sphere)
+        public void OnDestroySphere(GameObject sphere)
         {
+            if (!sphere) return;
             ParticleSystem particle = _onDestroySphereParticlesPool.Get();
             particle.transform.position = sphere.transform.position;
             particle.Play();
-            await WaitForParticleToStop(particle);
-            _onDestroySphereParticlesPool.Release(particle);
+            StartCoroutine(WaitForParticleToStop(particle));
         }
 
-        private async UniTask WaitForParticleToStop(ParticleSystem particle)
+        private IEnumerator WaitForParticleToStop(ParticleSystem particle)
         {
-            while (particle.IsAlive())
-            {
-                await UniTask.Yield();
-            }
+            yield return new WaitUntil(() => !particle.IsAlive());
+            _onDestroySphereParticlesPool.Release(particle);
         }
 
         private ParticleSystem OnCreate()
         {
-            count += 1;
-            Debug.Log(count);
-            var particle = Object.Instantiate(_onDestroySphereParticlePrefab);
+            _count += 1;
+            Debug.Log(_count);
+            var particle = Instantiate(_onDestroySphereParticlePrefab);
             particle.gameObject.SetActive(false);
             return particle;
         }
@@ -72,7 +71,7 @@ namespace Gameplay.Animations
 
         private void OnDestroyObject(ParticleSystem particle)
         {
-            Object.Destroy(particle.gameObject);
+            Destroy(particle.gameObject);
         }
     }
 }

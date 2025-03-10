@@ -1,5 +1,4 @@
 ﻿using Gameplay.SphereData;
-using Gameplay.Utils;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -32,7 +31,7 @@ namespace Gameplay.Animations
             builder.Register<ThrowingBallAnimation>(Lifetime.Scoped)
                 .WithParameter("respawnBallButton", _respawnBallButton);
 
-            builder.Register<ParticlesFactory>(Lifetime.Scoped)
+            builder.RegisterComponentOnNewGameObject<ParticlesFactory>(Lifetime.Scoped, "Particles Factory")
                 .WithParameter(_onDestroySphereParticlePrefab);
 
             builder.Register<MoveUIAnimation>(Lifetime.Scoped)

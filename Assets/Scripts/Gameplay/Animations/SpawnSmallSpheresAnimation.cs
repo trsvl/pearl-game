@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.SphereData;
 using UnityEngine;
@@ -55,7 +56,7 @@ namespace Gameplay.Animations
             return positionFromCenter;
         }
 
-        public async Task DoAnimation()
+        public async UniTask DoAnimation()
         {
             const float moveDuration = 0.2f;
             const int delayBetweenIterations = (int)moveDuration * 1000;
@@ -84,7 +85,7 @@ namespace Gameplay.Animations
                         DestroySegmentObject(sphereListArray[localIndex], sphereSegment);
                     });
 
-                    await Task.Delay(delayBetweenIterations);
+                    await UniTask.Delay(delayBetweenIterations);
                 }
             }
         }

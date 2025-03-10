@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 
@@ -19,7 +19,7 @@ namespace Gameplay.Animations
             _pauseButton.gameObject.SetActive(false);
         }
 
-        public void MoveToTarget(RectTransform uiElement, float offsetX, float offsetY, float duration,
+        private void MoveToTarget(RectTransform uiElement, float offsetX, float offsetY, float duration,
             Vector2 targetPos = default)
         {
             targetPos = targetPos == default ? uiElement.anchoredPosition : targetPos;
@@ -30,12 +30,12 @@ namespace Gameplay.Animations
             uiElement.DOAnchorPos(targetPos, duration).SetEase(Ease.OutQuad);
         }
 
-        public Task DoAnimation()
+        public UniTask DoAnimation()
         {
             MoveToTarget(_header, 0, 500f, 0.5f);
             MoveToTarget(_pauseButton, 500f, 0, 1f);
 
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Pool;
 
@@ -42,11 +43,11 @@ namespace Gameplay.Animations
             _onDestroySphereParticlesPool.Release(particle);
         }
 
-        private async Task WaitForParticleToStop(ParticleSystem particle)
+        private async UniTask WaitForParticleToStop(ParticleSystem particle)
         {
             while (particle.IsAlive())
             {
-                await Task.Yield();
+                await UniTask.Yield();
             }
         }
 

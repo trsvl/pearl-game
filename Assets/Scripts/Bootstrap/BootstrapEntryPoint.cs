@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using VContainer.Unity;
 
 namespace Bootstrap
@@ -14,7 +14,7 @@ namespace Bootstrap
             _loader = loader;
         }
 
-        public async Task StartAsync(CancellationToken cancellation = new())
+        public async UniTask StartAsync(CancellationToken cancellation)
         {
             bool isBootstrapScene = Loader.IsCurrentSceneEqual(SceneName.Bootstrap);
             if (!isBootstrapScene) return;

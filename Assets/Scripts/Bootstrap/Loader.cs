@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,7 +15,7 @@ namespace Bootstrap
             _loadingScreenPrefab = loadingScreenPrefab;
         }
 
-        public async Task LoadScene(SceneName scene)
+        public async UniTask LoadScene(SceneName scene)
         {
             CreateLoadingScreen();
 
@@ -38,7 +38,7 @@ namespace Bootstrap
                     loadingScene.allowSceneActivation = true;
                 }
 
-                await Task.Yield();
+                await UniTask.Yield();
             }
 
             DestroyLoadingScreen();

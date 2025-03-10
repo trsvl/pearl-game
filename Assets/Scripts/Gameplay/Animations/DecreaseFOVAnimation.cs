@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
 using Gameplay.Utils;
@@ -22,7 +23,7 @@ namespace Gameplay.Animations
             _eventBus = eventBus;
         }
 
-        public async Task DoAnimation()
+        public async UniTask DoAnimation()
         {
             const float duration = 1f;
 

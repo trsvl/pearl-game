@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public interface IGlobalSubscriber
@@ -33,7 +33,7 @@ public interface IDestroySphereLayer : IGlobalSubscriber
 
 public interface IReleaseBall : IGlobalSubscriber
 {
-    Task OnReleaseBall();
+    UniTask OnReleaseBall();
 }
 
 public interface IAfterReleaseBall : IGlobalSubscriber
@@ -43,7 +43,7 @@ public interface IAfterReleaseBall : IGlobalSubscriber
 
 public interface IAnimation : IGlobalSubscriber
 {
-    Task DoAnimation();
+    UniTask DoAnimation();
 }
 
 public interface IStartAnimation : IAnimation

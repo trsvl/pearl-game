@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Random;
 
@@ -28,9 +29,9 @@ namespace Gameplay.BallThrowing
             DestructAfterDelay(sphere);
         }
 
-        private async void DestructAfterDelay(GameObject sphere)
+        private async UniTask DestructAfterDelay(GameObject sphere)
         {
-            await Task.Delay(fallDuration);
+            await UniTask.Delay(fallDuration);
             Object.Destroy(sphere);
         }
 

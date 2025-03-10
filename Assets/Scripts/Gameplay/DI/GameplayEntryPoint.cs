@@ -1,12 +1,9 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
 using Bootstrap;
+using Cysharp.Threading.Tasks;
 using Gameplay.Animations;
-using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using Gameplay.Utils;
-using UnityEngine;
-using Utils.EventBusSystem;
 using VContainer;
 using VContainer.Unity;
 
@@ -22,7 +19,7 @@ namespace Gameplay.DI
             _container = container;
         }
 
-        public async Task StartAsync(CancellationToken cancellation = new())
+        public async UniTask StartAsync(CancellationToken cancellation)
         {
             var dataContext = _container.Resolve<DataContext>();
             var playerData = _container.Resolve<PlayerData>();

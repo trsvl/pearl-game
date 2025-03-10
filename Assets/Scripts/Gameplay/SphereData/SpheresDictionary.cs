@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Utils.EventBusSystem;
 using Object = UnityEngine.Object;
@@ -60,7 +61,7 @@ namespace Gameplay.SphereData
             allSpheres.Clear();
         }
 
-        private async Task DestroySpheresSegment(Color color, GameObject targetSphere)
+        private async UniTask DestroySpheresSegment(Color color, GameObject targetSphere)
         {
             if (!allSpheres.TryGetValue(color, out HashSet<GameObject>[] spheresHashSetsArray)) return;
 
@@ -84,7 +85,7 @@ namespace Gameplay.SphereData
                     _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
 
                     int delay = Mathf.RoundToInt(100 * (1f / ((i + 2) * 0.5f)));
-                    await Task.Delay(delay);
+                    await UniTask.Delay(delay);
                 }
             }
 

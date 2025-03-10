@@ -1,6 +1,5 @@
-﻿using System.Collections;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.IO;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -11,7 +10,7 @@ namespace Gameplay.SphereData
         private SpheresData spheres;
 
 
-        public async Task LoadSpheres(int levelNumber, SphereGenerator sphereGenerator)
+        public async UniTask LoadSpheres(int levelNumber, SphereGenerator sphereGenerator)
         {
             string filePath = FilePath(levelNumber);
 
@@ -25,7 +24,7 @@ namespace Gameplay.SphereData
 
                 while (!operation.isDone)
                 {
-                    await Task.Yield();
+                    await UniTask.Yield();
                 }
 
                 if (www.result != UnityWebRequest.Result.Success)

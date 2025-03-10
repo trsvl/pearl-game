@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using UnityEngine.UI;
@@ -30,10 +31,10 @@ namespace Gameplay.UI.Buttons
             _button.interactable = IsEnoughOfColors();
         }
 
-        public Task OnReleaseBall()
+        public UniTask OnReleaseBall()
         {
             _button.interactable = false;
-            return Task.CompletedTask;
+            return UniTask.CompletedTask;
         }
 
         public void OnAfterReleaseBall()

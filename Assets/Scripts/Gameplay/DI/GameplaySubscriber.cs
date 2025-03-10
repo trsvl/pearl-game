@@ -18,6 +18,7 @@ namespace Gameplay.DI
         private readonly EventBus _eventBus;
         private readonly GameplayStateObserver _gameplayStateObserver;
         private readonly IObjectResolver _container;
+        private Type[] subscribers;
 
 
         public GameplaySubscriber(EventBus eventBus, GameplayStateObserver gameplayStateObserver,
@@ -30,6 +31,16 @@ namespace Gameplay.DI
 
         public void Initialize()
         {
+            subscribers = new[]
+            {
+                typeof(PearlsData),
+                typeof(SphereOnHitBehaviour),
+                typeof(SpheresDictionary),
+                typeof(ParticlesFactory),
+                typeof(ThrowingBallAnimation),
+                typeof(RespawnBallButton)
+            };
+
             AddGameplayListeners(
                 typeof(BallThrower),
                 typeof(SphereGenerator),
@@ -39,21 +50,14 @@ namespace Gameplay.DI
             );
 
             Subscribe(
-                typeof(PearlsData),
-                typeof(SphereOnHitBehaviour),
-                typeof(SpheresDictionary),
-                typeof(ParticlesFactory),
-                typeof(ThrowingBallAnimation),
-                typeof(RespawnBallButton)
+                subscribers
             );
         }
 
         public void Dispose()
         {
             Unsubscribe(
-                typeof(PearlsData),
-                typeof(SphereOnHitBehaviour),
-                typeof(SpheresDictionary)
+                subscribers
             );
         }
 

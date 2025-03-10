@@ -23,6 +23,8 @@ namespace Gameplay.BallThrowing
         private EventBus _eventBus;
         private SpheresDictionary _spheresDictionary;
         private CameraManager _cameraManager;
+        private GameResultChecker _gameResultChecker;
+        private IObjectResolver _container;
 
         private Color[] _levelColors => _spheresDictionary.GetLevelColors();
         private Vector3 _ballLocalScale;
@@ -39,13 +41,15 @@ namespace Gameplay.BallThrowing
 
         [Inject]
         public void Init(Ball ballPrefab, ShotsData shotsData, EventBus eventBus, SpheresDictionary spheresDictionary,
-            CameraManager cameraManager)
+            CameraManager cameraManager, GameResultChecker gameResultChecker, IObjectResolver container)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
             _spheresDictionary = spheresDictionary;
             _cameraManager = cameraManager;
+            _gameResultChecker = gameResultChecker;
+            _container = container;
         }
 
         public (GameObject currentBall, GameObject nextBall) InitBallData()
@@ -93,7 +97,7 @@ namespace Gameplay.BallThrowing
             _shotsData.CurrentNumber -= 1;
             _currentBallCount -= 1;
 
-            Destroy(_currentBall?.gameObject, 3f);
+            StartCoroutine(DestroyBallDelay(_currentBall?.gameObject));
 
             _currentBall = null;
 
@@ -145,7 +149,8 @@ namespace Gameplay.BallThrowing
             block.SetColor(AllColors.BaseColor, GenerateBallColor());
             ballRenderer.SetPropertyBlock(block);
 
-            ball.Init(_eventBus, ballRenderer, ballCollider, ballRigidbody, block);
+            _container.Inject(ball);
+            ball.Init(ballRenderer, ballCollider, ballRigidbody, block);
 
             return ball;
         }
@@ -165,8 +170,16 @@ namespace Gameplay.BallThrowing
 
         private IEnumerator SpawnNextBallDelay()
         {
-            yield return new WaitForSeconds(1f);
+            yield return new WaitForSeconds(1.5f);
             if (!_nextBall) SpawnNextBall();
+        }
+
+        private IEnumerator DestroyBallDelay(GameObject ballObject)
+        {
+            yield return new WaitForSeconds(3f);
+
+            Destroy(ballObject);
+            _gameResultChecker.CheckGameResult();
         }
 
         public bool IsPreventedToSpawnBall()

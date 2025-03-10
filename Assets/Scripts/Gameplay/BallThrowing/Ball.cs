@@ -1,6 +1,8 @@
 ﻿using Gameplay.SphereData;
+using Gameplay.Utils;
 using UnityEngine;
 using Utils.EventBusSystem;
+using VContainer;
 
 namespace Gameplay.BallThrowing
 {
@@ -14,10 +16,15 @@ namespace Gameplay.BallThrowing
         private MaterialPropertyBlock _materialPropertyBlock;
 
 
-        public void Init(EventBus eventBus, Renderer ballRenderer, Collider ballCollider, Rigidbody ballRigidbody,
-            MaterialPropertyBlock materialPropertyBlock)
+        [Inject]
+        public void Construct(EventBus eventBus)
         {
             _eventBus = eventBus;
+        }
+
+        public void Init(Renderer ballRenderer, Collider ballCollider, Rigidbody ballRigidbody,
+            MaterialPropertyBlock materialPropertyBlock)
+        {
             _renderer = ballRenderer;
             _collider = ballCollider;
             _rigidbody = ballRigidbody;
@@ -26,27 +33,26 @@ namespace Gameplay.BallThrowing
 
         private void OnCollisionEnter(Collision collision)
         {
-            if (!_isTouchedSphere && collision.gameObject.CompareTag("Ball"))
+            if (_isTouchedSphere || !collision.gameObject.CompareTag("Ball")) return;
+
+            _isTouchedSphere = true;
+
+            Renderer sphereRenderer = collision.gameObject.GetComponent<Renderer>();
+            sphereRenderer.GetPropertyBlock(_materialPropertyBlock);
+            Color touchedSphereColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
+
+            _renderer.GetPropertyBlock(_materialPropertyBlock);
+            Color ballColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
+
+            if (ballColor == touchedSphereColor)
             {
-                _isTouchedSphere = true;
-
-                Renderer sphereRenderer = collision.gameObject.GetComponent<Renderer>();
-                sphereRenderer.GetPropertyBlock(_materialPropertyBlock);
-                Color touchedSphereColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
-
-                _renderer.GetPropertyBlock(_materialPropertyBlock);
-                Color ballColor = _materialPropertyBlock.GetColor(AllColors.BaseColor);
-
-                if (ballColor == touchedSphereColor)
-                {
-                    _eventBus.RaiseEvent<IDestroySphereSegment>(handler =>
-                        handler.OnDestroySphereSegment(ballColor, collision.gameObject));
-                    Destroy(gameObject);
-                }
-                else
-                {
-                    _collider.enabled = false;
-                }
+                _eventBus.RaiseEvent<IDestroySphereSegment>(handler =>
+                    handler.OnDestroySphereSegment(ballColor, collision.gameObject));
+                gameObject.SetActive(false);
+            }
+            else
+            {
+                _collider.enabled = false;
             }
         }
 

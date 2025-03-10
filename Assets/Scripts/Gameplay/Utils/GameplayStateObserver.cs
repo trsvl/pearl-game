@@ -33,31 +33,41 @@ namespace Gameplay.Utils
 
         public void StartGame()
         {
+            Time.timeScale = 1;
+            
             NotifyListeners<IStartGame>(GameplayState == GameplayState.OFF, GameplayState.PLAY,
                 (listener) => listener.StartGame());
         }
 
         public void PauseGame()
         {
+            Time.timeScale = 0;
+
             NotifyListeners<IPauseGame>(GameplayState == GameplayState.PLAY, GameplayState.PAUSE,
                 (listener) => listener.PauseGame());
         }
 
         public void ResumeGame()
         {
+            Time.timeScale = 1;
+
             NotifyListeners<IResumeGame>(GameplayState == GameplayState.PAUSE, GameplayState.PLAY,
                 (listener) => listener.ResumeGame());
         }
 
         public void FinishGame()
         {
-            NotifyListeners<IFinishGame>(true, GameplayState.FINISH,
+            Time.timeScale = 0;
+            
+            NotifyListeners<IFinishGame>(GameplayState == GameplayState.PLAY, GameplayState.FINISH,
                 (listener) => listener.FinishGame());
         }
 
         public void LoseGame()
         {
-            NotifyListeners<ILoseGame>(true, GameplayState.LOSE,
+            Time.timeScale = 0;
+            
+            NotifyListeners<ILoseGame>(GameplayState == GameplayState.PLAY, GameplayState.LOSE,
                 (listener) => listener.LoseGame());
         }
 

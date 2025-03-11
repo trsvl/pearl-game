@@ -32,8 +32,10 @@ namespace Gameplay.Animations
 
         public UniTask DoAnimation()
         {
-            MoveToTarget(_header, 0, 500f, 0.5f);
-            MoveToTarget(_pauseButton, 500f, 0, 1f);
+            const float duration = 0.15f;
+            
+            MoveToTarget(_header, 0, 500f, duration);
+            MoveToTarget(_pauseButton, 500f, 0, duration * 2);
 
             return UniTask.CompletedTask;
         }

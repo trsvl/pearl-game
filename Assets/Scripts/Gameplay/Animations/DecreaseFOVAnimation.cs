@@ -13,7 +13,6 @@ namespace Gameplay.Animations
         private readonly CameraManager _cameraManager;
         private readonly EventBus _eventBus;
         private readonly CancellationToken _cancellationToken;
-        private Tweener _tweener;
 
 
         public DecreaseFOVAnimation(BallFactory ballFactory, CameraManager cameraManager, EventBus eventBus,
@@ -35,17 +34,14 @@ namespace Gameplay.Animations
         {
             const float duration = 1f;
 
-            await UniTask.Delay(1000, cancellationToken: _cancellationToken);
+            await UniTask.Delay(500, cancellationToken: _cancellationToken);
 
             float initialFOV = _cameraManager.GetInitialFOV();
             float targetFOV = _cameraManager.CalculateNewFOV(destroyedSphereLayers);
            // _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnStartChangeFOV());
 
-            _tweener = DOVirtual.Float(initialFOV, targetFOV, duration, _ballFactory.UpdateBallsPosition);
+            await DOVirtual.Float(initialFOV, targetFOV, duration, _ballFactory.UpdateBallsPosition).ToUniTask(cancellationToken: _cancellationToken);
 
-            await _tweener.AsyncWaitForCompletion();
-
-            _tweener?.Kill();
             _cameraManager.AssignNewFOV();
            // _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnEndChangeFOV());
         }

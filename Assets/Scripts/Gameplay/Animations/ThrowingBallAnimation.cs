@@ -12,6 +12,7 @@ namespace Gameplay.Animations
         private readonly CameraManager _cameraManager;
         private readonly RectTransform _respawnBallButton;
         private readonly CancellationToken _cancellationToken;
+        private const float startingAnimationDuration = 0.3f;
 
 
         public ThrowingBallAnimation(BallFactory ballFactory, CameraManager cameraManager,
@@ -40,7 +41,7 @@ namespace Gameplay.Animations
                 await UniTask.Yield();
             }
 
-            await _ballFactory.NextBall.transform.DOMove(_ballFactory.CurrentBallSpawnPoint, 0.5f)
+            await _ballFactory.NextBall.transform.DOMove(_ballFactory.CurrentBallSpawnPoint, 0.2f)
                 .SetEase(Ease.OutQuad)
                 .ToUniTask(cancellationToken: _cancellationToken);
 
@@ -54,7 +55,7 @@ namespace Gameplay.Animations
                 ball.transform.position.z);
             ball.transform.position = initialPos;
 
-            await ball.transform.DOMove(targetPos, 1f)
+            await ball.transform.DOMove(targetPos, startingAnimationDuration)
                 .SetEase(Ease.OutQuad)
                 .ToUniTask(cancellationToken: _cancellationToken);
         }
@@ -70,7 +71,7 @@ namespace Gameplay.Animations
             _respawnBallButton.anchoredPosition = initialPos;
             _respawnBallButton.gameObject.SetActive(true);
 
-            ball.transform.DOMove(targetPos, 1f)
+            ball.transform.DOMove(targetPos, startingAnimationDuration)
                 .SetEase(Ease.OutQuad)
                 .OnUpdate(() => { updateUIPosition.Update(ball.transform.position); });
         }

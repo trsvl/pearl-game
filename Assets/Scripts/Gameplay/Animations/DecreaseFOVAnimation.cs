@@ -26,7 +26,6 @@ namespace Gameplay.Animations
 
         public void OnDestroySphereLayer(int destroyedSphereLayers)
         {
-            Debug.Log(destroyedSphereLayers);
             _ = DoAnimation(destroyedSphereLayers);
         }
 

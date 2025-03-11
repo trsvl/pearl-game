@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
@@ -12,11 +13,14 @@ namespace Gameplay.SphereData
     {
         private readonly EventBus _eventBus;
         private readonly CancellationToken _cancellationToken;
-        private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
-        private Vector3 lowestSphereScale = Vector3.one * 10f;
+        private readonly Dictionary<Color, HashSet<GameObject>[]> _allSpheres = new();
         private List<Color> _levelColors;
-        private int sphereLayers = -1;
+        private int _sphereLayers = -1;
+        private int _ignoreIndex = -1;
         private GameObject _targetSphere;
+
+        private readonly Queue<(Color, GameObject, int)> _queue = new();
+        private readonly SemaphoreSlim _semaphore = new(1, 1);
 
 
         public SpheresDictionary(EventBus eventBus, CancellationToken cancellationToken = default)
@@ -27,7 +31,7 @@ namespace Gameplay.SphereData
 
         public void AddColorToDictionary(Color color, int bigSpheresCount)
         {
-            if (allSpheres.ContainsKey(color)) return;
+            if (_allSpheres.ContainsKey(color)) return;
 
             var sphereListArray = new HashSet<GameObject>[bigSpheresCount];
 
@@ -36,17 +40,17 @@ namespace Gameplay.SphereData
                 sphereListArray[i] = new HashSet<GameObject>();
             }
 
-            allSpheres.Add(color, sphereListArray);
+            _allSpheres.Add(color, sphereListArray);
         }
 
         public void AddSphere(Color color, GameObject sphere, int index)
         {
-            allSpheres[color][index].Add(sphere);
+            _allSpheres[color][index].Add(sphere);
         }
 
         public void DestroyAllSpheres()
         {
-            foreach (var pair in allSpheres)
+            foreach (var pair in _allSpheres)
             {
                 foreach (var sphereList in pair.Value)
                 {
@@ -60,18 +64,18 @@ namespace Gameplay.SphereData
                 }
             }
 
-            allSpheres.Clear();
+            _allSpheres.Clear();
         }
 
         private async UniTask DestroySpheresSegment(Color color, GameObject targetSphere, int currentShotsNumber)
         {
             _targetSphere = targetSphere;
 
-            foreach (Color key in allSpheres.Keys)
+            foreach (Color key in _allSpheres.Keys)
             {
                 if (!ColorsAreSimilar(key, color)) continue;
 
-                foreach (HashSet<GameObject> spheresSegment in allSpheres[key])
+                foreach (HashSet<GameObject> spheresSegment in _allSpheres[key])
                 {
                     if (!spheresSegment.Contains(_targetSphere)) continue;
 
@@ -89,7 +93,7 @@ namespace Gameplay.SphereData
 
         private async UniTask CheckSphereLayers()
         {
-            var sphereValues = allSpheres.Values;
+            var sphereValues = _allSpheres.Values;
             int length = sphereValues.First().Length;
 
             bool isDestroyLayer = false;
@@ -103,38 +107,43 @@ namespace Gameplay.SphereData
                     if (isDestroyLayer)
                     {
                         await DestroySphereSegment(sphereListArray[i], _targetSphere);
+                        continue;
                     }
 
-                    else if (sphereListArray[i].Count > 0 || sphereLayers == length - i) break;
-
-                    if (isDestroyLayer) continue;
+                    if (sphereListArray[i].Count > 0 || (_ignoreIndex != -1 && _ignoreIndex <= i)) break;
 
                     count++;
 
                     if (count != sphereValues.Count) continue;
 
-                    sphereLayers = length - i;
+                    _sphereLayers = GetSphereLayersCount(i, length);
+                    _ignoreIndex = i;
                     isDestroyLayer = true;
-                    _eventBus.RaiseEvent<IDestroySphereLayer>(handler => handler.OnDestroySphereLayer(sphereLayers));
+                    _eventBus.RaiseEvent<IDestroySphereLayer>(handler => handler.OnDestroySphereLayer(_sphereLayers));
                 }
             }
+        }
+
+        private int GetSphereLayersCount(int i, int length)
+        {
+            return Math.Abs(i - length) - (_sphereLayers == -1 ? 0 : _sphereLayers);
         }
 
         private void CheckDictionaryColors()
         {
             List<Color> colors = new List<Color>();
 
-            foreach (Color key in allSpheres.Keys)
+            foreach (Color key in _allSpheres.Keys)
             {
                 int count = 0;
 
-                foreach (HashSet<GameObject> spheresSegment in allSpheres[key])
+                foreach (HashSet<GameObject> spheresSegment in _allSpheres[key])
                 {
                     if (spheresSegment.Count > 0) break;
 
                     count++;
 
-                    if (count == allSpheres[key].Length)
+                    if (count == _allSpheres[key].Length)
                     {
                         colors.Add(key);
                     }
@@ -143,7 +152,7 @@ namespace Gameplay.SphereData
 
             foreach (Color color in colors)
             {
-                allSpheres.Remove(color);
+                _allSpheres.Remove(color);
             }
         }
 
@@ -176,17 +185,36 @@ namespace Gameplay.SphereData
 
         public Dictionary<Color, HashSet<GameObject>[]>.ValueCollection GetSpheres()
         {
-            return allSpheres.Values;
+            return _allSpheres.Values;
         }
 
         public void OnDestroySphereSegment(Color segmentColor, GameObject target, int currentShotsNumber)
         {
-            _ = DestroySpheresSegment(segmentColor, target, currentShotsNumber);
+            _queue.Enqueue((segmentColor, target, currentShotsNumber));
+            ProcessQueue().Forget();
         }
 
         public Color[] GetLevelColors()
         {
-            return allSpheres.Keys.ToArray();
+            return _allSpheres.Keys.ToArray();
+        }
+
+        private async UniTaskVoid ProcessQueue()
+        {
+            await _semaphore.WaitAsync(_cancellationToken);
+
+            try
+            {
+                while (_queue.Count > 0)
+                {
+                    var (color, targetSphere, shots) = _queue.Dequeue();
+                    await DestroySpheresSegment(color, targetSphere, shots);
+                }
+            }
+            finally
+            {
+                _semaphore.Release();
+            }
         }
     }
 }

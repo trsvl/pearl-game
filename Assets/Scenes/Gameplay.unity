@@ -521,7 +521,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _dragSensitivity: 0.1
   _verticalMultiplier: 3
-  _trajectoryPoints: 40
+  _trajectoryPoints: 13
   _timeStep: 0.07
   _collisionMaskLine:
     serializedVersion: 2
@@ -998,7 +998,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 151
+    m_Bits: 215
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
@@ -1310,7 +1310,7 @@ MonoBehaviour:
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_RaycastPadding: {x: -25, y: -25, z: -25, w: -25}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

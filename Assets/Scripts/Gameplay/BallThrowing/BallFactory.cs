@@ -95,6 +95,8 @@ namespace Gameplay.BallThrowing
             _shotsData.CurrentNumber -= 1;
             _currentBallCount -= 1;
 
+            Destroy(_currentBall?.gameObject, 3f);
+
             _currentBall?.Release(_shotsData.CurrentNumber);
 
             _currentBall = null;

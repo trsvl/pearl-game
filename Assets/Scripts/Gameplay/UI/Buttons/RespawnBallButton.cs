@@ -1,5 +1,6 @@
 ﻿using Gameplay.BallThrowing;
 using Gameplay.SphereData;
+using Gameplay.UI.Header;
 using UnityEngine.UI;
 
 namespace Gameplay.UI.Buttons
@@ -8,12 +9,15 @@ namespace Gameplay.UI.Buttons
     {
         private readonly Button _button;
         private readonly SpheresDictionary _spheresDictionary;
+        private readonly ShotsData _shotsData;
 
 
-        public RespawnBallButton(Button button, BallFactory ballFactory, SpheresDictionary spheresDictionary)
+        public RespawnBallButton(Button button, BallFactory ballFactory, SpheresDictionary spheresDictionary,
+            ShotsData shotsData)
         {
             _button = button;
             _spheresDictionary = spheresDictionary;
+            _shotsData = shotsData;
 
             _button.onClick.AddListener(ballFactory.RespawnBall);
             _button.interactable = false;
@@ -21,12 +25,12 @@ namespace Gameplay.UI.Buttons
 
         public void StartGame()
         {
-            IsActiveButton(IsEnoughOfColors());
+            IsActiveButton(Condition());
         }
 
         public void OnAfterDestroySphereSegment(int currentShotsNumber)
         {
-            IsActiveButton(IsEnoughOfColors());
+            IsActiveButton(Condition());
         }
 
         public void OnReleaseBall()
@@ -36,12 +40,12 @@ namespace Gameplay.UI.Buttons
 
         public void OnAfterReleaseBall()
         {
-            IsActiveButton(IsEnoughOfColors());
+            IsActiveButton(Condition());
         }
 
-        private bool IsEnoughOfColors()
+        private bool Condition()
         {
-            return _spheresDictionary.GetLevelColors().Length > 2;
+            return _spheresDictionary.GetLevelColors().Length > 2 && _shotsData.CurrentNumber > 2;
         }
 
         private void IsActiveButton(bool isEnabled)

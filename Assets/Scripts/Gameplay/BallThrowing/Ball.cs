@@ -73,7 +73,7 @@ namespace Gameplay.BallThrowing
         public void ApplyForce(Vector3 force)
         {
             _rigidbody.isKinematic = false;
-            _rigidbody.AddForce(force, ForceMode.VelocityChange);
+            _rigidbody.AddForce(force, ForceMode.Impulse);
         }
 
         public void Release(int currentShotsNumber)

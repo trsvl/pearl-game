@@ -17,6 +17,8 @@ namespace Gameplay.SphereData
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
         private Vector3 lowestSphereScale = Vector3.one * 10f;
         private List<Color> _levelColors;
+        private int sphereLayers = -1;
+        private GameObject _targetSphere;
 
 
         public SpheresDictionary(EventBus eventBus, CancellationToken cancellationToken = default)
@@ -65,7 +67,7 @@ namespace Gameplay.SphereData
 
         private async UniTask DestroySpheresSegment(Color color, GameObject targetSphere)
         {
-            bool isDeleteColor = true;
+            _targetSphere = targetSphere;
 
             foreach (Color key in allSpheres.Keys)
             {
@@ -73,35 +75,96 @@ namespace Gameplay.SphereData
 
                 foreach (HashSet<GameObject> spheresSegment in allSpheres[key])
                 {
-                    if (spheresSegment.Count > 0 && !spheresSegment.Contains(targetSphere)) isDeleteColor = false;
+                    if (!spheresSegment.Contains(_targetSphere)) continue;
 
-                    if (!spheresSegment.Contains(targetSphere)) continue;
+                    await DestroySphereSegment(spheresSegment, _targetSphere);
+                }
+            }
 
-                    var sortedSegmentByDistance = spheresSegment
-                        .OrderBy(obj => (obj.transform.position - targetSphere.transform.position).sqrMagnitude)
-                        .ToList();
+            await CheckSphereLayers();
 
-                    for (int i = 0; i < sortedSegmentByDistance.Count; i++)
+            CheckDictionaryColors();
+
+            _eventBus.RaiseEvent<IAfterDestroySphereSegment>(handler =>
+                handler.OnAfterDestroySphereSegment());
+        }
+
+        private async UniTask CheckSphereLayers()
+        {
+            var sphereValues = allSpheres.Values;
+            int length = sphereValues.First().Length;
+
+            bool isDestroyLayer = false;
+
+            for (int i = 0; i < length; i++)
+            {
+                int count = 0;
+
+                foreach (var sphereListArray in sphereValues)
+                {
+                    if (isDestroyLayer)
                     {
-                        GameObject sphere = sortedSegmentByDistance[i];
+                        await DestroySphereSegment(sphereListArray[i], _targetSphere);
+                    }
 
-                        spheresSegment.Remove(sphere);
+                    else if (sphereListArray[i].Count > 0 || sphereLayers == i) break;
 
-                        _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
+                    if (isDestroyLayer) continue;
 
-                        int delay = Mathf.RoundToInt(100 * (1f / ((i + 2) * 0.5f)));
-                        await UniTask.Delay(delay, cancellationToken: _cancellationToken);
+                    count++;
+
+                    if (count != sphereValues.Count) continue;
+
+                    sphereLayers = i;
+                    isDestroyLayer = true;
+                }
+            }
+        }
+
+        private void CheckDictionaryColors()
+        {
+            List<Color> colors = new List<Color>();
+
+            foreach (Color key in allSpheres.Keys)
+            {
+                int count = 0;
+
+                foreach (HashSet<GameObject> spheresSegment in allSpheres[key])
+                {
+                    if (spheresSegment.Count > 0) break;
+
+                    count++;
+
+                    if (count == allSpheres[key].Length)
+                    {
+                        colors.Add(key);
                     }
                 }
             }
 
-            if (isDeleteColor)
+            foreach (Color color in colors)
             {
                 allSpheres.Remove(color);
             }
+        }
 
-            _eventBus.RaiseEvent<IAfterDestroySphereSegment>(handler =>
-                handler.OnAfterDestroySphereSegment());
+        private async UniTask DestroySphereSegment(HashSet<GameObject> spheresSegment, GameObject targetSphere)
+        {
+            var sortedSegmentByDistance = spheresSegment
+                .OrderBy(obj => (obj.transform.position - targetSphere.transform.position).sqrMagnitude)
+                .ToList();
+
+            for (int i = 0; i < sortedSegmentByDistance.Count; i++)
+            {
+                GameObject sphere = sortedSegmentByDistance[i];
+
+                spheresSegment.Remove(sphere);
+
+                _eventBus.RaiseEvent<IDestroySphere>(handler => handler.OnDestroySphere(sphere));
+
+                int delay = Mathf.RoundToInt(100 * (1f / ((i + 2) * 0.5f)));
+                await UniTask.Delay(delay, cancellationToken: _cancellationToken);
+            }
         }
 
         private bool ColorsAreSimilar(Color color1, Color color2, float tolerance = 0.05f)

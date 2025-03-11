@@ -82,15 +82,14 @@ namespace Gameplay.Animations
                     UniTask moveTask = sphereSegment.transform.DOMove(initialPosition, moveDuration)
                         .SetEase(Ease.OutQuad)
                         .ToUniTask();
-                    
+
                     UniTask.Void(() =>
                     {
                         moveTask.ContinueWith(() => DestroySegmentObject(sphereListArray[localIndex], sphereSegment));
                         return default;
                     });
-                   
-                    await UniTask.Delay(delayBetweenIterations);
 
+                    await UniTask.Delay(delayBetweenIterations);
                 }
             }
         }

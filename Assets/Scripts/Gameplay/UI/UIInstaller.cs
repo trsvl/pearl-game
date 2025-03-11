@@ -28,7 +28,7 @@ namespace Gameplay.UI
 
             builder.Register<ShotsData>(Lifetime.Scoped)
                 .WithParameter("shotsText", _shotsText)
-                .WithParameter(5); //!!!
+                .WithParameter(20); //!!!
 
             builder.Register<PauseButton>(Lifetime.Scoped)
                 .WithParameter(_pauseButton);

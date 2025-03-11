@@ -3,7 +3,7 @@ using Gameplay.UI.Header;
 
 namespace Gameplay.Utils
 {
-    public class GameResultChecker
+    public class GameResultChecker : IAfterDestroySphereSegment
     {
         private readonly ShotsData _shotsData;
         private readonly GameplayStateObserver _gameplayStateObserver;
@@ -28,6 +28,11 @@ namespace Gameplay.Utils
             {
                 _gameplayStateObserver.LoseGame();
             }
+        }
+
+        public void OnAfterDestroySphereSegment(int currentShotsNumber)
+        {
+            CheckGameResult(currentShotsNumber);
         }
     }
 }

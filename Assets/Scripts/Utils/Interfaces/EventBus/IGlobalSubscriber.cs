@@ -13,7 +13,7 @@ public interface IChangeFOVAnimation : IGlobalSubscriber
 
 public interface IDestroySphereSegment : IGlobalSubscriber
 {
-    void OnDestroySphereSegment(Color segmentColor, GameObject target);
+    void OnDestroySphereSegment(Color segmentColor, GameObject target, int currentShotsNumber);
 }
 
 public interface IDestroySphere : IGlobalSubscriber
@@ -23,17 +23,17 @@ public interface IDestroySphere : IGlobalSubscriber
 
 public interface IAfterDestroySphereSegment : IGlobalSubscriber
 {
-    void OnAfterDestroySphereSegment();
+    void OnAfterDestroySphereSegment(int currentShotsNumber);
 }
 
 public interface IDestroySphereLayer : IGlobalSubscriber
 {
-    void OnDestroySphereLayer(bool isLayerDestroyed);
+    void OnDestroySphereLayer(int destroyedSphereLayers);
 }
 
 public interface IReleaseBall : IGlobalSubscriber
 {
-    UniTask OnReleaseBall();
+    void OnReleaseBall();
 }
 
 public interface IAfterReleaseBall : IGlobalSubscriber

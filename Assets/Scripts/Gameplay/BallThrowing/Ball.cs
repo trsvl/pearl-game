@@ -9,17 +9,22 @@ namespace Gameplay.BallThrowing
     public class Ball : MonoBehaviour
     {
         private EventBus _eventBus;
+        private GameResultChecker _gameResultChecker;
+
         private Renderer _renderer;
         private Collider _collider;
         private Rigidbody _rigidbody;
         private bool _isTouchedSphere;
+        private bool _isTouchedRightSphere;
         private MaterialPropertyBlock _materialPropertyBlock;
+        private int _currentShotsNumber = -1;
 
 
         [Inject]
-        public void Construct(EventBus eventBus)
+        public void Construct(EventBus eventBus, GameResultChecker gameResultChecker)
         {
             _eventBus = eventBus;
+            _gameResultChecker = gameResultChecker;
         }
 
         public void Init(Renderer ballRenderer, Collider ballCollider, Rigidbody ballRigidbody,
@@ -46,9 +51,12 @@ namespace Gameplay.BallThrowing
 
             if (ballColor == touchedSphereColor)
             {
+                _isTouchedRightSphere = true;
+
                 _eventBus.RaiseEvent<IDestroySphereSegment>(handler =>
-                    handler.OnDestroySphereSegment(ballColor, collision.gameObject));
-                gameObject.SetActive(false);
+                    handler.OnDestroySphereSegment(ballColor, collision.gameObject, _currentShotsNumber));
+
+                Destroy(gameObject);
             }
             else
             {
@@ -66,6 +74,16 @@ namespace Gameplay.BallThrowing
         {
             _rigidbody.isKinematic = false;
             _rigidbody.AddForce(force, ForceMode.VelocityChange);
+        }
+
+        public void Release(int currentShotsNumber)
+        {
+            _currentShotsNumber = currentShotsNumber;
+        }
+
+        private void OnDestroy()
+        {
+            if (!_isTouchedRightSphere) _gameResultChecker?.CheckGameResult(_currentShotsNumber);
         }
     }
 }

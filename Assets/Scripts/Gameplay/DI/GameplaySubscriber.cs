@@ -38,7 +38,9 @@ namespace Gameplay.DI
                 typeof(SpheresDictionary),
                 typeof(ParticlesFactory),
                 typeof(ThrowingBallAnimation),
-                typeof(RespawnBallButton)
+                typeof(RespawnBallButton),
+                typeof(GameResultChecker),
+                typeof(DecreaseFOVAnimation)
             };
 
             AddGameplayListeners(

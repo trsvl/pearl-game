@@ -6,18 +6,16 @@ namespace Gameplay.Animations
 {
     public class CameraManager
     {
-        private readonly SpheresDictionary _spheresDictionary;
         private readonly Camera _mainCamera;
         private readonly Camera _uiCamera; //!!!
         private float _initialFOV;
         private int alreadyTriggeredIndex;
 
 
-        public CameraManager(SpheresDictionary spheresDictionary, Camera uiCamera)
+        public CameraManager(Camera uiCamera)
         {
             _mainCamera = Camera.main;
             _initialFOV = _mainCamera.fieldOfView;
-            _spheresDictionary = spheresDictionary;
             _uiCamera = uiCamera;
         }
 
@@ -31,37 +29,10 @@ namespace Gameplay.Animations
             _initialFOV = _mainCamera.fieldOfView;
         }
 
-        public float GetNewFOV()
-        {
-            var allSpheres = _spheresDictionary.GetSpheres();
-
-            int length = allSpheres.First().Length;
-
-            int destroyLayerCount = 0;
-
-            for (int i = length - 1; i >= 0; i--)
-            {
-                bool isSphereLayerDestroyed = true;
-
-                foreach (var sphereListArray in allSpheres)
-                {
-                    if (sphereListArray[i].Count == 0 && alreadyTriggeredIndex > i) continue;
-
-                    isSphereLayerDestroyed = false;
-                    break;
-                }
-
-                if (isSphereLayerDestroyed) destroyLayerCount++;
-                else break;
-            }
-
-            return CalculateNewFOV(destroyLayerCount);
-        }
-
-        private float CalculateNewFOV(int destroyLayerIndex)
+        public float CalculateNewFOV(int destroyedSphereLayers)
         {
             const float step = 6f;
-            float newFOV = _initialFOV - destroyLayerIndex * step;
+            float newFOV = _initialFOV - destroyedSphereLayers * step;
 
             return newFOV;
         }
@@ -77,8 +48,8 @@ namespace Gameplay.Animations
             distance += 0.5f * _ballSize;
             _mainCamera.transform.position = new Vector3(0, 0, distance);
 
-            Vector3 ballPosition = new Vector3(0.8f, 0.15f, distance);
-            Vector3 nextBallPosition = new Vector3(0.65f, 0.05f, distance);
+            Vector3 ballPosition = new Vector3(0.8f, 0.2f, distance);
+            Vector3 nextBallPosition = new Vector3(0.6f, 0.1f, distance);
             var ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
             var nextBallSpawnPoint = _mainCamera.ViewportToWorldPoint(nextBallPosition);
 

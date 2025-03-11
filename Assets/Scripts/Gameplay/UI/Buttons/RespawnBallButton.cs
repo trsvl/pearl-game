@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using Gameplay.BallThrowing;
+﻿using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using UnityEngine.UI;
 
@@ -25,15 +24,14 @@ namespace Gameplay.UI.Buttons
             IsActiveButton(IsEnoughOfColors());
         }
 
-        public void OnAfterDestroySphereSegment()
+        public void OnAfterDestroySphereSegment(int currentShotsNumber)
         {
             IsActiveButton(IsEnoughOfColors());
         }
 
-        public UniTask OnReleaseBall()
+        public void OnReleaseBall()
         {
             IsActiveButton(false);
-            return UniTask.CompletedTask;
         }
 
         public void OnAfterReleaseBall()

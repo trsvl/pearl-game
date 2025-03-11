@@ -25,14 +25,14 @@ namespace Gameplay.Animations
 
         public async UniTask DoAnimation()
         {
-            (GameObject currentBall, GameObject nextBall) = _ballFactory.InitBallData();
+            (GameObject currentBall, GameObject nextBall) = _ballFactory.InitBallsData();
 
             MoveBallAndUI(nextBall);
 
             await MoveBall(currentBall);
         }
 
-        public async UniTask OnReleaseBall()
+        public async void OnReleaseBall()
         {
             while (!_ballFactory.NextBall)
             {

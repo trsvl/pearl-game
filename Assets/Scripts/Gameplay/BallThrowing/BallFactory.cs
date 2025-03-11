@@ -23,11 +23,9 @@ namespace Gameplay.BallThrowing
         private EventBus _eventBus;
         private SpheresDictionary _spheresDictionary;
         private CameraManager _cameraManager;
-        private GameResultChecker _gameResultChecker;
         private IObjectResolver _container;
 
         private Color[] _levelColors => _spheresDictionary.GetLevelColors();
-        private Vector3 _ballLocalScale;
         private Color _previousColor;
 
         private Ball _currentBall;
@@ -41,25 +39,23 @@ namespace Gameplay.BallThrowing
 
         [Inject]
         public void Init(Ball ballPrefab, ShotsData shotsData, EventBus eventBus, SpheresDictionary spheresDictionary,
-            CameraManager cameraManager, GameResultChecker gameResultChecker, IObjectResolver container)
+            CameraManager cameraManager, IObjectResolver container)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
             _spheresDictionary = spheresDictionary;
             _cameraManager = cameraManager;
-            _gameResultChecker = gameResultChecker;
             _container = container;
+
+            Init();
         }
 
-        public (GameObject currentBall, GameObject nextBall) InitBallData()
+        private void Init()
         {
             var initialBall = Instantiate(_ballPrefab);
             initialBall.gameObject.SetActive(false);
 
-            _ballLocalScale = _spheresDictionary.LowestSphereScale;
-
-            initialBall.transform.localScale = Vector3.one;
             Renderer ballRenderer = initialBall.GetComponent<Renderer>();
             Bounds bounds = ballRenderer.bounds;
             const float ballScale = 0.3f;
@@ -69,15 +65,18 @@ namespace Gameplay.BallThrowing
 
             Destroy(initialBall.gameObject);
 
-            UpdateBallPosition(0f);
+            UpdateBallsPosition(0f);
+        }
 
+        public (GameObject currentBall, GameObject nextBall) InitBallsData()
+        {
             SpawnCurrentBall();
             SpawnNextBall();
 
             return (_currentBall.gameObject, _nextBall.gameObject);
         }
 
-        public void UpdateBallPosition(float newFOV)
+        public void UpdateBallsPosition(float newFOV)
         {
             (Vector3 newBallPosition, Vector3 newNextBallPosition) =
                 _cameraManager.UpdateBallsPositionAndFOV(_ballSize, newFOV);
@@ -85,9 +84,8 @@ namespace Gameplay.BallThrowing
             _currentBallSpawnPoint = newBallPosition;
             _nextBallSpawnPoint = newNextBallPosition;
 
-            if (!_currentBall) return;
-
-            _currentBall.transform.position = _currentBallSpawnPoint;
+            if (_currentBall) _currentBall.transform.position = _currentBallSpawnPoint;
+            if (_nextBall) _nextBall.transform.position = _nextBallSpawnPoint;
         }
 
         public void ReleaseBall(Vector3 direction)
@@ -97,7 +95,7 @@ namespace Gameplay.BallThrowing
             _shotsData.CurrentNumber -= 1;
             _currentBallCount -= 1;
 
-            StartCoroutine(DestroyBallDelay(_currentBall?.gameObject, _shotsData.CurrentNumber));
+            _currentBall?.Release(_shotsData.CurrentNumber);
 
             _currentBall = null;
 
@@ -143,8 +141,6 @@ namespace Gameplay.BallThrowing
             var ballCollider = ball.GetComponent<Collider>();
             var ballRigidbody = ball.GetComponent<Rigidbody>();
 
-            ball.transform.localScale = _ballLocalScale;
-
             MaterialPropertyBlock block = new MaterialPropertyBlock();
             block.SetColor(AllColors.BaseColor, GenerateBallColor());
             ballRenderer.SetPropertyBlock(block);
@@ -171,16 +167,9 @@ namespace Gameplay.BallThrowing
 
         private IEnumerator SpawnNextBallDelay()
         {
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(0.5f);
             if (!_nextBall) SpawnNextBall();
-        }
-
-        private IEnumerator DestroyBallDelay(GameObject ballObject, int currentShotsNumber)
-        {
-            yield return new WaitForSeconds(3f);
-
-            Destroy(ballObject);
-            _gameResultChecker.CheckGameResult(currentShotsNumber);
+            if (_currentBall) _eventBus.RaiseEvent<IAfterReleaseBall>(handler => handler.OnAfterReleaseBall());
         }
 
         public bool IsPreventedToSpawnBall()

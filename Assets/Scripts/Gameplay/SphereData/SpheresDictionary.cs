@@ -10,8 +10,6 @@ namespace Gameplay.SphereData
 {
     public class SpheresDictionary : IDestroySphereSegment
     {
-        public Vector3 LowestSphereScale => lowestSphereScale;
-
         private readonly EventBus _eventBus;
         private readonly CancellationToken _cancellationToken;
         private readonly Dictionary<Color, HashSet<GameObject>[]> allSpheres = new();
@@ -65,7 +63,7 @@ namespace Gameplay.SphereData
             allSpheres.Clear();
         }
 
-        private async UniTask DestroySpheresSegment(Color color, GameObject targetSphere)
+        private async UniTask DestroySpheresSegment(Color color, GameObject targetSphere, int currentShotsNumber)
         {
             _targetSphere = targetSphere;
 
@@ -86,7 +84,7 @@ namespace Gameplay.SphereData
             CheckDictionaryColors();
 
             _eventBus.RaiseEvent<IAfterDestroySphereSegment>(handler =>
-                handler.OnAfterDestroySphereSegment());
+                handler.OnAfterDestroySphereSegment(currentShotsNumber));
         }
 
         private async UniTask CheckSphereLayers()
@@ -107,7 +105,7 @@ namespace Gameplay.SphereData
                         await DestroySphereSegment(sphereListArray[i], _targetSphere);
                     }
 
-                    else if (sphereListArray[i].Count > 0 || sphereLayers == i) break;
+                    else if (sphereListArray[i].Count > 0 || sphereLayers == length - i) break;
 
                     if (isDestroyLayer) continue;
 
@@ -115,8 +113,9 @@ namespace Gameplay.SphereData
 
                     if (count != sphereValues.Count) continue;
 
-                    sphereLayers = i;
+                    sphereLayers = length - i;
                     isDestroyLayer = true;
+                    _eventBus.RaiseEvent<IDestroySphereLayer>(handler => handler.OnDestroySphereLayer(sphereLayers));
                 }
             }
         }
@@ -180,17 +179,9 @@ namespace Gameplay.SphereData
             return allSpheres.Values;
         }
 
-        public void SetLowestSphereScale(Vector3 sphereScale)
+        public void OnDestroySphereSegment(Color segmentColor, GameObject target, int currentShotsNumber)
         {
-            if (sphereScale.x < lowestSphereScale.x)
-            {
-                lowestSphereScale = sphereScale;
-            }
-        }
-
-        public void OnDestroySphereSegment(Color segmentColor, GameObject target)
-        {
-            _ = DestroySpheresSegment(segmentColor, target);
+            _ = DestroySpheresSegment(segmentColor, target, currentShotsNumber);
         }
 
         public Color[] GetLevelColors()

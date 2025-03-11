@@ -35,7 +35,6 @@ namespace Gameplay.SphereData
                 materialPropertyBlock.SetColor(AllColors.BaseColor, color);
 
                 spheresDictionary.AddSphere(color, sphere, bigSphereIndex);
-                spheresDictionary.SetLowestSphereScale(sphere.transform.localScale);
 
                 sphere.GetComponent<Renderer>().SetPropertyBlock(materialPropertyBlock);
 

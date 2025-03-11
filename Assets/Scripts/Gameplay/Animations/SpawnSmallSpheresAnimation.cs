@@ -12,8 +12,6 @@ namespace Gameplay.Animations
         private readonly SpheresDictionary _spheresDictionary;
         private readonly Transform _parent;
 
-        private const float distance = 50f;
-
 
         public SpawnSmallSpheresAnimation(SpheresDictionary spheresDictionary, Transform parent)
         {
@@ -45,25 +43,14 @@ namespace Gameplay.Animations
             Object.Destroy(sphereSegment);
         }
 
-        private Vector3 GeneratePositionFromCenter(int directionX, Vector3 initialPosition)
-        {
-            float randomY = Random.value;
-
-            Vector3 randomDirection =
-                new Vector3(directionX * distance, randomY, initialPosition.z);
-            Vector3 positionFromCenter = initialPosition + randomDirection;
-            return positionFromCenter;
-        }
-
         public async UniTask DoAnimation()
         {
-            const float moveDuration = 0.3f;
-            const int delayBetweenIterations = (int)moveDuration * 1000;
+            const float moveDuration = 0.05f;
+            const int delayBetweenIterations = (int)(moveDuration * 1000);
 
             var allSpheres = _spheresDictionary.GetSpheres();
 
             int length = allSpheres.First().Length;
-            int directionX = 1;
 
             for (int i = 0; i < length; i++)
             {
@@ -74,20 +61,16 @@ namespace Gameplay.Animations
                     int localIndex = i;
 
                     GameObject sphereSegment = CreateSegmentObject(_parent, sphereListArray[i]);
-                    Vector3 initialPosition = sphereSegment.transform.position;
+                    Vector3 initialScale = sphereSegment.transform.localScale;
 
-                    directionX *= -1;
-                    sphereSegment.transform.position = GeneratePositionFromCenter(directionX, initialPosition);
-
-                    UniTask moveTask = sphereSegment.transform.DOMove(initialPosition, moveDuration)
-                        .SetEase(Ease.OutQuad)
+                    await sphereSegment.transform.DOScale(initialScale * 1.2f, moveDuration).SetEase(Ease.OutBack)
                         .ToUniTask();
 
-                    UniTask.Void(() =>
-                    {
-                        moveTask.ContinueWith(() => DestroySegmentObject(sphereListArray[localIndex], sphereSegment));
-                        return default;
-                    });
+                    UniTask scaleSphereSegment = sphereSegment.transform.DOScale(initialScale, moveDuration)
+                        .SetEase(Ease.OutBack).ToUniTask();
+
+                    await scaleSphereSegment.ContinueWith(() =>
+                        DestroySegmentObject(sphereListArray[localIndex], sphereSegment));
 
                     await UniTask.Delay(delayBetweenIterations);
                 }

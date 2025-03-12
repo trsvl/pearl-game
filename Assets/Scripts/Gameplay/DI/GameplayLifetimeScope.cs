@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
+using Bootstrap;
+using Bootstrap.AudioSystem;
 using Gameplay.Animations;
 using Gameplay.Utils;
 using UnityEngine;
@@ -13,6 +15,7 @@ namespace Gameplay.DI
     public class GameplayLifetimeScope : BaseLifetimeScope
     {
         [SerializeField] private List<GameObject> _installers;
+        [SerializeField] private AudioManager _audioManagerPrefab;
 
 
         protected override void Configure(IContainerBuilder builder)
@@ -26,6 +29,8 @@ namespace Gameplay.DI
             }
 
             new UtilsInstaller().Install(builder);
+            
+            builder.RegisterComponentInNewPrefab(_audioManagerPrefab, Lifetime.Scoped); //!!!
 
             builder.UseEntryPoints(points =>
             {

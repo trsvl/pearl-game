@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace Gameplay.SphereData
 {
-    public class SpheresDictionary : IDestroySphereSegment
+    public class SpheresDictionary : IDestroySphereSegmentOnHit
     {
         private readonly EventBus _eventBus;
         private readonly CancellationToken _cancellationToken;
@@ -162,6 +162,8 @@ namespace Gameplay.SphereData
                 .OrderBy(obj => (obj.transform.position - targetSphere.transform.position).sqrMagnitude)
                 .ToList();
 
+            _eventBus.RaiseEvent<IDestroySphereSegment>(handler => handler.OnDestroySphereSegment());
+
             for (int i = 0; i < sortedSegmentByDistance.Count; i++)
             {
                 GameObject sphere = sortedSegmentByDistance[i];
@@ -188,7 +190,7 @@ namespace Gameplay.SphereData
             return _allSpheres.Values;
         }
 
-        public void OnDestroySphereSegment(Color segmentColor, GameObject target, int currentShotsNumber)
+        public void OnDestroySphereSegmentOnHit(Color segmentColor, GameObject target, int currentShotsNumber)
         {
             _queue.Enqueue((segmentColor, target, currentShotsNumber));
             ProcessQueue().Forget();

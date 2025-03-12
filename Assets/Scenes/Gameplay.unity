@@ -2138,6 +2138,8 @@ MonoBehaviour:
   - {fileID: 1988250815}
   - {fileID: 1366334601}
   - {fileID: 150371519}
+  _audioManagerPrefab: {fileID: 773998526056471044, guid: a371d7ff695efd4428c7c03e52f63c8b,
+    type: 3}
 --- !u!4 &1958809427
 Transform:
   m_ObjectHideFlags: 0

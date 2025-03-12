@@ -1,4 +1,6 @@
 ﻿using System;
+using Bootstrap;
+using Bootstrap.AudioSystem;
 using Gameplay.Animations;
 using Gameplay.BallThrowing;
 using Gameplay.SphereData;
@@ -40,7 +42,9 @@ namespace Gameplay.DI
                 typeof(ThrowingBallAnimation),
                 typeof(RespawnBallButton),
                 typeof(GameResultChecker),
-                typeof(DecreaseFOVAnimation)
+                typeof(DecreaseFOVAnimation),
+                typeof(AudioManager),
+                typeof(SpawnSmallSpheresAnimation)
             };
 
             AddGameplayListeners(
@@ -48,7 +52,8 @@ namespace Gameplay.DI
                 typeof(SphereGenerator),
                 typeof(PauseButton),
                 typeof(RespawnBallButton),
-                typeof(GamePopupManager)
+                typeof(GamePopupManager),
+                typeof(AudioManager)
             );
 
             Subscribe(

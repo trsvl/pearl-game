@@ -53,8 +53,8 @@ namespace Gameplay.BallThrowing
             {
                 _isTouchedRightSphere = true;
 
-                _eventBus.RaiseEvent<IDestroySphereSegment>(handler =>
-                    handler.OnDestroySphereSegment(ballColor, collision.gameObject, _currentShotsNumber));
+                _eventBus.RaiseEvent<IDestroySphereSegmentOnHit>(handler =>
+                    handler.OnDestroySphereSegmentOnHit(ballColor, collision.gameObject, _currentShotsNumber));
 
                 Destroy(gameObject);
             }

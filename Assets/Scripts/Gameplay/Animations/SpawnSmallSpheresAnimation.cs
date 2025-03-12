@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.SphereData;
 using UnityEngine;
+using Utils.EventBusSystem;
 
 namespace Gameplay.Animations
 {
@@ -11,12 +12,14 @@ namespace Gameplay.Animations
     {
         private readonly SpheresDictionary _spheresDictionary;
         private readonly Transform _parent;
+        private readonly EventBus _eventBus;
 
 
-        public SpawnSmallSpheresAnimation(SpheresDictionary spheresDictionary, Transform parent)
+        public SpawnSmallSpheresAnimation(SpheresDictionary spheresDictionary, Transform parent, EventBus eventBus)
         {
             _spheresDictionary = spheresDictionary;
             _parent = parent;
+            _eventBus = eventBus;
         }
 
         private GameObject CreateSegmentObject(Transform parent, HashSet<GameObject> allSpheres)
@@ -71,6 +74,8 @@ namespace Gameplay.Animations
 
                     await scaleSphereSegment.ContinueWith(() =>
                         DestroySegmentObject(sphereListArray[localIndex], sphereSegment));
+
+                    _eventBus.RaiseEvent<ISpawnSphereSegment>(handler => handler.OnSpawnSphereSegment());
 
                     await UniTask.Delay(delayBetweenIterations);
                 }

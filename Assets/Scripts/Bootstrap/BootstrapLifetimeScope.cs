@@ -1,15 +1,14 @@
-using Bootstrap.AudioSystem;
 using UnityEngine;
 using Utils.EventBusSystem;
+using Utils.Scene.DI;
 using VContainer;
 using VContainer.Unity;
 
 namespace Bootstrap
 {
-    public class BootstrapLifetimeScope : LifetimeScope
+    public class BootstrapLifetimeScope : BaseLifetimeScope
     {
         [SerializeField] private GameObject _loadingScreenPrefab;
-        [SerializeField] private AudioManager _audioManagerPrefab;
 
 
         protected override void Configure(IContainerBuilder builder)
@@ -21,7 +20,10 @@ namespace Bootstrap
 
             builder.Register<EventBus>(Lifetime.Singleton);
 
-           // builder.RegisterComponentInNewPrefab(_audioManagerPrefab, Lifetime.Singleton).DontDestroyOnLoad();
+            AudioManager audioManager = new GameObject("Audio Manager").AddComponent<AudioManager>();
+            audioManager.transform.SetParent(transform);
+            builder.RegisterComponent(audioManager)
+                .WithParameter(audioList.audios);
 
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }

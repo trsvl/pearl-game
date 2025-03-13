@@ -820,9 +820,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parentReference:
-    TypeName: 
+    TypeName: Bootstrap.BootstrapLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
+  sceneAudioList: {fileID: -4613299141898453364, guid: 6e78e823172378d4caf0275c6d27c5cc,
+    type: 3}
   _installers:
   - {fileID: 412597661}
 --- !u!1 &669705252

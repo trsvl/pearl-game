@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using static UnityEngine.Random;
@@ -7,8 +7,14 @@ namespace Gameplay.BallThrowing
 {
     public class SphereOnHitBehaviour : IDestroySphere
     {
+        private readonly CancellationToken _cancellationToken;
         private const int fallDuration = 5000;
 
+
+        public SphereOnHitBehaviour(CancellationToken cancellationToken)
+        {
+            _cancellationToken = cancellationToken;
+        }
 
         private void ChangeSphere(GameObject sphere)
         {
@@ -22,7 +28,7 @@ namespace Gameplay.BallThrowing
                 float randomX = Range(0f, 0.5f);
                 float randomZ = Range(0f, 0.5f);
                 Vector3 randomPos = new Vector3(randomX, 1f, randomZ);
-                
+
                 rb.AddForce(randomPos, ForceMode.Impulse);
             }
 
@@ -31,7 +37,7 @@ namespace Gameplay.BallThrowing
 
         private async UniTask DestructAfterDelay(GameObject sphere)
         {
-            await UniTask.Delay(fallDuration);
+            await UniTask.Delay(fallDuration, cancellationToken: _cancellationToken);
             Object.Destroy(sphere);
         }
 

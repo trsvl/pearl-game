@@ -7,4 +7,5 @@
     LoseGame,
     SpawnSphereSegment,
     HitSphereSegment,
+    ButtonClick
 }

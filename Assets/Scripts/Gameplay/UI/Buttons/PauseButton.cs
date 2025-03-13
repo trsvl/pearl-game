@@ -1,18 +1,15 @@
-﻿using Gameplay.Utils;
-using UnityEngine;
+﻿using Bootstrap;
+using Gameplay.Utils;
 using UnityEngine.UI;
+using Utils.UI.Buttons;
 
 namespace Gameplay.UI.Buttons
 {
-    public class PauseButton : IStartGame
+    public class PauseButton : BaseButton, IStartGame
     {
-        private readonly Button _button;
-
-
-        public PauseButton(Button button, GameplayStateObserver gameplayStateObserver)
+        public PauseButton(Button button, GameplayStateObserver gameplayStateObserver, AudioManager audioManager) :
+            base(button, audioManager)
         {
-            _button = button;
-
             _button.onClick.AddListener(gameplayStateObserver.PauseGame);
             _button.interactable = false;
         }

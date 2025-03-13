@@ -1,21 +1,21 @@
-﻿using Gameplay.BallThrowing;
+﻿using Bootstrap;
+using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
 using UnityEngine.UI;
+using Utils.UI.Buttons;
 
 namespace Gameplay.UI.Buttons
 {
-    public class RespawnBallButton : IStartGame, IAfterDestroySphereSegment, IReleaseBall, IAfterReleaseBall
+    public class RespawnBallButton : BaseButton, IStartGame, IAfterDestroySphereSegment, IReleaseBall, IAfterReleaseBall
     {
-        private readonly Button _button;
         private readonly SpheresDictionary _spheresDictionary;
         private readonly ShotsData _shotsData;
 
 
-        public RespawnBallButton(Button button, BallFactory ballFactory, SpheresDictionary spheresDictionary,
-            ShotsData shotsData)
+        public RespawnBallButton(Button button, AudioManager audioManager, BallFactory ballFactory,
+            SpheresDictionary spheresDictionary, ShotsData shotsData) : base(button, audioManager)
         {
-            _button = button;
             _spheresDictionary = spheresDictionary;
             _shotsData = shotsData;
 

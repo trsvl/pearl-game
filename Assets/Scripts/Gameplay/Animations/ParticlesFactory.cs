@@ -53,7 +53,7 @@ namespace Gameplay.Animations
         private ParticleSystem OnCreate()
         {
             _count += 1;
-           // Debug.Log(_count);
+            // Debug.Log(_count);
             var particle = Instantiate(_onDestroySphereParticlePrefab);
             particle.gameObject.SetActive(false);
             return particle;

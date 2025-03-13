@@ -4,31 +4,26 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
+using Utils.Scene.AudioSystem;
 using VContainer;
 
-namespace Bootstrap.AudioSystem
+namespace Bootstrap
 {
-    public class AudioManager : MonoBehaviour, IReleaseBall, IDestroySphereSegmentOnHit, ISpawnSphereSegment,
-        IPauseGame,
-        IResumeGame, IStartGame, IFinishGame, ILoseGame, IDestroySphereSegment
+    public class AudioManager : MonoBehaviour
     {
-        public List<Audios> audios;
-
         private readonly Dictionary<AudioAction, List<Audio>> audioClips = new();
-        private CancellationTokenSource linkedCts;
         private CancellationToken _cancellationToken;
+        private CancellationTokenSource linkedCts;
+        private float test;
 
 
-        [Inject]
-        private void Init(CancellationToken cancellationToken)
+        public void AssignNewToken(CancellationToken cancellationToken)
         {
-            print("Initializing AudioManager");
             _cancellationToken = cancellationToken;
-
-            InitializeAudios();
         }
 
-        private void InitializeAudios()
+        [Inject]
+        public void SubscribeAudio(List<Audios> audios)
         {
             foreach (Audios arr in audios)
             {
@@ -53,8 +48,20 @@ namespace Bootstrap.AudioSystem
                     audioClips[arr.action].Add(a);
                 }
             }
+        }
 
-            audios.Clear();
+        public void UnsubscribeAudio(List<Audios> audios)
+        {
+            foreach (Audios arr in audios)
+            {
+                foreach (Audio a in arr.audios)
+                {
+                    if (audioClips.ContainsKey(arr.action) && audioClips[arr.action].Contains(a))
+                    {
+                        audioClips[arr.action].Remove(a);
+                    }
+                }
+            }
         }
 
         public void Play(AudioAction audioAction)
@@ -64,6 +71,30 @@ namespace Bootstrap.AudioSystem
                 a.source.time = a.startTime;
                 PlayAudio(a).Forget();
             });
+        }
+
+        public void PauseGame()
+        {
+            foreach (List<Audio> audioList in audioClips.Values)
+            {
+                foreach (Audio a in audioList)
+                {
+                    if (!a.source.isPlaying) continue;
+
+                    PauseFade(a);
+                }
+            }
+        }
+
+        public void ResumeGame()
+        {
+            foreach (List<Audio> audioList in audioClips.Values)
+            {
+                foreach (Audio a in audioList)
+                {
+                    ResumeFade(a);
+                }
+            }
         }
 
         private async UniTask PlayAudio(Audio a)
@@ -112,65 +143,6 @@ namespace Bootstrap.AudioSystem
             linkedCts = CancellationTokenSource.CreateLinkedTokenSource(linkedCts.Token, _cancellationToken);
             a.source.UnPause();
             FadeVolume(a.source, a.source.volume, a.volume, 0.1f, true).Forget();
-        }
-
-        public void OnReleaseBall()
-        {
-            Play(AudioAction.Throw);
-        }
-
-        public void OnDestroySphereSegmentOnHit(Color segmentColor, GameObject target, int currentShotsNumber)
-        {
-            Play(AudioAction.HitSphere);
-        }
-
-        public void OnSpawnSphereSegment()
-        {
-            Play(AudioAction.SpawnSphereSegment);
-        }
-
-        public void PauseGame()
-        {
-            foreach (List<Audio> audioList in audioClips.Values)
-            {
-                foreach (Audio a in audioList)
-                {
-                    if (!a.source.isPlaying) continue;
-
-                    PauseFade(a);
-                }
-            }
-        }
-
-        public void ResumeGame()
-        {
-            foreach (List<Audio> audioList in audioClips.Values)
-            {
-                foreach (Audio a in audioList)
-                {
-                    ResumeFade(a);
-                }
-            }
-        }
-
-        public void StartGame()
-        {
-            Play(AudioAction.StartGame);
-        }
-
-        public void FinishGame()
-        {
-            Play(AudioAction.FinishGame);
-        }
-
-        public void LoseGame()
-        {
-            Play(AudioAction.LoseGame);
-        }
-
-        public void OnDestroySphereSegment()
-        {
-            Play(AudioAction.HitSphereSegment);
         }
     }
 }

@@ -1,48 +1,16 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &1496878927660404972
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 532659495526500483}
-  - component: {fileID: 773998526056471044}
-  m_Layer: 0
-  m_Name: Audio Manager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &532659495526500483
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1496878927660404972}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &773998526056471044
+--- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1496878927660404972}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 289c05bb46d14822a6a6d712a59885e2, type: 3}
-  m_Name: 
+  m_Script: {fileID: 11500000, guid: 97b41e029b114ac3b77aefaa9bd713b7, type: 3}
+  m_Name: Gameplay
   m_EditorClassIdentifier: 
   audios:
   - action: 0
@@ -51,7 +19,7 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: 7204c3c6643dce347beeb52a9b6c8e0d, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.197
+      volume: 0.275
       pitch: 1
       playOnAwake: 0
       loop: 0
@@ -65,7 +33,7 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: 23bc8b88f59058c40acde5b86f7c2bcc, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.591
+      volume: 0.672
       pitch: 1
       playOnAwake: 0
       loop: 0
@@ -79,10 +47,10 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: 40d5d15fda51b094a8f057661d3c6eb3, type: 3}
       audioMixerGroup: {fileID: 7464744996077038469, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.099
+      volume: 0.157
       pitch: 1
       playOnAwake: 0
-      loop: 1
+      loop: 0
       fadeInDuration: 5
       fadeOutDuration: 0
       startTime: 32
@@ -93,38 +61,38 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: 02444eb6abf167b4c8e1996eb0abc376, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.394
+      volume: 0.175
       pitch: 1
       playOnAwake: 0
       loop: 0
       fadeInDuration: 0
-      fadeOutDuration: 0.2
+      fadeOutDuration: 0
       startTime: 0
       delay: 0
     - source: {fileID: 0}
       clip: {fileID: 8300000, guid: 009baca14a49ce54ea2284b08a5d4dab, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.394
+      volume: 0.27
       pitch: 1
       playOnAwake: 0
       loop: 0
       fadeInDuration: 0
-      fadeOutDuration: 0.2
+      fadeOutDuration: 0
       startTime: 0
-      delay: 1.2
+      delay: 0.1
   - action: 4
     audios:
     - source: {fileID: 0}
       clip: {fileID: 8300000, guid: 1a4a25d6a56b3d24eacf62856cda8c9e, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.296
+      volume: 0.241
       pitch: 1
       playOnAwake: 0
       loop: 0
       fadeInDuration: 0
-      fadeOutDuration: 0.2
+      fadeOutDuration: 0
       startTime: 0
       delay: 0
   - action: 5
@@ -133,7 +101,7 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: 0b2e53ca9ee41a44299421b6f96d4148, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.296
+      volume: 0.292
       pitch: 1
       playOnAwake: 0
       loop: 0
@@ -147,7 +115,7 @@ MonoBehaviour:
       clip: {fileID: 8300000, guid: feb74d7034f2fec4082e538aed151ad5, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 0.409
+      volume: 0.288
       pitch: 1
       playOnAwake: 0
       loop: 0

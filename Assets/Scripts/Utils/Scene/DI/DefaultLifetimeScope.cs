@@ -1,15 +1,16 @@
 ﻿using System.Threading;
 using VContainer;
-using VContainer.Unity;
 
-namespace Utils.DI
+namespace Utils.Scene.DI
 {
-    public abstract class BaseLifetimeScope : LifetimeScope
+    public abstract class DefaultLifetimeScope : BaseLifetimeScope
     {
         private readonly CancellationTokenSource _cts = new();
 
         protected override void Configure(IContainerBuilder builder)
         {
+            base.Configure(builder);
+
             builder.RegisterInstance(_cts.Token);
         }
 
@@ -17,6 +18,7 @@ namespace Utils.DI
         {
             _cts.Cancel();
             _cts.Dispose();
+
             base.OnDestroy();
         }
     }

@@ -48,7 +48,7 @@ MonoBehaviour:
     TypeName: 
   autoRun: 1
   autoInjectGameObjects: []
+  _installers: []
+  audioList: {fileID: 11400000, guid: 84241a61a26496849ba70f63638374ad, type: 2}
   _loadingScreenPrefab: {fileID: 3232087451204459997, guid: d3726b35d3900db4498c02eac462d10b,
-    type: 3}
-  _audioManagerPrefab: {fileID: 773998526056471044, guid: a371d7ff695efd4428c7c03e52f63c8b,
     type: 3}

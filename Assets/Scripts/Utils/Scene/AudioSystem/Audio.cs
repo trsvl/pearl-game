@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 
-namespace Bootstrap.AudioSystem
+namespace Utils.Scene.AudioSystem
 {
     [Serializable]
     public class Audios

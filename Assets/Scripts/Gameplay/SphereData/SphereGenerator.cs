@@ -5,8 +5,6 @@ namespace Gameplay.SphereData
 {
     public class SphereGenerator : MonoBehaviour, IStartGame, ILoseGame, IPauseGame, IResumeGame, IFinishGame
     {
-        public int allPearlsCount { get; private set; }
-
         protected AllColors _allColors { get; private set; }
 
         private GameObject _spherePrefab;
@@ -56,7 +54,6 @@ namespace Gameplay.SphereData
             for (int i = 0; i < data.spheres.Length; i++)
             {
                 var bigSphere = new BigSphere(data.spheres[i]);
-                allPearlsCount += data.spheres[i].smallSphereCount;
                 GenerateSmallSpheres(data, bigSphere, i);
             }
         }

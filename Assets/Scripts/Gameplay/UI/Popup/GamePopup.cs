@@ -12,8 +12,8 @@ namespace Gameplay.UI.Popup
 
         public void PauseGame(UnityAction RestartGameClick, UnityAction ResumeGameCLick, UnityAction MainMenuClick)
         {
-            AssignButton(RestartGameClick, "Restart game");
             AssignButton(ResumeGameCLick, "Resume game");
+            AssignButton(RestartGameClick, "Restart game");
             AssignButton(MainMenuClick, "Main menu");
         }
 

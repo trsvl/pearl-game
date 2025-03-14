@@ -29,7 +29,7 @@ namespace Gameplay.DI
 
             await _container.Resolve<SpawnSmallSpheresAnimation>().DoAnimation();
 
-            _ = _container.Resolve<MoveUIAnimation>().DoAnimation();
+            _container.Resolve<MoveUIAnimation>().DoAnimation().Forget();
 
             await _container.Resolve<ThrowingBallAnimation>().DoAnimation();
 

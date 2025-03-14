@@ -1,30 +1,34 @@
 ﻿using Bootstrap;
+using Cysharp.Threading.Tasks;
+using Gameplay.Animations;
 using Gameplay.Utils;
 using UnityEngine;
 
 namespace Gameplay.UI.Popup
 {
-    public class GamePopupManager : IPauseGame, IResumeGame, IFinishGame, ILoseGame
+    public class GamePopupManager : IPauseGame, IResumeGame, ILoseGame
     {
         private readonly GamePopup _gamePopupPrefab;
         private readonly Transform _canvases;
         private readonly GameplayStateObserver _gameplayStateObserver;
         private readonly Loader _loader;
+        private readonly MoveUIAnimation _moveUIAnimation;
         private GamePopup _gamePopup;
 
 
         public GamePopupManager(GamePopup gamePopupPrefab, Transform canvases,
-            GameplayStateObserver gameplayStateObserver, Loader loader)
+            GameplayStateObserver gameplayStateObserver, Loader loader, MoveUIAnimation moveUIAnimation)
         {
             _gamePopupPrefab = gamePopupPrefab;
             _canvases = canvases;
             _gameplayStateObserver = gameplayStateObserver;
             _loader = loader;
+            _moveUIAnimation = moveUIAnimation;
         }
 
         public void PauseGame()
         {
-            _gamePopup = Object.Instantiate(_gamePopupPrefab, _canvases);
+            CreatePopup();
             _gamePopup.PauseGame(RestartGameClick, ResumeGameCLick, MainMenuClick);
         }
 
@@ -35,14 +39,20 @@ namespace Gameplay.UI.Popup
 
         public void FinishGame()
         {
-            _gamePopup = Object.Instantiate(_gamePopupPrefab, _canvases);
+            CreatePopup();
             _gamePopup.FinishGame(RestartGameClick, MainMenuClick);
         }
 
         public void LoseGame()
         {
-            _gamePopup = Object.Instantiate(_gamePopupPrefab, _canvases);
+            CreatePopup();
             _gamePopup.LoseGame(RestartGameClick, MainMenuClick);
+        }
+
+        private void CreatePopup()
+        {
+            _gamePopup = Object.Instantiate(_gamePopupPrefab, _canvases);
+            _moveUIAnimation.Move(_gamePopup.GetComponent<RectTransform>(), 0, -500f, 0.2f).Forget();
         }
 
         private void ResumeGameCLick()

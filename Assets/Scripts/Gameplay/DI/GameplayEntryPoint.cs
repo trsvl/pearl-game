@@ -34,6 +34,8 @@ namespace Gameplay.DI
             await _container.Resolve<ThrowingBallAnimation>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();
+
+            _container.Resolve<GameplayStateObserver>().FinishGame();
         }
     }
 }

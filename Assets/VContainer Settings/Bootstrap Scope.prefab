@@ -52,3 +52,9 @@ MonoBehaviour:
   audioList: {fileID: 11400000, guid: 84241a61a26496849ba70f63638374ad, type: 2}
   _loadingScreenPrefab: {fileID: 3232087451204459997, guid: d3726b35d3900db4498c02eac462d10b,
     type: 3}
+  _goldIconPrefab: {fileID: 5199859942593474234, guid: 78432094f7e0ce047b8fa11b7ef0cff9,
+    type: 3}
+  _diamondIconPrefab: {fileID: 6247679867041235511, guid: 6720c4dd3285c8749ac2b4a3ee050a6d,
+    type: 3}
+  _mainMenuHeaderPrefab: {fileID: 4504516149177714889, guid: fa420b683aaf6934194e813cf6727604,
+    type: 3}

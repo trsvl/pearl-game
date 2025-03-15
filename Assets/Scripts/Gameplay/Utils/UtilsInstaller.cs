@@ -8,6 +8,8 @@ namespace Gameplay.Utils
         public void Install(IContainerBuilder builder)
         {
             builder.Register<GameplayStateObserver>(Lifetime.Scoped);
+            
+            builder.Register<FinishGameController>(Lifetime.Scoped);
 
             builder.Register<GameResultChecker>(Lifetime.Scoped);
         }

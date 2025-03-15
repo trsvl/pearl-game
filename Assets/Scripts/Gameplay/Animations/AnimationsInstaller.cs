@@ -1,4 +1,5 @@
 ﻿using Gameplay.SphereData;
+using MainMenu.UI.Header;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -33,6 +34,9 @@ namespace Gameplay.Animations
 
             builder.RegisterComponentOnNewGameObject<ParticlesFactory>(Lifetime.Scoped, "Particles Factory")
                 .WithParameter(_onDestroySphereParticlePrefab);
+
+            builder.Register<ChangeHeader>(Lifetime.Scoped)
+                .WithParameter("header", _header);
 
             builder.Register<MoveUIAnimation>(Lifetime.Scoped)
                 .WithParameter("header", _header)

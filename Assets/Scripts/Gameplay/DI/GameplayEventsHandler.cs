@@ -29,7 +29,8 @@ namespace Gameplay.DI
                 typeof(GamePopupManager),
                 typeof(PauseButton),
                 typeof(SphereGenerator),
-                typeof(BallThrower)
+                typeof(BallThrower),
+                typeof(FinishGameController),
             })
         {
         }

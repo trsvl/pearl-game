@@ -34,6 +34,11 @@ namespace Gameplay.UI.Popup
             Destroy(gameObject);
         }
 
+        public void AssignCamera(Camera canvasCamera)
+        {
+            GetComponent<Canvas>().worldCamera = canvasCamera;
+        }
+
         private void AssignButton(UnityAction listener, string text)
         {
             var button = Instantiate(_buttonPrefab, buttonSpawnParent);

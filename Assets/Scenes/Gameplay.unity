@@ -1135,6 +1135,8 @@ MonoBehaviour:
   _pauseButton: {fileID: 1411875821}
   _respawnBallButton: {fileID: 1452890071}
   _uiCamera: {fileID: 853203908}
+  _mainMenuHeaderPrefab: {fileID: 4504516149177714889, guid: fa420b683aaf6934194e813cf6727604,
+    type: 3}
 --- !u!1 &1411875820
 GameObject:
   m_ObjectHideFlags: 0

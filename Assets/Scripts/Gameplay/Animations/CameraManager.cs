@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using Gameplay.SphereData;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Gameplay.Animations
 {
@@ -59,6 +57,11 @@ namespace Gameplay.Animations
         public Camera GetMainCamera()
         {
             return _mainCamera;
+        }
+
+        public Camera GetUICamera()
+        {
+            return _uiCamera;
         }
     }
 }

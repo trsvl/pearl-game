@@ -1,4 +1,5 @@
 using System.Threading;
+using Bootstrap.Currency;
 using Gameplay.Animations;
 using MainMenu.UI.Header;
 using UnityEngine;
@@ -26,7 +27,7 @@ namespace Bootstrap
 
             builder.Register<CameraManager>(Lifetime.Singleton).WithParameter(Camera.main); //!!!
 
-            builder.Register<Currencies>(Lifetime.Singleton)
+            builder.Register<CurrencyModel>(Lifetime.Singleton)
                 .WithParameter("goldIconPrefab", _goldIconPrefab)
                 .WithParameter("diamondIconPrefab", _diamondIconPrefab)
                 .WithParameter(_mainMenuHeaderPrefab);

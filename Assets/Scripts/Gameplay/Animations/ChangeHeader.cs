@@ -1,4 +1,5 @@
 ﻿using Bootstrap;
+using Bootstrap.Currency;
 using Cysharp.Threading.Tasks;
 using MainMenu.UI.Header;
 using UnityEngine;
@@ -11,16 +12,16 @@ namespace Gameplay.Animations
         private readonly RectTransform _header;
         private readonly MainMenuHeader _mainMenuHeaderPrefab;
         private readonly MoveUIAnimation _moveUIAnimation;
-        private readonly Currencies _currencies;
+        private readonly CurrencyModel _currencyModel;
         private readonly CameraManager _cameraManager;
 
         public ChangeHeader(RectTransform header, MainMenuHeader mainMenuHeaderPrefab, MoveUIAnimation moveUIAnimation,
-            Currencies currencies, CameraManager cameraManager)
+            CurrencyModel currencyModel, CameraManager cameraManager)
         {
             _header = header;
             _mainMenuHeaderPrefab = mainMenuHeaderPrefab;
             _moveUIAnimation = moveUIAnimation;
-            _currencies = currencies;
+            _currencyModel = currencyModel;
             _cameraManager = cameraManager;
         }
 
@@ -30,10 +31,10 @@ namespace Gameplay.Animations
 
             mainMenuHeader.AssignCamera(_cameraManager.GetUICamera());
 
-            _currencies.BindGoldCurrencyText(mainMenuHeader._goldText);
-            _currencies.BindDiamondCurrencyText(mainMenuHeader._diamondText);
-            _currencies.BindGoldIcon(mainMenuHeader._goldIcon);
-            _currencies.BindDiamondIcon(mainMenuHeader._diamondIcon);
+            _currencyModel.BindGoldCurrencyText(mainMenuHeader._goldText);
+            _currencyModel.BindDiamondCurrencyText(mainMenuHeader._diamondText);
+            _currencyModel.BindGoldIcon(mainMenuHeader._goldIcon);
+            _currencyModel.BindDiamondIcon(mainMenuHeader._diamondIcon);
 
             RectTransform newHeader = mainMenuHeader.GetComponentInChildren<RectTransform>();
             Vector2 targetPosition = _header.anchoredPosition;

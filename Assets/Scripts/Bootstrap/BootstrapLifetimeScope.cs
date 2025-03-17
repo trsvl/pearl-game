@@ -1,7 +1,5 @@
-using System.Threading;
+using System.Text;
 using Bootstrap.Currency;
-using Gameplay.Animations;
-using MainMenu.UI.Header;
 using UnityEngine;
 using Utils.EventBusSystem;
 using Utils.Scene.DI;
@@ -13,9 +11,7 @@ namespace Bootstrap
     public class BootstrapLifetimeScope : BaseLifetimeScope
     {
         [SerializeField] private GameObject _loadingScreenPrefab;
-        [SerializeField] private GameObject _goldIconPrefab;
-        [SerializeField] private GameObject _diamondIconPrefab;
-        [SerializeField] private MainMenuHeader _mainMenuHeaderPrefab;
+        [SerializeField] private GameObject _currencyPrefab;
 
 
         protected override void Configure(IContainerBuilder builder)
@@ -23,28 +19,22 @@ namespace Bootstrap
             builder.Register<Loader>(Lifetime.Singleton)
                 .WithParameter(_loadingScreenPrefab);
 
-            builder.Register<PlayerData>(Lifetime.Singleton);
+            builder.Register<PlayerData>(Lifetime.Singleton); //!!!
 
-            builder.Register<CameraManager>(Lifetime.Singleton).WithParameter(Camera.main); //!!!
+            builder.Register<CurrencyView>(Lifetime.Singleton)
+                .WithParameter(_currencyPrefab)
+                .WithParameter(new CurrencyConverter())
+                .WithParameter(new StringBuilder());
 
-            builder.Register<CurrencyModel>(Lifetime.Singleton)
-                .WithParameter("goldIconPrefab", _goldIconPrefab)
-                .WithParameter("diamondIconPrefab", _diamondIconPrefab)
-                .WithParameter(_mainMenuHeaderPrefab);
+            builder.Register<CurrencyModel>(Lifetime.Singleton);
 
-            builder.RegisterComponent(_mainMenuHeaderPrefab);
-
-            builder.Register<CurrencyConverter>(Lifetime.Singleton);
-
-            CancellationTokenSource tokenSource = new CancellationTokenSource(); //!!!
-            builder.Register<CurrencyAnimation>(Lifetime.Singleton).WithParameter(tokenSource.Token);
+            builder.Register<CurrencyController>(Lifetime.Singleton);
 
             builder.Register<EventBus>(Lifetime.Singleton);
 
             AudioManager audioManager = new GameObject("Audio Manager").AddComponent<AudioManager>();
             audioManager.transform.SetParent(transform);
-            builder.RegisterComponent(audioManager)
-                .WithParameter(audioList.audios);
+            builder.RegisterComponent(audioManager).WithParameter(audioList.audios);
 
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }

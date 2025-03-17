@@ -1,32 +1,42 @@
-﻿using Gameplay.Animations;
+﻿using System;
+using System.Threading;
+using Bootstrap.Currency;
 using UnityEngine;
-using VContainer;
+using Object = UnityEngine.Object;
 
 namespace MainMenu.UI.Header
 {
-    public class MainMenuHeaderManager
+    public class MainMenuHeaderManager : IDisposable
     {
         private readonly MainMenuHeader _mainMenuHeaderPrefab;
         private MainMenuHeader _mainMenuHeader;
         private readonly Camera _uiCamera;
+        private readonly CurrencyController _currencyController;
+        private readonly CancellationToken _cancellationToken;
 
-        public MainMenuHeaderManager(MainMenuHeader mainMenuHeaderPrefab, Camera uiCamera)
+
+        public MainMenuHeaderManager(MainMenuHeader mainMenuHeaderPrefab, Camera uiCamera,
+            CurrencyController currencyController, CancellationToken cancellationToken)
         {
             _mainMenuHeaderPrefab = mainMenuHeaderPrefab;
             _uiCamera = uiCamera;
+            _currencyController = currencyController;
+            _cancellationToken = cancellationToken;
         }
 
-
-        [Inject]
-        public void AssignCreatedHeader()
+        public MainMenuHeader CreateHeader()
         {
             _mainMenuHeader = Object.Instantiate(_mainMenuHeaderPrefab);
             _mainMenuHeader.AssignCamera(_uiCamera);
+
+            _currencyController.InitMainMenuHeaderCurrencies(_mainMenuHeader, _cancellationToken);
+
+            return _mainMenuHeader;
         }
 
-        public MainMenuHeader GetHeader()
+        public void Dispose()
         {
-            return _mainMenuHeader;
+            _currencyController.ClearMainMenuHeaderCurrencies();
         }
     }
 }

@@ -545,8 +545,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4aba7753afd0420681265e6419edcd53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _goldIconPrefab: {fileID: 5199859942593474234, guid: 78432094f7e0ce047b8fa11b7ef0cff9,
+    type: 3}
   _goldIcon: {fileID: 8371609858655541626}
   _goldText: {fileID: 7207530687838590229}
+  _diamondIconPrefab: {fileID: 6247679867041235511, guid: 6720c4dd3285c8749ac2b4a3ee050a6d,
+    type: 3}
   _diamondIcon: {fileID: 2739122839360347588}
   _diamondText: {fileID: 5898147434256491180}
 --- !u!1 &6868877262477103526

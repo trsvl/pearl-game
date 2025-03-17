@@ -58,6 +58,7 @@ namespace Bootstrap
                 {
                     if (audioClips.ContainsKey(arr.action) && audioClips[arr.action].Contains(a))
                     {
+                        Destroy(a.source);
                         audioClips[arr.action].Remove(a);
                     }
                 }

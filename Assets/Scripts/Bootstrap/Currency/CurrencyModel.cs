@@ -57,6 +57,8 @@ namespace Bootstrap.Currency
                 currency = ulong.MinValue;
             }
             else currency -= value;
+
+            OnCurrencyChanged?.Invoke(type, currency, value);
         }
 
         private ulong ParseData(string data)

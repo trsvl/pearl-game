@@ -6,7 +6,9 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MainMenu.UI.Header;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
@@ -14,44 +16,42 @@ namespace Bootstrap.Currency
 {
     public class CurrencyView : IDisposable
     {
+        private readonly GameObject _currencyPrefab;
         private readonly CurrencyConverter _currencyConverter;
         private readonly StringBuilder _stringBuilder;
 
-        private readonly Dictionary<CurrencyType, (RectTransform, TextMeshProUGUI, GameObject)> _currencyViews = new();
+        private readonly Dictionary<CurrencyType, (RectTransform, TextMeshProUGUI)> _currencyViews = new();
         private CancellationToken _cancellationToken;
 
-        private GameObject _goldIconPrefab;
-        private RectTransform _goldIcon;
-        private TextMeshProUGUI _goldText;
 
-        private GameObject __diamondIconPrefab;
-        private RectTransform _diamondIcon;
-        private TextMeshProUGUI _diamondText;
-
-
-        public CurrencyView(CurrencyConverter currencyConverter, StringBuilder stringBuilder)
+        public CurrencyView(GameObject currencyPrefab, CurrencyConverter currencyConverter, StringBuilder stringBuilder)
         {
+            _currencyPrefab = currencyPrefab;
             _currencyConverter = currencyConverter;
             _stringBuilder = stringBuilder;
         }
 
-        public void InitHeader(MainMenuHeaderManager mainMenuHeaderManager, CancellationToken cancellationToken)
+        public void InitHeader(MainMenuHeader header, CancellationToken cancellationToken)
         {
             Debug.Log("INIT HEADER CURRENCY VIEW");
 
             _cancellationToken = cancellationToken;
 
-            var header = mainMenuHeaderManager.GetHeader();
+            _currencyViews.Add(CurrencyType.Gold, (header._goldIcon, header._goldText));
+            _currencyViews.Add(CurrencyType.Diamond, (header._diamondIcon, header._diamondText));
+        }
 
-            _goldIcon = header._goldIcon;
-            _goldText = header._goldText;
+        public void ClearHeader()
+        {
+            if (_currencyViews.ContainsKey(CurrencyType.Gold))
+            {
+                _currencyViews.Remove(CurrencyType.Gold);
+            }
 
-            _currencyViews.Add(CurrencyType.Gold, (_goldIcon, _goldText, _goldIconPrefab));
-
-            _diamondIcon = header._diamondIcon;
-            _diamondText = header._diamondText;
-
-            _currencyViews.Add(CurrencyType.Diamond, (_diamondIcon, _diamondText, __diamondIconPrefab));
+            if (_currencyViews.ContainsKey(CurrencyType.Diamond))
+            {
+                _currencyViews.Remove(CurrencyType.Diamond);
+            }
         }
 
         public void UpdateCurrencyText(CurrencyType type, ulong currencyValue, ulong addedValue)
@@ -62,46 +62,87 @@ namespace Bootstrap.Currency
             _stringBuilder.Append(_currencyConverter.Convert(value));
             _currencyViews[type].Item2.SetText(_stringBuilder);
 
-            if (isAddedValuePositive) CollectCurrency(type, value, addedValue).Forget();
+            if (isAddedValuePositive) CollectCurrency(type, value, currencyValue).Forget();
         }
 
         private async UniTask CollectCurrency(CurrencyType type, ulong startValue, ulong endValue)
         {
             int objectCount = Random.Range(5, 8);
-
+            float spawnDelay = 0.1f;
             float objMoveDuration = 1f;
+
+            await UniTask.DelayFrame(1, cancellationToken: _cancellationToken);
+
+            MoveObjects(type, objectCount, spawnDelay, objMoveDuration).Forget();
+
+            await UniTask.WaitForSeconds(objMoveDuration + spawnDelay, cancellationToken: _cancellationToken,
+                ignoreTimeScale: true);
+
+            float textUpdateDuration = (spawnDelay) * (objectCount - 2) + 0.2f;
+            UpdateCurrencyTextAnimation(type, startValue, endValue, textUpdateDuration);
+        }
+
+        private async UniTask MoveObjects(CurrencyType type, int objectCount, float spawnDelay, float objMoveDuration)
+        {
+            var prefab = Object.Instantiate(_currencyPrefab);
+            var spriteRenderer = prefab.GetComponent<SpriteRenderer>();
+            Sprite sprite = _currencyViews[type].Item1.GetComponent<Image>().sprite;
+            spriteRenderer.sprite = sprite;
+            Vector3 targetScale = CalculateObjectLocalScale(spriteRenderer, _currencyViews[type].Item1);
+            prefab.transform.position = Vector3.one * 1000f;
 
             for (int i = 0; i < objectCount; i++)
             {
                 float randomX = Random.Range(1f, 3f);
                 float randomY = Random.Range(1f, 3f);
-                Vector2 randomSpawnPoint = new Vector2(randomX, 0 + randomY);
+
+                Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenCenter); //!!!
+
+                Vector2 randomSpawnPoint = new Vector2(worldPosition.x + randomX, worldPosition.y + randomY);
                 Quaternion randomRotation = Quaternion.Euler(0, 0, Random.Range(0, 360));
 
-                GameObject obj = Object.Instantiate(_currencyViews[type].Item3, randomSpawnPoint, randomRotation);
-                Vector3 endScale = obj.transform.localScale;
+                GameObject obj = Object.Instantiate(prefab, randomSpawnPoint, randomRotation);
                 obj.transform.localScale = Vector3.zero;
+                prefab.SetActive(true);
 
-                await obj.transform.DOScale(endScale, 0.1f).SetUpdate(true)
+                await obj.transform.DOScale(targetScale, spawnDelay)
+                    .SetUpdate(true)
+                    .SetEase(Ease.OutBack)
                     .ToUniTask(cancellationToken: _cancellationToken);
 
                 UniTask moveTask = obj.transform.DOMove(_currencyViews[type].Item1.position, objMoveDuration)
                     .SetUpdate(true)
+                    .SetEase(Ease.InBack)
                     .ToUniTask(cancellationToken: _cancellationToken);
 
                 moveTask.ContinueWith(() => Object.Destroy(obj.gameObject));
             }
 
-            await UniTask.WaitForSeconds(objMoveDuration, cancellationToken: _cancellationToken);
+            Object.Destroy(prefab);
+        }
 
-            float duration = objMoveDuration * (objectCount - 2);
-            UpdateCurrencyTextAnimation(type, startValue, endValue, duration);
+        private Vector3 CalculateObjectLocalScale(SpriteRenderer spriteRenderer, RectTransform uiElement)
+        {
+            Vector2 spritePixelSize = spriteRenderer.sprite.rect.size;
+            float pixelsPerUnit = spriteRenderer.sprite.pixelsPerUnit;
+            Vector2 spriteWorldSize = spritePixelSize / pixelsPerUnit;
+
+            Vector2 uiSize = uiElement.rect.size;
+            Vector3 uiWorldSize = uiElement.TransformVector(uiSize);
+
+            Vector3 scaleFactor = new Vector3(
+                uiWorldSize.x / spriteWorldSize.x,
+                uiWorldSize.x / spriteWorldSize.x,
+                uiWorldSize.x / spriteWorldSize.x
+            );
+
+            return scaleFactor;
         }
 
         private void UpdateCurrencyTextAnimation(CurrencyType type, ulong startValue, ulong endValue, float duration)
         {
             ulong value = startValue;
-            Debug.Log("TEXT");
             DOTween.To(
                     () => value,
                     x => value = x,

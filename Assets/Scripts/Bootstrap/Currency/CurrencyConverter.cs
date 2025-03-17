@@ -1,8 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
-namespace Bootstrap
+namespace Bootstrap.Currency
 {
     public class CurrencyConverter
     {
@@ -21,16 +22,18 @@ namespace Bootstrap
         {
             string currencyString = currency.ToString();
 
-            int length = currencyString.Length - 1;
+            int length = currencyString.Length;
+            
+            if (length <= 3) return currencyString;
 
             int exponent = length - (length % 3);
 
             if (!abbreviations.TryGetValue(exponent, out string abbreviation)) return currencyString;
 
             int mod = length % 3;
-            int integerPartLength  = mod == 0 ? 1 : mod + 1;
+            int integerPartLength = mod == 0 ? 1 : mod;
             int decimalPartLength = 3 - integerPartLength;
-            
+
             Span<char> buffer = stackalloc char[32];
             int index = 0;
 

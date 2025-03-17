@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using Bootstrap;
+using UnityEngine;
 
 namespace Utils.Scene.AudioSystem
 {
@@ -23,6 +24,7 @@ namespace Utils.Scene.AudioSystem
 
         public void Dispose()
         {
+            Debug.Log("AudioEventsHandler.Dispose");
             _audioManager.UnsubscribeAudio(_audios);
         }
     }

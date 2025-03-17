@@ -9,7 +9,7 @@ namespace MainMenu.UI
     {
         public void Install(IContainerBuilder builder)
         {
-            builder.RegisterComponentInHierarchy<MainMenuHeader>();
+            builder.RegisterComponentInHierarchy<MainMenuHeaderManager>();
 
            // builder.RegisterBuildCallback(container => { container.Resolve<MainMenuHeader>(); });
         }

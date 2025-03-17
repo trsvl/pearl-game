@@ -1135,8 +1135,6 @@ MonoBehaviour:
   _pauseButton: {fileID: 1411875821}
   _respawnBallButton: {fileID: 1452890071}
   _uiCamera: {fileID: 853203908}
-  _mainMenuHeaderPrefab: {fileID: 4504516149177714889, guid: fa420b683aaf6934194e813cf6727604,
-    type: 3}
 --- !u!1 &1411875820
 GameObject:
   m_ObjectHideFlags: 0
@@ -2135,11 +2133,6 @@ MonoBehaviour:
     TypeName: Bootstrap.BootstrapLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
-  _installers:
-  - {fileID: 904864057}
-  - {fileID: 1988250815}
-  - {fileID: 1366334601}
-  - {fileID: 150371519}
   audioList: {fileID: 11400000, guid: 968fe64468b4b3c4ab05fc01c1e70e44, type: 2}
 --- !u!4 &1958809427
 Transform:
@@ -2158,6 +2151,7 @@ Transform:
   - {fileID: 1988250816}
   - {fileID: 1366334602}
   - {fileID: 150371520}
+  - {fileID: 2109520612}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1988250815
@@ -2309,6 +2303,53 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!1 &2109520611
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2109520612}
+  - component: {fileID: 2109520613}
+  m_Layer: 0
+  m_Name: Main Menu Header Installer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2109520612
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109520611}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1958809427}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2109520613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2109520611}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 441b35e3fb8a453fa06a08a18c960249, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mainMenuHeaderPrefab: {fileID: 4504516149177714889, guid: fa420b683aaf6934194e813cf6727604,
+    type: 3}
+  _uiCamera: {fileID: 853203908}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

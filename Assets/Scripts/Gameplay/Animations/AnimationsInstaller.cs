@@ -36,7 +36,7 @@ namespace Gameplay.Animations
                 .WithParameter(_onDestroySphereParticlePrefab);
 
             builder.Register<ChangeHeader>(Lifetime.Scoped)
-                .WithParameter("header", _header);
+                .WithParameter("gameplayHeader", _header);
 
             builder.Register<MoveUIAnimation>(Lifetime.Scoped)
                 .WithParameter("header", _header)

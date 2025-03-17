@@ -1,34 +1,26 @@
-﻿using Bootstrap;
-using Bootstrap.Currency;
+﻿using Bootstrap.Currency;
 using Cysharp.Threading.Tasks;
 using Gameplay.Animations;
-using Gameplay.UI.Popup;
-using Utils.EventBusSystem;
 
 namespace Gameplay.Utils
 {
     public class FinishGameController : IFinishGame
     {
-        private readonly EventBus _eventBus;
-        private readonly MoveUIAnimation _moveUIAnimation;
-        private readonly GamePopupManager _gamePopupManager;
         private readonly ChangeHeader _changeHeader;
-        private readonly CurrencyModel _currencyModel;
+        private readonly CurrencyController _currencyController;
 
-        public FinishGameController(EventBus eventBus, MoveUIAnimation moveUIAnimation,
-            GamePopupManager gamePopupManager, ChangeHeader changeHeader, CurrencyModel currencyModel)
+        
+        public FinishGameController(ChangeHeader changeHeader, CurrencyController currencyController)
         {
-            _eventBus = eventBus;
-            _moveUIAnimation = moveUIAnimation;
-            _gamePopupManager = gamePopupManager;
             _changeHeader = changeHeader;
-            _currencyModel = currencyModel;
+            _currencyController = currencyController;
         }
 
         public void FinishGame()
         {
             _changeHeader.Do(0.5f).Forget();
-            _currencyModel.GoldCurrency += 500;
+            _currencyController.UpdateCurrency(CurrencyType.Gold, 500);
+            _currencyController.UpdateCurrency(CurrencyType.Diamond, 0);
         }
     }
 }

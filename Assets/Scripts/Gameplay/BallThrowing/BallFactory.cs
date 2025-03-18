@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Linq;
+using Bootstrap;
 using Gameplay.Animations;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
@@ -22,7 +23,7 @@ namespace Gameplay.BallThrowing
         private ShotsData _shotsData;
         private EventBus _eventBus;
         private SpheresDictionary _spheresDictionary;
-        private CameraManager _cameraManager;
+        private CameraController _cameraController;
         private IObjectResolver _container;
 
         private Color[] _levelColors => _spheresDictionary.GetLevelColors();
@@ -39,13 +40,13 @@ namespace Gameplay.BallThrowing
 
         [Inject]
         public void Init(Ball ballPrefab, ShotsData shotsData, EventBus eventBus, SpheresDictionary spheresDictionary,
-            CameraManager cameraManager, IObjectResolver container)
+            CameraController cameraController, IObjectResolver container)
         {
             _ballPrefab = ballPrefab;
             _shotsData = shotsData;
             _eventBus = eventBus;
             _spheresDictionary = spheresDictionary;
-            _cameraManager = cameraManager;
+            _cameraController = cameraController;
             _container = container;
 
             Init();
@@ -79,7 +80,7 @@ namespace Gameplay.BallThrowing
         public void UpdateBallsPosition(float newFOV)
         {
             (Vector3 newBallPosition, Vector3 newNextBallPosition) =
-                _cameraManager.UpdateBallsPositionAndFOV(_ballSize, newFOV);
+                _cameraController.UpdateBallsPositionAndFOV(_ballSize, newFOV);
 
             _currentBallSpawnPoint = newBallPosition;
             _nextBallSpawnPoint = newNextBallPosition;

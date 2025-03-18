@@ -29,11 +29,13 @@ namespace Gameplay.DI
 
             await _container.Resolve<SpawnSmallSpheresAnimation>().DoAnimation();
 
-            _container.Resolve<MoveUIAnimation>().DoAnimation().Forget();
+            _container.Resolve<MoveUIAnimation>().MoveOnStart().Forget();
 
             await _container.Resolve<ThrowingBallAnimation>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();
+
+            await UniTask.WaitForSeconds(0.1f, cancellationToken: cancellation, ignoreTimeScale: true);
 
             _container.Resolve<GameplayStateObserver>().FinishGame();
         }

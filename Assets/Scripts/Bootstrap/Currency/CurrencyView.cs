@@ -6,7 +6,6 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using MainMenu.UI.Header;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
@@ -19,22 +18,23 @@ namespace Bootstrap.Currency
         private readonly GameObject _currencyPrefab;
         private readonly CurrencyConverter _currencyConverter;
         private readonly StringBuilder _stringBuilder;
+        private readonly CameraController _cameraController;
 
         private readonly Dictionary<CurrencyType, (RectTransform, TextMeshProUGUI)> _currencyViews = new();
         private CancellationToken _cancellationToken;
 
 
-        public CurrencyView(GameObject currencyPrefab, CurrencyConverter currencyConverter, StringBuilder stringBuilder)
+        public CurrencyView(GameObject currencyPrefab, CurrencyConverter currencyConverter, StringBuilder stringBuilder,
+            CameraController cameraController)
         {
             _currencyPrefab = currencyPrefab;
             _currencyConverter = currencyConverter;
             _stringBuilder = stringBuilder;
+            _cameraController = cameraController;
         }
 
         public void InitHeader(MainMenuHeader header, CancellationToken cancellationToken)
         {
-            Debug.Log("INIT HEADER CURRENCY VIEW");
-
             _cancellationToken = cancellationToken;
 
             _currencyViews.Add(CurrencyType.Gold, (header._goldIcon, header._goldText));
@@ -93,13 +93,10 @@ namespace Bootstrap.Currency
 
             for (int i = 0; i < objectCount; i++)
             {
-                float randomX = Random.Range(1f, 3f);
-                float randomY = Random.Range(1f, 3f);
+                float randomX = Random.Range(-1f, 1f);
+                float randomY = Random.Range(-1f, 1f);
 
-                Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0f);
-                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenCenter); //!!!
-
-                Vector2 randomSpawnPoint = new Vector2(worldPosition.x + randomX, worldPosition.y + randomY);
+                Vector2 randomSpawnPoint = new Vector2(randomX, randomY);
                 Quaternion randomRotation = Quaternion.Euler(0, 0, Random.Range(0, 360));
 
                 GameObject obj = Object.Instantiate(prefab, randomSpawnPoint, randomRotation);
@@ -116,7 +113,7 @@ namespace Bootstrap.Currency
                     .SetEase(Ease.InBack)
                     .ToUniTask(cancellationToken: _cancellationToken);
 
-                moveTask.ContinueWith(() => Object.Destroy(obj.gameObject));
+                moveTask.ContinueWith(() => Object.Destroy(obj.gameObject)).Forget();
             }
 
             Object.Destroy(prefab);
@@ -159,7 +156,6 @@ namespace Bootstrap.Currency
 
         public void Dispose()
         {
-            Debug.Log("CLEAR ALL THE CURRENCY VIEW");
             _currencyViews.Clear();
         }
     }

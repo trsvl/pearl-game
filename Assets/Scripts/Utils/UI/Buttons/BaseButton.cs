@@ -8,10 +8,10 @@ namespace Utils.UI.Buttons
         protected readonly Button _button;
 
 
-        protected BaseButton(Button button, AudioManager audioManager)
+        protected BaseButton(Button button, AudioController audioController)
         {
             _button = button;
-            _button.onClick.AddListener(() => audioManager.Play(AudioAction.ButtonClick));
+            _button.onClick.AddListener(() => audioController.Play(AudioAction.ButtonClick));
         }
     }
 }

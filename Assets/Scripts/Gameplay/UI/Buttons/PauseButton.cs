@@ -7,8 +7,8 @@ namespace Gameplay.UI.Buttons
 {
     public class PauseButton : BaseButton, IStartGame
     {
-        public PauseButton(Button button, GameplayStateObserver gameplayStateObserver, AudioManager audioManager) :
-            base(button, audioManager)
+        public PauseButton(Button button, GameplayStateObserver gameplayStateObserver, AudioController audioController) :
+            base(button, audioController)
         {
             _button.onClick.AddListener(gameplayStateObserver.PauseGame);
             _button.interactable = false;

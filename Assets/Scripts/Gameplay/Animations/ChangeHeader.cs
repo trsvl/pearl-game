@@ -18,14 +18,16 @@ namespace Gameplay.Animations
             _moveUIAnimation = moveUIAnimation;
         }
 
-        public async UniTask Do(float duration)
+        public async UniTask Swap(float duration)
         {
-            var mainMenuHeader = _mainMenuHeaderManager.CreateHeader();
-
-            RectTransform newHeader = mainMenuHeader.GetComponentInChildren<RectTransform>();
             Vector2 targetPosition = _gameplayHeader.anchoredPosition;
-            _gameplayHeader.gameObject.SetActive(false);
-            await _moveUIAnimation.Move(newHeader, 0, 500f, duration, targetPosition);
+
+            await _moveUIAnimation.Move(_gameplayHeader, duration, targetOffset: (0f, 500f));
+            Object.Destroy(_gameplayHeader.gameObject);
+
+            RectTransform mainMenuHeader = _mainMenuHeaderManager.CreateHeader();
+            await _moveUIAnimation.Move(mainMenuHeader, duration, initialOffset: (0f, 500f),
+                targetPosition: targetPosition);
         }
     }
 }

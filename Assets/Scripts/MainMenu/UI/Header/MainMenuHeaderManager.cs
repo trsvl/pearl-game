@@ -24,14 +24,14 @@ namespace MainMenu.UI.Header
             _cancellationToken = cancellationToken;
         }
 
-        public MainMenuHeader CreateHeader()
+        public RectTransform CreateHeader()
         {
             _mainMenuHeader = Object.Instantiate(_mainMenuHeaderPrefab);
             _mainMenuHeader.AssignCamera(_uiCamera);
 
             _currencyController.InitMainMenuHeaderCurrencies(_mainMenuHeader, _cancellationToken);
 
-            return _mainMenuHeader;
+            return _mainMenuHeader.transform.GetChild(0).GetComponent<RectTransform>();
         }
 
         public void Dispose()

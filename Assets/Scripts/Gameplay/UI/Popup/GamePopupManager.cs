@@ -13,20 +13,20 @@ namespace Gameplay.UI.Popup
         private readonly GameplayStateObserver _gameplayStateObserver;
         private readonly Loader _loader;
         private readonly MoveUIAnimation _moveUIAnimation;
-        private readonly CameraManager _cameraManager;
+        private readonly CameraController _cameraController;
         private GamePopup _gamePopup;
 
 
         public GamePopupManager(GamePopup gamePopupPrefab, Transform canvases,
             GameplayStateObserver gameplayStateObserver, Loader loader, MoveUIAnimation moveUIAnimation,
-            CameraManager cameraManager)
+            CameraController cameraController)
         {
             _gamePopupPrefab = gamePopupPrefab;
             _canvases = canvases;
             _gameplayStateObserver = gameplayStateObserver;
             _loader = loader;
             _moveUIAnimation = moveUIAnimation;
-            _cameraManager = cameraManager;
+            _cameraController = cameraController;
         }
 
         public void PauseGame()
@@ -55,8 +55,8 @@ namespace Gameplay.UI.Popup
         private void CreatePopup()
         {
             _gamePopup = Object.Instantiate(_gamePopupPrefab, _canvases);
-            _gamePopup.AssignCamera(_cameraManager.GetUICamera());
-            _moveUIAnimation.Move(_gamePopup.GetComponent<RectTransform>(), 0, -500f, 0.2f).Forget();
+            _gamePopup.AssignCamera(_cameraController.GetUICamera());
+            _moveUIAnimation.Move(_gamePopup.GetContainer(), 0.25f, initialOffset: (0f, -1000f)).Forget();
         }
 
         private void ResumeGameCLick()

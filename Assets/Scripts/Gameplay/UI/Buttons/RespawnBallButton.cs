@@ -13,8 +13,8 @@ namespace Gameplay.UI.Buttons
         private readonly ShotsData _shotsData;
 
 
-        public RespawnBallButton(Button button, AudioManager audioManager, BallFactory ballFactory,
-            SpheresDictionary spheresDictionary, ShotsData shotsData) : base(button, audioManager)
+        public RespawnBallButton(Button button, AudioController audioController, BallFactory ballFactory,
+            SpheresDictionary spheresDictionary, ShotsData shotsData) : base(button, audioController)
         {
             _spheresDictionary = spheresDictionary;
             _shotsData = shotsData;

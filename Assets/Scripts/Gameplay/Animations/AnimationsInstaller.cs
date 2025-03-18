@@ -1,5 +1,4 @@
 ﻿using Gameplay.SphereData;
-using MainMenu.UI.Header;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -12,14 +11,10 @@ namespace Gameplay.Animations
         [SerializeField] private RectTransform _header;
         [SerializeField] private RectTransform _pauseButton;
         [SerializeField] private RectTransform _respawnBallButton;
-        [SerializeField] private Camera _uiCamera;
 
 
         public void Install(IContainerBuilder builder)
         {
-            builder.Register<CameraManager>(Lifetime.Scoped)
-                .WithParameter(_uiCamera);
-
             builder.Register<DecreaseFOVAnimation>(Lifetime.Scoped);
 
             builder.Register<SpawnSmallSpheresAnimation>(Lifetime.Scoped)

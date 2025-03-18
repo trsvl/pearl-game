@@ -8,24 +8,23 @@ namespace Utils.Scene.AudioSystem
 {
     public class AudioEventsHandler : IDisposable
     {
-        protected readonly AudioManager _audioManager;
+        protected readonly AudioController AudioController;
         private readonly List<Audios> _audios;
 
 
-        protected AudioEventsHandler(AudioManager audioManager, List<Audios> audios,
+        protected AudioEventsHandler(AudioController audioController, List<Audios> audios,
             CancellationToken cancellationToken)
         {
-            _audioManager = audioManager;
+            AudioController = audioController;
             _audios = audios;
 
-            _audioManager.AssignNewToken(cancellationToken);
-            _audioManager.SubscribeAudio(_audios);
+            AudioController.AssignNewToken(cancellationToken);
+            AudioController.SubscribeAudio(_audios);
         }
 
         public void Dispose()
         {
-            Debug.Log("AudioEventsHandler.Dispose");
-            _audioManager.UnsubscribeAudio(_audios);
+            AudioController.UnsubscribeAudio(_audios);
         }
     }
 }

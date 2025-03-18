@@ -7,7 +7,7 @@ namespace Gameplay.UI.Popup
     public class GamePopup : MonoBehaviour
     {
         [SerializeField] private TextButton _buttonPrefab;
-        [SerializeField] private Transform buttonSpawnParent;
+        [SerializeField] private RectTransform _container;
 
 
         public void PauseGame(UnityAction RestartGameClick, UnityAction ResumeGameCLick, UnityAction MainMenuClick)
@@ -39,9 +39,14 @@ namespace Gameplay.UI.Popup
             GetComponent<Canvas>().worldCamera = canvasCamera;
         }
 
+        public RectTransform GetContainer()
+        {
+            return _container;
+        }
+
         private void AssignButton(UnityAction listener, string text)
         {
-            var button = Instantiate(_buttonPrefab, buttonSpawnParent);
+            var button = Instantiate(_buttonPrefab, _container.transform);
             button.Set(listener, text);
         }
     }

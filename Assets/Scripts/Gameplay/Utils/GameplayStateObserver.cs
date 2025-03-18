@@ -1,4 +1,5 @@
 ﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Utils.EventBusSystem;
 
@@ -7,12 +8,14 @@ namespace Gameplay.Utils
     public class GameplayStateObserver
     {
         private readonly EventBus _eventBus;
+        private readonly FinishGameController _finishGameController;
         private GameplayState GameplayState = GameplayState.OFF;
 
 
-        public GameplayStateObserver(EventBus eventBus)
+        public GameplayStateObserver(EventBus eventBus, FinishGameController finishGameController)
         {
             _eventBus = eventBus;
+            _finishGameController = finishGameController;
         }
 
         public void StartGame()
@@ -44,7 +47,11 @@ namespace Gameplay.Utils
             Time.timeScale = 0;
 
             NotifyListeners(GameplayState == GameplayState.PLAY, GameplayState.FINISH,
-                () => _eventBus.RaiseEvent<IFinishGame>(handler => handler.FinishGame()));
+                () =>
+                {
+                    _eventBus.RaiseEvent<IFinishGame>(handler => handler.FinishGame());
+                    _finishGameController.FinishGame().Forget();
+                });
         }
 
         public void LoseGame()

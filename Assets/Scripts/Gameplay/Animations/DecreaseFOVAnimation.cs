@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using Bootstrap;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
@@ -10,16 +11,16 @@ namespace Gameplay.Animations
     public class DecreaseFOVAnimation : IDestroySphereLayer
     {
         private readonly BallFactory _ballFactory;
-        private readonly CameraManager _cameraManager;
+        private readonly CameraController _cameraController;
         private readonly EventBus _eventBus;
         private readonly CancellationToken _cancellationToken;
 
 
-        public DecreaseFOVAnimation(BallFactory ballFactory, CameraManager cameraManager, EventBus eventBus,
+        public DecreaseFOVAnimation(BallFactory ballFactory, CameraController cameraController, EventBus eventBus,
             CancellationToken cancellationToken)
         {
             _ballFactory = ballFactory;
-            _cameraManager = cameraManager;
+            _cameraController = cameraController;
             _eventBus = eventBus;
             _cancellationToken = cancellationToken;
         }
@@ -35,13 +36,13 @@ namespace Gameplay.Animations
 
             await UniTask.Delay(500, cancellationToken: _cancellationToken);
 
-            float initialFOV = _cameraManager.GetInitialFOV();
-            float targetFOV = _cameraManager.CalculateNewFOV(destroyedSphereLayers);
+            float initialFOV = _cameraController.GetInitialFOV();
+            float targetFOV = _cameraController.CalculateNewFOV(destroyedSphereLayers);
            // _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnStartChangeFOV());
 
             await DOVirtual.Float(initialFOV, targetFOV, duration, _ballFactory.UpdateBallsPosition).ToUniTask(cancellationToken: _cancellationToken);
 
-            _cameraManager.AssignNewFOV();
+            _cameraController.AssignNewFOV();
            // _eventBus.RaiseEvent<IChangeFOVAnimation>(handler => handler.OnEndChangeFOV());
         }
     }

@@ -9,12 +9,11 @@ using VContainer;
 
 namespace Bootstrap
 {
-    public class AudioManager : MonoBehaviour
+    public class AudioController : MonoBehaviour
     {
         private readonly Dictionary<AudioAction, List<Audio>> audioClips = new();
         private CancellationToken _cancellationToken;
         private CancellationTokenSource linkedCts;
-        private float test;
 
 
         public void AssignNewToken(CancellationToken cancellationToken)

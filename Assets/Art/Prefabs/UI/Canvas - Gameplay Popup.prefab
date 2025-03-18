@@ -220,7 +220,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _buttonPrefab: {fileID: 6068384358192139898, guid: 5f5c3185e04c6b541afa11d60fd746ec,
     type: 3}
-  buttonSpawnParent: {fileID: 7495861965302036405}
+  _buttonSpawnParent: {fileID: 7495861965302036405}
+  _container: {fileID: 7495861965302036405}
 --- !u!1 &8107300789748473059
 GameObject:
   m_ObjectHideFlags: 0

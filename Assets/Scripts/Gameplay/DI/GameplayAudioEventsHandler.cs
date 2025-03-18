@@ -9,54 +9,54 @@ namespace Gameplay.DI
     public class GameplayAudioEventsHandler : AudioEventsHandler, IReleaseBall, IDestroySphereSegmentOnHit,
         ISpawnSphereSegment, IPauseGame, IResumeGame, IStartGame, IFinishGame, ILoseGame, IDestroySphereSegment
     {
-        public GameplayAudioEventsHandler(AudioManager audioManager, List<Audios> audios,
-            CancellationToken cancellationToken) : base(audioManager, audios, cancellationToken)
+        public GameplayAudioEventsHandler(AudioController audioController, List<Audios> audios,
+            CancellationToken cancellationToken) : base(audioController, audios, cancellationToken)
         {
         }
 
         public void OnReleaseBall()
         {
-            _audioManager.Play(AudioAction.Throw);
+            AudioController.Play(AudioAction.Throw);
         }
 
         public void OnDestroySphereSegmentOnHit(Color segmentColor, GameObject target, int currentShotsNumber)
         {
-            _audioManager.Play(AudioAction.HitSphere);
+            AudioController.Play(AudioAction.HitSphere);
         }
 
         public void OnSpawnSphereSegment()
         {
-            _audioManager.Play(AudioAction.SpawnSphereSegment);
+            AudioController.Play(AudioAction.SpawnSphereSegment);
         }
 
         public void PauseGame()
         {
-            _audioManager.PauseGame();
+            AudioController.PauseGame();
         }
 
         public void ResumeGame()
         {
-            _audioManager.ResumeGame();
+            AudioController.ResumeGame();
         }
 
         public void StartGame()
         {
-            _audioManager.Play(AudioAction.StartGame);
+            AudioController.Play(AudioAction.StartGame);
         }
 
         public void FinishGame()
         {
-            _audioManager.Play(AudioAction.FinishGame);
+            AudioController.Play(AudioAction.FinishGame);
         }
 
         public void LoseGame()
         {
-            _audioManager.Play(AudioAction.LoseGame);
+            AudioController.Play(AudioAction.LoseGame);
         }
 
         public void OnDestroySphereSegment()
         {
-            _audioManager.Play(AudioAction.HitSphereSegment);
+            AudioController.Play(AudioAction.HitSphereSegment);
         }
     }
 }

@@ -4,7 +4,7 @@ using Gameplay.Animations;
 
 namespace Gameplay.Utils
 {
-    public class FinishGameController : IFinishGame
+    public class FinishGameController
     {
         private readonly ChangeHeader _changeHeader;
         private readonly CurrencyController _currencyController;
@@ -16,11 +16,10 @@ namespace Gameplay.Utils
             _currencyController = currencyController;
         }
 
-        public void FinishGame()
+        public async UniTask FinishGame()
         {
-            _changeHeader.Do(0.5f).Forget();
+            await _changeHeader.Swap(0.25f);
             _currencyController.UpdateCurrency(CurrencyType.Gold, 500);
-            _currencyController.UpdateCurrency(CurrencyType.Diamond, 0);
         }
     }
 }

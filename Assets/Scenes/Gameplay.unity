@@ -1134,7 +1134,6 @@ MonoBehaviour:
   _header: {fileID: 838950212}
   _pauseButton: {fileID: 1411875821}
   _respawnBallButton: {fileID: 1452890071}
-  _uiCamera: {fileID: 853203908}
 --- !u!1 &1411875820
 GameObject:
   m_ObjectHideFlags: 0
@@ -2134,6 +2133,9 @@ MonoBehaviour:
   autoRun: 1
   autoInjectGameObjects: []
   audioList: {fileID: 11400000, guid: 968fe64468b4b3c4ab05fc01c1e70e44, type: 2}
+  _mainCamera: {fileID: 1192349405}
+  _perspectiveCamera: {fileID: 1192349405}
+  _uiCamera: {fileID: 853203908}
 --- !u!4 &1958809427
 Transform:
   m_ObjectHideFlags: 0

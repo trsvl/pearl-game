@@ -1,20 +1,24 @@
 ﻿using UnityEngine;
 
-namespace Gameplay.Animations
+namespace Bootstrap
 {
-    public class CameraManager
+    public class CameraController
     {
-        private readonly Camera _mainCamera;
-        private readonly Camera _uiCamera; //!!!
+        private Camera _mainCamera;
+        private Camera _perspectiveCamera;
+        private Camera _uiCamera;
+
         private float _initialFOV;
         private int alreadyTriggeredIndex;
 
 
-        public CameraManager(Camera uiCamera)
+        public void UpdateCameras(Camera mainCamera, Camera perspectiveCamera, Camera uiCamera)
         {
-            _mainCamera = Camera.main;
-            _initialFOV = _mainCamera.fieldOfView;
+            _mainCamera = mainCamera;
+            _perspectiveCamera = perspectiveCamera;
             _uiCamera = uiCamera;
+
+            _initialFOV = _perspectiveCamera.fieldOfView;
         }
 
         public float GetInitialFOV()
@@ -24,7 +28,7 @@ namespace Gameplay.Animations
 
         public void AssignNewFOV()
         {
-            _initialFOV = _mainCamera.fieldOfView;
+            _initialFOV = _perspectiveCamera.fieldOfView;
         }
 
         public float CalculateNewFOV(int destroyedSphereLayers)
@@ -38,18 +42,18 @@ namespace Gameplay.Animations
         public (Vector3 ballPosition, Vector3 nextBallPosition) UpdateBallsPositionAndFOV(float _ballSize,
             float newFOV = 0f)
         {
-            _mainCamera.fieldOfView = newFOV == 0f ? _initialFOV : newFOV;
+            _perspectiveCamera.fieldOfView = newFOV == 0f ? _initialFOV : newFOV;
 
             float cameraView =
-                2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * _mainCamera.fieldOfView);
+                2.0f * Mathf.Tan(0.5f * Mathf.Deg2Rad * _perspectiveCamera.fieldOfView);
             float distance = 2f * _ballSize / cameraView;
             distance += 0.5f * _ballSize;
-            _mainCamera.transform.position = new Vector3(0, 0, distance);
+            _perspectiveCamera.transform.position = new Vector3(0, 0, distance);
 
             Vector3 ballPosition = new Vector3(0.8f, 0.2f, distance);
             Vector3 nextBallPosition = new Vector3(0.6f, 0.1f, distance);
-            var ballSpawnPoint = _mainCamera.ViewportToWorldPoint(ballPosition);
-            var nextBallSpawnPoint = _mainCamera.ViewportToWorldPoint(nextBallPosition);
+            var ballSpawnPoint = _perspectiveCamera.ViewportToWorldPoint(ballPosition);
+            var nextBallSpawnPoint = _perspectiveCamera.ViewportToWorldPoint(nextBallPosition);
 
             return (ballSpawnPoint, nextBallSpawnPoint);
         }
@@ -57,6 +61,11 @@ namespace Gameplay.Animations
         public Camera GetMainCamera()
         {
             return _mainCamera;
+        }
+
+        public Camera GetPerspectiveCamera()
+        {
+            return _perspectiveCamera;
         }
 
         public Camera GetUICamera()

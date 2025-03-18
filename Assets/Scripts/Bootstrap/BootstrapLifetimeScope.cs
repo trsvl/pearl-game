@@ -30,11 +30,13 @@ namespace Bootstrap
 
             builder.Register<CurrencyController>(Lifetime.Singleton);
 
+            builder.Register<CameraController>(Lifetime.Singleton);
+
             builder.Register<EventBus>(Lifetime.Singleton);
 
-            AudioManager audioManager = new GameObject("Audio Manager").AddComponent<AudioManager>();
-            audioManager.transform.SetParent(transform);
-            builder.RegisterComponent(audioManager).WithParameter(audioList.audios);
+            AudioController audioController = new GameObject("Audio Manager").AddComponent<AudioController>();
+            audioController.transform.SetParent(transform);
+            builder.RegisterComponent(audioController).WithParameter(audioList.audios);
 
             builder.RegisterEntryPoint<BootstrapEntryPoint>();
         }

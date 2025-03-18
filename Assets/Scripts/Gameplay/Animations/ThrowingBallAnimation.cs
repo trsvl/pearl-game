@@ -1,4 +1,5 @@
 ﻿using System.Threading;
+using Bootstrap;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Gameplay.BallThrowing;
@@ -9,17 +10,17 @@ namespace Gameplay.Animations
     public class ThrowingBallAnimation : IStartAnimation, IReleaseBall
     {
         private readonly BallFactory _ballFactory;
-        private readonly CameraManager _cameraManager;
+        private readonly CameraController _cameraController;
         private readonly RectTransform _respawnBallButton;
         private readonly CancellationToken _cancellationToken;
         private const float startingAnimationDuration = 0.3f;
 
 
-        public ThrowingBallAnimation(BallFactory ballFactory, CameraManager cameraManager,
+        public ThrowingBallAnimation(BallFactory ballFactory, CameraController cameraController,
             RectTransform respawnBallButton, CancellationToken cancellationToken)
         {
             _ballFactory = ballFactory;
-            _cameraManager = cameraManager;
+            _cameraController = cameraController;
             _respawnBallButton = respawnBallButton;
             _cancellationToken = cancellationToken;
         }
@@ -67,7 +68,7 @@ namespace Gameplay.Animations
                 ball.transform.position.z);
             ball.transform.position = initialPos;
 
-            var updateUIPosition = new UpdateUIPosition(_cameraManager.GetMainCamera(), _respawnBallButton);
+            var updateUIPosition = new UpdateUIPosition(_cameraController.GetPerspectiveCamera(), _respawnBallButton);
             _respawnBallButton.anchoredPosition = initialPos;
             _respawnBallButton.gameObject.SetActive(true);
 

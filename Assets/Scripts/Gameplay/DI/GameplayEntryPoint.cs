@@ -35,9 +35,9 @@ namespace Gameplay.DI
 
             _container.Resolve<GameplayStateObserver>().StartGame();
 
-            await UniTask.WaitForSeconds(0.1f, cancellationToken: cancellation, ignoreTimeScale: true);
+           // await UniTask.WaitForSeconds(0.1f, cancellationToken: cancellation, ignoreTimeScale: true);
 
-            _container.Resolve<GameplayStateObserver>().FinishGame();
+          //  _container.Resolve<GameplayStateObserver>().FinishGame();
         }
     }
 }

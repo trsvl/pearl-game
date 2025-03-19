@@ -170,7 +170,7 @@ namespace Gameplay.BallThrowing
 
         private IEnumerator SpawnNextBallDelay()
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1.5f);
             if (!_nextBall) SpawnNextBall();
             if (_currentBall) _eventBus.RaiseEvent<IAfterReleaseBall>(handler => handler.OnAfterReleaseBall());
         }

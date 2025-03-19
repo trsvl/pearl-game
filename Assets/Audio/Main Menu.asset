@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97b41e029b114ac3b77aefaa9bd713b7, type: 3}
+  m_Name: Main Menu
+  m_EditorClassIdentifier: 
+  audios:
+  - action: 7
+    audios:
+    - source: {fileID: 0}
+      clip: {fileID: 8300000, guid: 40d5d15fda51b094a8f057661d3c6eb3, type: 3}
+      audioMixerGroup: {fileID: 7464744996077038469, guid: b08a97eddaf54264d9e3f2b921639ce0,
+        type: 2}
+      volume: 0.176
+      pitch: 1
+      playOnAwake: 0
+      loop: 1
+      fadeInDuration: 5
+      fadeOutDuration: 0
+      startTime: 32
+      delay: 0

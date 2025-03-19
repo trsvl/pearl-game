@@ -18,19 +18,19 @@ namespace Bootstrap.Currency
         private readonly GameObject _currencyPrefab;
         private readonly CurrencyConverter _currencyConverter;
         private readonly StringBuilder _stringBuilder;
-        private readonly CameraController _cameraController;
+        private readonly AudioController _audioController;
 
         private readonly Dictionary<CurrencyType, (RectTransform, TextMeshProUGUI)> _currencyViews = new();
         private CancellationToken _cancellationToken;
 
 
         public CurrencyView(GameObject currencyPrefab, CurrencyConverter currencyConverter, StringBuilder stringBuilder,
-            CameraController cameraController)
+            AudioController audioController)
         {
             _currencyPrefab = currencyPrefab;
             _currencyConverter = currencyConverter;
             _stringBuilder = stringBuilder;
-            _cameraController = cameraController;
+            _audioController = audioController;
         }
 
         public void InitHeader(MainMenuHeader header, CancellationToken cancellationToken)
@@ -68,18 +68,20 @@ namespace Bootstrap.Currency
         private async UniTask CollectCurrency(CurrencyType type, ulong startValue, ulong endValue)
         {
             int objectCount = Random.Range(5, 8);
-            float spawnDelay = 0.1f;
-            float objMoveDuration = 1f;
+            const float spawnDelay = 0.1f;
+            const float objMoveDuration = 1f;
 
             await UniTask.DelayFrame(1, cancellationToken: _cancellationToken);
 
             MoveObjects(type, objectCount, spawnDelay, objMoveDuration).Forget();
 
+            _audioController.Play(AudioAction.CollectCurrency);
+
             await UniTask.WaitForSeconds(objMoveDuration + spawnDelay, cancellationToken: _cancellationToken,
                 ignoreTimeScale: true);
 
             float textUpdateDuration = (spawnDelay) * (objectCount - 2) + 0.2f;
-            UpdateCurrencyTextAnimation(type, startValue, endValue, textUpdateDuration);
+            UpdateCurrencyTextAnimation(type, startValue, endValue, textUpdateDuration).Forget();
         }
 
         private async UniTask MoveObjects(CurrencyType type, int objectCount, float spawnDelay, float objMoveDuration)
@@ -137,10 +139,11 @@ namespace Bootstrap.Currency
             return scaleFactor;
         }
 
-        private void UpdateCurrencyTextAnimation(CurrencyType type, ulong startValue, ulong endValue, float duration)
+        private async UniTask UpdateCurrencyTextAnimation(CurrencyType type, ulong startValue, ulong endValue,
+            float duration)
         {
             ulong value = startValue;
-            DOTween.To(
+            await DOTween.To(
                     () => value,
                     x => value = x,
                     endValue,

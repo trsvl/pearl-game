@@ -5,12 +5,6 @@ public interface IGlobalSubscriber
 {
 }
 
-public interface IChangeFOVAnimation : IGlobalSubscriber
-{
-    void OnStartChangeFOV();
-    void OnEndChangeFOV();
-}
-
 public interface IDestroySphereSegmentOnHit : IGlobalSubscriber
 {
     void OnDestroySphereSegmentOnHit(Color segmentColor, GameObject target, int currentShotsNumber);
@@ -58,4 +52,9 @@ public interface IStartAnimation : IAnimation
 public interface ISpawnSphereSegment : IGlobalSubscriber
 {
     void OnSpawnSphereSegment();
+}
+
+public interface IMainMenuStart : IGlobalSubscriber
+{
+    void OnMainMenuStart();
 }

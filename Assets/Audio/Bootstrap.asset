@@ -13,17 +13,31 @@ MonoBehaviour:
   m_Name: Bootstrap
   m_EditorClassIdentifier: 
   audios:
-  - action: 7
+  - action: 8
     audios:
     - source: {fileID: 0}
       clip: {fileID: 8300000, guid: 5e26e10c3bd45fa49b1f221ded67bd2a, type: 3}
       audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
         type: 2}
-      volume: 1
+      volume: 0.318
       pitch: 1
       playOnAwake: 0
       loop: 0
       fadeInDuration: 0
       fadeOutDuration: 0
+      startTime: 0
+      delay: 0
+  - action: 9
+    audios:
+    - source: {fileID: 0}
+      clip: {fileID: 8300000, guid: c031b8dca043f7f4f8f4e577f55e5acf, type: 3}
+      audioMixerGroup: {fileID: 8449333373385172914, guid: b08a97eddaf54264d9e3f2b921639ce0,
+        type: 2}
+      volume: 0.288
+      pitch: 1
+      playOnAwake: 0
+      loop: 0
+      fadeInDuration: 0
+      fadeOutDuration: 1
       startTime: 0
       delay: 0

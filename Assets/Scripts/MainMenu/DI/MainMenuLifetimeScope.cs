@@ -1,4 +1,5 @@
-﻿using Utils.Scene.DI;
+﻿using MainMenu.UI.Footer;
+using Utils.Scene.DI;
 using VContainer;
 using VContainer.Unity;
 
@@ -10,7 +11,17 @@ namespace MainMenu.DI
         {
             base.Configure(builder);
 
-            builder.RegisterComponentInHierarchy<MainMenuManager>();
+            builder.RegisterComponentInHierarchy<MainMenuFooter>();
+
+            builder.Register<MainMenuEventsHandler>(Lifetime.Scoped);
+
+            builder.Register<MainMenuAudioEventsHandler>(Lifetime.Scoped).WithParameter(audioList.audios);
+
+            builder.RegisterBuildCallback(container =>
+            {
+                container.Resolve<MainMenuEventsHandler>();
+                container.Resolve<MainMenuAudioEventsHandler>();
+            });
 
             builder.RegisterEntryPoint<MainMenuEntryPoint>();
         }

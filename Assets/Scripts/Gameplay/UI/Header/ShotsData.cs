@@ -18,9 +18,13 @@ namespace Gameplay.UI.Header
         private int _currentNumber;
 
 
-        public ShotsData(TextMeshProUGUI shotsText, int initialNumber)
+        public ShotsData(TextMeshProUGUI shotsText)
         {
             _shotsText = shotsText;
+        }
+
+        public void SetInitialNumber(int initialNumber)
+        {
             CurrentNumber = initialNumber;
         }
 

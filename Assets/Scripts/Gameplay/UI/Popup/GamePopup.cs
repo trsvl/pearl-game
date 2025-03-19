@@ -47,7 +47,7 @@ namespace Gameplay.UI.Popup
         private void AssignButton(UnityAction listener, string text)
         {
             var button = Instantiate(_buttonPrefab, _container.transform);
-            button.Set(listener, text);
+            button.Init(listener, text);
         }
     }
 }

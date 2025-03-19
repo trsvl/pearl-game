@@ -34,6 +34,12 @@ namespace MainMenu.UI.Header
             return _mainMenuHeader.transform.GetChild(0).GetComponent<RectTransform>();
         }
 
+        public void InitHeader()
+        {
+            _mainMenuHeader = Object.FindObjectOfType<MainMenuHeader>();
+            _currencyController.InitMainMenuHeaderCurrencies(_mainMenuHeader, _cancellationToken);
+        }
+
         public void Dispose()
         {
             _currencyController.ClearMainMenuHeaderCurrencies();

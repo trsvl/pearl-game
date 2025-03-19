@@ -11,10 +11,19 @@ namespace Bootstrap
 {
     public class AudioController : MonoBehaviour
     {
+        public static AudioController Instance;
+
         private readonly Dictionary<AudioAction, List<Audio>> audioClips = new();
         private CancellationToken _cancellationToken;
         private CancellationTokenSource linkedCts;
 
+
+        [Inject]
+        public AudioController()
+        {
+            print("Audio Controller initialized");
+            Instance = this;
+        }
 
         public void AssignNewToken(CancellationToken cancellationToken)
         {

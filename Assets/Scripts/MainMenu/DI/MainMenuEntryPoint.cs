@@ -1,20 +1,26 @@
-﻿using VContainer.Unity;
+﻿using MainMenu.UI.Footer;
+using MainMenu.UI.Header;
+using Utils.EventBusSystem;
+using VContainer;
+using VContainer.Unity;
 
 namespace MainMenu.DI
 {
-    public class MainMenuEntryPoint : IStartable
+    public class MainMenuEntryPoint : IInitializable
     {
-        private readonly MainMenuManager _mainMenuManager;
+        private readonly IObjectResolver _container;
 
 
-        public MainMenuEntryPoint(MainMenuManager mainMenuManager)
+        public MainMenuEntryPoint(IObjectResolver container)
         {
-            _mainMenuManager = mainMenuManager;
+            _container = container;
         }
 
-        public void Start()
+        public void Initialize()
         {
-            _mainMenuManager.UpdateLevel();
+            _container.Resolve<MainMenuHeaderManager>().InitHeader();
+            _container.Resolve<MainMenuFooter>().UpdateLevel();
+            _container.Resolve<EventBus>().RaiseEvent<IMainMenuStart>(handler => handler.OnMainMenuStart());
         }
     }
 }

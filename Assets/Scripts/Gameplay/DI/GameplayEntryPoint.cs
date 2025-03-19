@@ -3,6 +3,7 @@ using Bootstrap;
 using Cysharp.Threading.Tasks;
 using Gameplay.Animations;
 using Gameplay.SphereData;
+using Gameplay.UI.Header;
 using Gameplay.Utils;
 using VContainer;
 using VContainer.Unity;
@@ -24,20 +25,19 @@ namespace Gameplay.DI
             var dataContext = _container.Resolve<DataContext>();
             var playerData = _container.Resolve<PlayerData>();
             var sphereGenerator = _container.Resolve<SphereGenerator>();
+            var spheresDictionary = _container.Resolve<SpheresDictionary>();
 
             await dataContext.LoadSpheres(playerData.CurrentLevel, sphereGenerator);
 
             await _container.Resolve<SpawnSmallSpheresAnimation>().DoAnimation();
 
-            _container.Resolve<MoveUIAnimation>().MoveOnStart().Forget();
+            _container.Resolve<ShotsData>().SetInitialNumber(spheresDictionary.GetShotsCount());
+
+            _container.Resolve<MoveUIAnimation>().MoveOnStart();
 
             await _container.Resolve<ThrowingBallAnimation>().DoAnimation();
 
             _container.Resolve<GameplayStateObserver>().StartGame();
-
-           // await UniTask.WaitForSeconds(0.1f, cancellationToken: cancellation, ignoreTimeScale: true);
-
-          //  _container.Resolve<GameplayStateObserver>().FinishGame();
         }
     }
 }

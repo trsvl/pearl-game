@@ -201,6 +201,12 @@ namespace Gameplay.SphereData
             return _allSpheres.Keys.ToArray();
         }
 
+        public int GetShotsCount()
+        {
+            int layerNumber = _allSpheres.First().Value.Length;
+            return _allSpheres.Keys.Count * layerNumber + 1;
+        }
+
         private async UniTaskVoid ProcessQueue()
         {
             await _semaphore.WaitAsync(_cancellationToken);

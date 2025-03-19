@@ -7,5 +7,7 @@
     LoseGame,
     SpawnSphereSegment,
     HitSphereSegment,
-    ButtonClick
+    MainMenuStart,
+    ButtonClick,
+    CollectCurrency
 }

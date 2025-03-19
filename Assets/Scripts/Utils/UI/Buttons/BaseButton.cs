@@ -1,17 +1,22 @@
 ﻿using Bootstrap;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace Utils.UI.Buttons
 {
-    public class BaseButton
+    public class BaseButton : Button
     {
-        protected readonly Button _button;
-
-
-        protected BaseButton(Button button, AudioController audioController)
+        public void Init(UnityAction listener)
         {
-            _button = button;
-            _button.onClick.AddListener(() => audioController.Play(AudioAction.ButtonClick));
+            onClick.AddListener(() => AudioController.Instance.Play(AudioAction.ButtonClick));
+            onClick.AddListener(listener);
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
+
+            onClick.RemoveAllListeners();
         }
     }
 }

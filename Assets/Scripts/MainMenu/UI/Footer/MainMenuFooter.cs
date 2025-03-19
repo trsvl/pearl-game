@@ -1,20 +1,20 @@
-﻿using System.Collections;
-using System.Threading.Tasks;
-using Bootstrap;
+﻿using Bootstrap;
+using Cysharp.Threading.Tasks;
 using Gameplay.SphereData;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.UI.Buttons;
 using VContainer;
 
-namespace MainMenu.DI
+namespace MainMenu.UI.Footer
 {
-    public class MainMenuManager : MonoBehaviour
+    public class MainMenuFooter : MonoBehaviour
     {
         [SerializeField] private TextMeshProUGUI _levelText;
-        [SerializeField] private Button _startGameButton;
-        [SerializeField] private Button _previousLevelButton;
-        [SerializeField] private Button _nextLevelButton;
+        [SerializeField] private BaseButton _startGameButton;
+        [SerializeField] private BaseButton _previousLevelButton;
+        [SerializeField] private BaseButton _nextLevelButton;
 
         private PlayerData _playerData;
         private SphereGenerator _sphereGenerator;
@@ -54,9 +54,9 @@ namespace MainMenu.DI
 
         private void OnEnable()
         {
-            _startGameButton.onClick.AddListener(() => _ = _loader.LoadScene(SceneName.Gameplay));
-            _previousLevelButton.onClick.AddListener(() => UpdateLevel(_levelNumber - 1));
-            _nextLevelButton.onClick.AddListener(() => UpdateLevel(_levelNumber + 1));
+            _startGameButton.Init(()=>_loader.LoadScene(SceneName.Gameplay).Forget());
+            _previousLevelButton.Init(() => UpdateLevel(_levelNumber - 1));
+            _nextLevelButton.Init(() => UpdateLevel(_levelNumber + 1));
         }
 
         private void OnDisable()

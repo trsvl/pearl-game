@@ -39,14 +39,12 @@ namespace Gameplay.Animations
                 .ToUniTask(cancellationToken: _cancellationToken);
         }
 
-        public UniTask MoveOnStart() //!!!
+        public void MoveOnStart()
         {
             const float duration = 0.15f;
 
             Move(_header, duration, initialOffset: (0f, 500f)).Forget();
             Move(_pauseButton, duration, initialOffset: (500f, 0f)).Forget();
-
-            return UniTask.CompletedTask;
         }
     }
 }

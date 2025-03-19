@@ -4,6 +4,7 @@ using Gameplay.UI.Popup;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils.UI.Buttons;
 using VContainer;
 using VContainer.Unity;
 
@@ -14,7 +15,7 @@ namespace Gameplay.UI
         [SerializeField] private TextMeshProUGUI _pearlsText;
         [SerializeField] private TextMeshProUGUI _shotsText;
 
-        [Space] [SerializeField] private Button _pauseButton;
+        [Space] [SerializeField] private BaseButton _pauseButton;
         [SerializeField] private Button _respawnBallButton;
 
         [Space] [SerializeField] private GamePopup _gamePopupPrefab;
@@ -27,8 +28,7 @@ namespace Gameplay.UI
                 .WithParameter("pearlsText", _pearlsText);
 
             builder.Register<ShotsData>(Lifetime.Scoped)
-                .WithParameter("shotsText", _shotsText)
-                .WithParameter(20); //!!!
+                .WithParameter("shotsText", _shotsText);
 
             builder.Register<PauseButton>(Lifetime.Scoped)
                 .WithParameter(_pauseButton);

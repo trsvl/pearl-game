@@ -1,5 +1,4 @@
-﻿using Bootstrap;
-using Gameplay.BallThrowing;
+﻿using Gameplay.BallThrowing;
 using Gameplay.SphereData;
 using Gameplay.UI.Header;
 using UnityEngine.UI;
@@ -7,15 +6,18 @@ using Utils.UI.Buttons;
 
 namespace Gameplay.UI.Buttons
 {
-    public class RespawnBallButton : BaseButton, IStartGame, IAfterDestroySphereSegment, IReleaseBall, IAfterReleaseBall
+    public class RespawnBallButton : IStartGame, IAfterDestroySphereSegment, IReleaseBall, IAfterReleaseBall,
+        IFinishGame, ILoseGame
     {
+        private readonly Button _button;
         private readonly SpheresDictionary _spheresDictionary;
         private readonly ShotsData _shotsData;
 
 
-        public RespawnBallButton(Button button, AudioController audioController, BallFactory ballFactory,
-            SpheresDictionary spheresDictionary, ShotsData shotsData) : base(button, audioController)
+        public RespawnBallButton(Button button, BallFactory ballFactory, SpheresDictionary spheresDictionary,
+            ShotsData shotsData)
         {
+            _button = button;
             _spheresDictionary = spheresDictionary;
             _shotsData = shotsData;
 
@@ -52,6 +54,16 @@ namespace Gameplay.UI.Buttons
         {
             _button.interactable = isEnabled;
             _button.gameObject.SetActive(isEnabled);
+        }
+
+        public void FinishGame()
+        {
+            _button.onClick.RemoveAllListeners();
+        }
+
+        public void LoseGame()
+        {
+            _button.onClick.RemoveAllListeners();
         }
     }
 }

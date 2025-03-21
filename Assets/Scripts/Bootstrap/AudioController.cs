@@ -21,7 +21,6 @@ namespace Bootstrap
         [Inject]
         public AudioController()
         {
-            print("Audio Controller initialized");
             Instance = this;
         }
 

@@ -40,9 +40,9 @@ namespace Gameplay.SphereData
         {
             ClearSpheres();
 
-            for (int i = 0; i < json.colorNames.Length; i++)
+            foreach (string t in json.colorNames)
             {
-                Color color = _allColors.GetColor(json.colorNames[i]);
+                Color color = _allColors.GetColor(t);
                 _spheresDictionary.AddColorToDictionary(color, json.spheres.Length);
             }
 

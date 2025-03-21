@@ -11,6 +11,7 @@ namespace Dev.LevelBuilder
         public BigSphereBuilder[] _bigSpheres;
 
         private SpheresData _spheresData;
+        private List<ColorName>[] _sphereColors;
 
 
         protected override void Update()
@@ -24,7 +25,7 @@ namespace Dev.LevelBuilder
 
             foreach (var sphere in _bigSpheres)
             {
-                foreach (var colorData in sphere.colorData)
+                foreach (var colorData in sphere.sphereData)
                 {
                     if (sphere._smallSphereCount == sphere.smallSphereCountRuntime &&
                         Mathf.Approximately(sphere._largeSphereRadius, sphere.largeSphereRadiusRuntime) &&
@@ -53,14 +54,19 @@ namespace Dev.LevelBuilder
 
             HashSet<string> colorNames = new();
 
+            _sphereColors = new List<ColorName>[_bigSpheres.Length];
+
             for (int i = 0; i < _bigSpheres.Length; i++)
             {
                 BigSphereData sphereData = _bigSpheres[i].GenerateBigSphereDataRuntime(_allColors);
                 spheresData.spheres[i] = sphereData;
 
-                foreach (var colorData in _bigSpheres[i].colorData)
+                _sphereColors[i] = new List<ColorName>();
+
+                foreach (var colorData in _bigSpheres[i].sphereData)
                 {
                     colorNames.Add(colorData.colorName.ToString());
+                    _sphereColors[i].Add(colorData.colorName);
                 }
             }
 
@@ -72,19 +78,14 @@ namespace Dev.LevelBuilder
 
         protected override void GenerateBigSphereData(SpheresData data)
         {
-            var colorNames = new ColorName[data.colorNames.Length];
-
-            for (int i = 0; i < data.colorNames.Length; i++)
-            {
-                colorNames[i] = Enum.Parse<ColorName>(data.colorNames[i]);
-            }
-
             _bigSpheres = new BigSphereBuilder[data.spheres.Length];
 
             for (int i = 0; i < _bigSpheres.Length; i++)
             {
-                var bigSphere = new BigSphereBuilder(data.spheres[i], colorNames);
+                var bigSphere = new BigSphereBuilder(data.spheres[i], data.colorNames);
+
                 _bigSpheres[i] = bigSphere;
+
                 GenerateSmallSpheres(data, bigSphere, i);
             }
         }

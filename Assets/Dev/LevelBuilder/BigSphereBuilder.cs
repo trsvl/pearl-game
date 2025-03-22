@@ -22,7 +22,7 @@ namespace Dev.LevelBuilder
         [Range(10, 500)] public int maxSpheresPerChunkRuntime;
         [Space] [Range(0f, 3f)] public float smallSphereScaleRuntime;
 
-        public List<ColorData> sphereData;
+        public List<ColorData> sphereColorData;
 
         public int _maxSpheresPerChunk { get; set; }
         public float _smallSphereScale { get; set; }
@@ -45,14 +45,14 @@ namespace Dev.LevelBuilder
             _smallSphereScale = SPHERE_SCALE;
             smallSphereScaleRuntime = SPHERE_SCALE;
 
-            GetSphereColors(data, colorNames);
+            GetSphereColors(data.colorIndexes, colorNames);
 
-            CreateSphereData();
+            CreateSphereColorData();
         }
 
-        private void GetSphereColors(BigSphereData data, string[] colorNames)
+        private void GetSphereColors(int[] colorIndexes, string[] colorNames)
         {
-            foreach (int colorIndex in data.colorIndexes)
+            foreach (int colorIndex in colorIndexes)
             {
                 ColorName colorName = Enum.Parse<ColorName>(colorNames[colorIndex]);
 
@@ -60,9 +60,9 @@ namespace Dev.LevelBuilder
             }
         }
 
-        private void CreateSphereData()
+        private void CreateSphereColorData()
         {
-            sphereData = new List<ColorData>();
+            sphereColorData = new List<ColorData>();
 
             foreach (ColorName colorName in colorCounts.Keys)
             {
@@ -72,21 +72,26 @@ namespace Dev.LevelBuilder
                     colorPercentageRuntime = colorCounts[colorName] / (float)_smallSphereCount,
                     colorName = colorName,
                 };
-                
-                sphereData.Add(newColorData);
+
+                sphereColorData.Add(newColorData);
             }
         }
 
-        public BigSphereData GenerateBigSphereDataRuntime(AllColors sphereColors)
+        public BigSphereData GenerateBigSphereDataRuntime(string[] colorNames)
         {
             _smallSphereCount = smallSphereCountRuntime;
             _largeSphereRadius = largeSphereRadiusRuntime;
             _maxSpheresPerChunk = maxSpheresPerChunkRuntime;
             _smallSphereScale = smallSphereScaleRuntime;
 
+            foreach (ColorData colorData in sphereColorData)
+            {
+                colorData.colorPercentage = colorData.colorPercentageRuntime;
+            }
+           
             GenerateLocalSpherePositions();
-            int[] colorIndexes = GenerateColorIndexes(sphereColors);
-            Debug.Log("index " + colorIndexes[0]);
+
+            int[] colorIndexes = GenerateColorIndexes(colorNames);
 
             BigSphereData bigSphereData = new BigSphereData()
             {
@@ -98,16 +103,17 @@ namespace Dev.LevelBuilder
             return bigSphereData;
         }
 
-        private int[] GenerateColorIndexes(AllColors allColors)
+        private int[] GenerateColorIndexes(string[] colorNames)
         {
-            Color[] sphereColors = sphereData.Select(mc => allColors.GetColor(mc.colorName.ToString()))
+            int[] colorIndexes = sphereColorData.Select(data => Array.IndexOf(colorNames, data.colorName.ToString()))
                 .ToArray();
-            float[] percentages = sphereData.Select(mc => mc.colorPercentage).ToArray();
+
+            float[] percentages = sphereColorData.Select(data => data.colorPercentage).ToArray();
 
             bool[] isAssigned = new bool[_smallSphereCount];
-            var colorIndexes = new int[_smallSphereCount];
+            var allIndexes = Enumerable.Repeat(-1, _smallSphereCount).ToArray();
 
-            for (int colorIndex = 0; colorIndex < sphereColors.Length; colorIndex++)
+            for (int colorIndex = 0; colorIndex < colorIndexes.Length; colorIndex++)
             {
                 float percentage = percentages[colorIndex];
                 int totalSpheres = Mathf.RoundToInt(_smallSphereCount * percentage);
@@ -123,7 +129,7 @@ namespace Dev.LevelBuilder
                     int seedIndex = FindFirstUnassigned(isAssigned);
                     if (seedIndex == -1) break;
 
-                    colorIndexes[seedIndex] = colorIndex;
+                    allIndexes[seedIndex] = colorIndexes[colorIndex];
                     isAssigned[seedIndex] = true;
                     remaining--;
                     chunkSize--;
@@ -136,14 +142,23 @@ namespace Dev.LevelBuilder
 
                     foreach (int idx in availableIndices)
                     {
-                        colorIndexes[idx] = colorIndex;
+                        allIndexes[idx] = colorIndexes[colorIndex];
                         isAssigned[idx] = true;
                         remaining--;
                     }
                 }
             }
 
-            return colorIndexes;
+            int fallbackColor = colorIndexes.Length > 0 ? colorIndexes[0] : 0;
+            for (int i = 0; i < _smallSphereCount; i++)
+            {
+                if (allIndexes[i] == -1)
+                {
+                    allIndexes[i] = fallbackColor;
+                }
+            }
+
+            return allIndexes;
         }
 
         private void GenerateLocalSpherePositions()

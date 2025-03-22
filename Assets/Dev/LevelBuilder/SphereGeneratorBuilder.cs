@@ -11,7 +11,7 @@ namespace Dev.LevelBuilder
         public BigSphereBuilder[] _bigSpheres;
 
         private SpheresData _spheresData;
-        private List<ColorName>[] _sphereColors;
+        private bool isRuntimeChanges;
 
 
         protected override void Update()
@@ -25,7 +25,7 @@ namespace Dev.LevelBuilder
 
             foreach (var sphere in _bigSpheres)
             {
-                foreach (var colorData in sphere.sphereData)
+                foreach (var colorData in sphere.sphereColorData)
                 {
                     if (sphere._smallSphereCount == sphere.smallSphereCountRuntime &&
                         Mathf.Approximately(sphere._largeSphereRadius, sphere.largeSphereRadiusRuntime) &&
@@ -33,8 +33,7 @@ namespace Dev.LevelBuilder
                         Mathf.Approximately(sphere._smallSphereScale, sphere.smallSphereScaleRuntime) &&
                         Mathf.Approximately(colorData.colorPercentage, colorData.colorPercentageRuntime)) continue;
 
-                    colorData.colorPercentage = colorData.colorPercentageRuntime;
-
+                    isRuntimeChanges = true;
                     var data = GenerateSpheresData(true);
                     LoadSpheres(data);
                 }
@@ -54,20 +53,18 @@ namespace Dev.LevelBuilder
 
             HashSet<string> colorNames = new();
 
-            _sphereColors = new List<ColorName>[_bigSpheres.Length];
+            foreach (BigSphereBuilder bigSphere in _bigSpheres)
+            {
+                foreach (var colorData in bigSphere.sphereColorData)
+                {
+                    colorNames.Add(colorData.colorName.ToString());
+                }
+            }
 
             for (int i = 0; i < _bigSpheres.Length; i++)
             {
-                BigSphereData sphereData = _bigSpheres[i].GenerateBigSphereDataRuntime(_allColors);
-                spheresData.spheres[i] = sphereData;
-
-                _sphereColors[i] = new List<ColorName>();
-
-                foreach (var colorData in _bigSpheres[i].sphereData)
-                {
-                    colorNames.Add(colorData.colorName.ToString());
-                    _sphereColors[i].Add(colorData.colorName);
-                }
+                BigSphereData bigSphereData = _bigSpheres[i].GenerateBigSphereDataRuntime(colorNames.ToArray());
+                spheresData.spheres[i] = bigSphereData;
             }
 
             spheresData.colorNames = colorNames.ToArray();
@@ -78,15 +75,27 @@ namespace Dev.LevelBuilder
 
         protected override void GenerateBigSphereData(SpheresData data)
         {
-            _bigSpheres = new BigSphereBuilder[data.spheres.Length];
-
-            for (int i = 0; i < _bigSpheres.Length; i++)
+            if (!isRuntimeChanges)
             {
-                var bigSphere = new BigSphereBuilder(data.spheres[i], data.colorNames);
+                _bigSpheres = new BigSphereBuilder[data.spheres.Length];
 
-                _bigSpheres[i] = bigSphere;
+                for (int i = 0; i < _bigSpheres.Length; i++)
+                {
+                    var bigSphere = new BigSphereBuilder(data.spheres[i], data.colorNames);
 
-                GenerateSmallSpheres(data, bigSphere, i);
+                    _bigSpheres[i] = bigSphere;
+
+                    GenerateSmallSpheres(data, bigSphere, i);
+                }
+            }
+            else
+            {
+                isRuntimeChanges = false;
+
+                for (int i = 0; i < _bigSpheres.Length; i++)
+                {
+                    GenerateSmallSpheres(data, _bigSpheres[i], i);
+                }
             }
         }
 
